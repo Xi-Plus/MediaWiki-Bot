@@ -1,0 +1,3 @@
+[submodule "function/cURL-HTTP-function"]
+	path = function/cURL-HTTP-function
+	url = https://github.com/Xi-Plus/cURL-HTTP-function.git
