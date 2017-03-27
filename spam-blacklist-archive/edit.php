@@ -33,6 +33,8 @@ function TimediffFormat($time) {
 	return round($time/(60*60*24))."天";
 }
 
+echo "現在時間: ".date("Y-m-d H:i:s")."\n";
+
 login();
 $edittoken = edittoken();
 for ($i=$C["fail_retry"]; $i > 0; $i--) {
@@ -63,6 +65,7 @@ for ($i=$C["fail_retry"]; $i > 0; $i--) {
 	$archive_count = array("all" => 0);
 	unset($text[0]);
 	echo "start split\n";
+	echo "存檔 ".date("Y-m-d H:i:s", time()-$C["archive_ago"])." 以前\n";
 	foreach ($text as $temp) {
 		if (preg_match("/(==.+?==)/", $temp, $m)) {
 			echo "title is ".$m[1]."\n";
@@ -80,7 +83,7 @@ for ($i=$C["fail_retry"]; $i > 0; $i--) {
 		echo "firsttime = ".date("Y/m/d H:i:s", $firsttime)."\n";
 		echo "lasttime = ".date("Y/m/d H:i:s", $lasttime)."\n";
 		if (time()-$lasttime > $C["archive_ago"]) {
-			$date = date("Y年m月d日", $firsttime);
+			$date = date("Y年n月j日", $firsttime);
 			if (!isset($newpagetext[$date])) {
 				$newpagetext[$date] = "";
 				$archive_count[$date] = 0;
@@ -103,7 +106,7 @@ for ($i=$C["fail_retry"]; $i > 0; $i--) {
 	echo "start edit\n";
 
 	echo "edit current page\n";
-	$summary = "[[Wikipedia:机器人/申请/A2093064-bot|機器人測試]]：存檔超過".TimediffFormat($C["archive_ago"])."無變更的章節，共".$archive_count["all"]."的章節存檔至".count($newpagetext)."個頁面";
+	$summary = "[[Wikipedia:机器人/申请/A2093064-bot|機器人測試]]：存檔超過".TimediffFormat($C["archive_ago"])."無變更的章節，共".$archive_count["all"]."個章節存檔至".count($newpagetext)."個頁面";
 	$post = array(
 		"action" => "edit",
 		"format" => "json",
@@ -148,9 +151,9 @@ foreach ($newpagetext as $date => $newtext) {
 	if (!isset($pages["missing"])) {
 		$oldtext = $pages["revisions"][0]["*"];
 		$basetimestamp2 = $pages["revisions"][0]["timestamp"];
-		echo "exist\n";
+		echo $page." exist\n";
 	} else {
-		"not exist\n";
+		echo $page." not exist\n";
 	}
 
 	$summary = "[[Wikipedia:机器人/申请/A2093064-bot|機器人測試]]：存檔自[[".$C["from_page"]."]]共".$archive_count[$date]."個章節";
