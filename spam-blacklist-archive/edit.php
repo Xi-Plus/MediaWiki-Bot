@@ -33,10 +33,25 @@ function TimediffFormat($time) {
 	return round($time/(60*60*24))."天";
 }
 
-echo "現在時間: ".date("Y-m-d H:i:s")."\n";
+echo "The time now is ".date("Y-m-d H:i:s")." (UTC)\n";
 
 login();
 $edittoken = edittoken();
+
+$retention_time = file_get_contents($C["retention_time"]);
+if ($retention_time === false) {
+	$retention_time = $C["retention_time_default"];
+	echo "Warning: fetch retention_time fail, use default value\n";
+}
+echo "archive before ".$retention_time." ago (".date("Y-m-d H:i:s", time()-$retention_time).")\n";
+
+$retention_bytes = file_get_contents($C["retention_bytes"]);
+if ($retention_bytes === false) {
+	$retention_bytes = $C["retention_bytes_default"];
+	echo "Warning: fetch retention_bytes fail, use default value\n";
+}
+echo "archive more than ".$retention_bytes." bytes\n";
+
 for ($i=$C["fail_retry"]; $i > 0; $i--) {
 	$starttimestamp = time();
 	$res = cURL($C["wikiapi"]."?".http_build_query(array(
@@ -53,7 +68,9 @@ for ($i=$C["fail_retry"]; $i > 0; $i--) {
 	$pages = current($res["query"]["pages"]);
 	$text = $pages["revisions"][0]["*"];
 	$basetimestamp = $pages["revisions"][0]["timestamp"];
-	echo "get now page\n";
+	echo "get main page\n";
+	$pagesize = strlen($text);
+	echo "page size: ".$pagesize."\n";
 
 	$hash = md5(uniqid(rand(), true));
 	$text = preg_replace("/^( *==.+?== *)$/m", $hash."$1", $text);
@@ -65,12 +82,11 @@ for ($i=$C["fail_retry"]; $i > 0; $i--) {
 	$archive_count = array("all" => 0);
 	unset($text[0]);
 	echo "start split\n";
-	echo "存檔 ".date("Y-m-d H:i:s", time()-$C["archive_ago"])." 以前\n";
 	foreach ($text as $temp) {
 		if (preg_match("/(==.+?==)/", $temp, $m)) {
-			echo "title is ".$m[1]."\n";
+			echo $m[1]."\t";
 		} else {
-			echo "title get fail\n";
+			echo "title get fail\t";
 		}
 		preg_match_all("/\d{4}年\d{1,2}月\d{1,2}日 \(.{3}\) \d{2}\:\d{2} \(UTC\)/", $temp, $m);
 		$firsttime = time();
@@ -80,9 +96,8 @@ for ($i=$C["fail_retry"]; $i > 0; $i--) {
 			if ($time < $firsttime) $firsttime = $time;
 			if ($time > $lasttime) $lasttime = $time;
 		}
-		echo "firsttime = ".date("Y/m/d H:i:s", $firsttime)."\n";
-		echo "lasttime = ".date("Y/m/d H:i:s", $lasttime)."\n";
-		if (time()-$lasttime > $C["archive_ago"]) {
+		echo "time=".date("Y/m/d H:i:s", $firsttime)."-".date("Y/m/d H:i:s", $lasttime)."\tsize=".strlen($temp)."\n";
+		if (time()-$lasttime > $retention_time || $pagesize > $retention_bytes) {
 			$date = date("Y年n月j日", $firsttime);
 			if (!isset($newpagetext[$date])) {
 				$newpagetext[$date] = "";
@@ -91,11 +106,13 @@ for ($i=$C["fail_retry"]; $i > 0; $i--) {
 			$newpagetext[$date] .= $temp;
 			$archive_count[$date]++;
 			$archive_count["all"]++;
-			echo "archive to ".$date."\n";
+			$pagesize -= strlen($temp);
+			echo "archive to ".$date."\t";
 		} else {
 			$oldpagetext.=$temp;
-			echo "not archive\n";
+			echo "not archive\t";
 		}
+		echo "total pagesize remain ".$pagesize;
 		echo "\n";
 	}
 
@@ -105,8 +122,8 @@ for ($i=$C["fail_retry"]; $i > 0; $i--) {
 
 	echo "start edit\n";
 
-	echo "edit current page\n";
-	$summary = "[[Wikipedia:机器人/申请/A2093064-bot|機器人測試]]：存檔超過".TimediffFormat($C["archive_ago"])."無變更的章節，共".$archive_count["all"]."個章節存檔至".count($newpagetext)."個頁面";
+	echo "edit main page\n";
+	$summary = $C["summary_prefix"]."：存檔".$archive_count["all"]."章節至".count($newpagetext)."頁面 (".$C["summary_config_page"]."：".TimediffFormat($retention_time)."/".$retention_bytes."位元組)";
 	$post = array(
 		"action" => "edit",
 		"format" => "json",
@@ -156,7 +173,7 @@ foreach ($newpagetext as $date => $newtext) {
 		echo $page." not exist\n";
 	}
 
-	$summary = "[[Wikipedia:机器人/申请/A2093064-bot|機器人測試]]：存檔自[[".$C["from_page"]."]]共".$archive_count[$date]."個章節";
+	$summary = $C["summary_prefix"]."：存檔自[[".$C["from_page"]."]]共".$archive_count[$date]."個章節";
 	$post = array(
 		"action" => "edit",
 		"format" => "json",
@@ -190,11 +207,3 @@ foreach ($newpagetext as $date => $newtext) {
 
 $spendtime = (microtime(true)-$starttime);
 echo "spend ".$spendtime." s.\n";
-
-// $post=array(
-// 	"appendtext"=>"\n*已存檔".count($newpagetext)."天，花了".$spendtime."秒。--~~~~",
-// 	"token"=>$token
-// );
-// $res = cURL($C["wikiapi"]."?action=edit&format=json&title=".$C["log_page"]."&summary=存檔log",$post,false,$C["cookiefile"]);
-// $res=json_decode($res->html);
-// echo "edit log\n";
