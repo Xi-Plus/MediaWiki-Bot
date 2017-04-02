@@ -64,12 +64,13 @@ for ($i=$C["fail_retry"]; $i > 0; $i--) {
 			echo "tag before\t";
 			$nochange = false;
 		}
-		$pagetext.=$temp;
+		$pagetext .= $temp;
 		echo "\n";
 	}
 
 	if ($nochange) {
-		exit("no change\n");
+		$pagetext .= "\n===".$month."月".$date."日===\n";
+		echo "tag at the end\n";
 	}
 
 	echo "start edit\n";
