@@ -1,0 +1,6 @@
+Options All -Indexes
+
+RewriteEngine On
+RewriteRule ^config/ - [F,L]
+RewriteRule ^function/ - [F,L]
+RewriteRule ^tmp/ - [F,L]
