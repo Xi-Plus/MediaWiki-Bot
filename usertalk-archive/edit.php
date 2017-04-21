@@ -114,6 +114,7 @@ for ($i=$C["fail_retry"]; $i > 0; $i--) {
 		"summary" => $summary,
 		"text" => $oldpagetext,
 		"token" => $edittoken,
+		"minor" => "",
 		"starttimestamp" => $starttimestamp,
 		"basetimestamp" => $basetimestamp
 	);
