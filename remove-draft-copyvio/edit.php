@@ -17,7 +17,6 @@ echo "The time now is ".date("Y-m-d H:i:s")." (UTC)\n";
 login();
 $edittoken = edittoken();
 
-$starttimestamp = time();
 $res = cURL($C["wikiapi"]."?".http_build_query(array(
 	"action" => "query",
 	"format" => "json",
@@ -78,7 +77,6 @@ foreach ($pagelist as $page) {
 			break;
 		}
 	}
-	break;
 }
 
 $spendtime = (microtime(true)-$starttime);
