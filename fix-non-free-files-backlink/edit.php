@@ -17,6 +17,7 @@ echo "The time now is ".date("Y-m-d H:i:s")." (UTC)\n";
 login();
 $edittoken = edittoken();
 
+$count = 0;
 foreach ($C["category"] as $category) {
 	$res = cURL($C["wikiapi"]."?".http_build_query(array(
 		"action" => "query",
@@ -100,6 +101,10 @@ foreach ($C["category"] as $category) {
 			} else {
 				break;
 			}
+		}
+		$count ++;
+		if ($count >= $C["max_edits_one_time"]) {
+			break 2;
 		}
 	}
 }

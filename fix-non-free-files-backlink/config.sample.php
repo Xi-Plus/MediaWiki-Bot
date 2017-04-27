@@ -9,6 +9,7 @@ $C["category"] = array(
 	"Category:缺少回链的非自由图像"
 );
 
+$C["max_edits_one_time"] = 3;
 $C["fail_retry"] = 5;
 
 $C["summary_prefix"] = "[[User:A2093064-bot/task/8|機器人]]";
