@@ -45,6 +45,11 @@ foreach ($C["category"] as $category) {
 		}
 		$res = json_decode($res, true);
 		$pages = current($res["query"]["pages"]);
+		if (!isset($pages["fileusage"])) {
+			echo "no use\n";
+			WriteLog($page["title"]." no use");
+			continue;
+		}
 		if (count($pages["fileusage"]) > 1) {
 			echo "use more than 1\n";
 			continue;
@@ -68,12 +73,12 @@ foreach ($C["category"] as $category) {
 			$text = $pages["revisions"][0]["*"];
 			$basetimestamp = $pages["revisions"][0]["timestamp"];
 
-			if (preg_match_all("/^ *\| *Article *= *.+$/mi", $text, $m) !== 1) {
+			if (preg_match_all("/\| *Article *= *.+$/mi", $text, $m) !== 1) {
 				echo "not match 1 time\n";
-				continue;
+				break;
 			}
 
-			$text = preg_replace("/^( *\| *Article *=).+$/mi", '${1} '.$article, $text);
+			$text = preg_replace("/(\| *Article *=).+$/mi", '${1} '.$article, $text);
 
 			$summary = $C["summary_prefix"]."，修正[[:".$category."]]";
 			$post = array(
@@ -99,12 +104,12 @@ foreach ($C["category"] as $category) {
 					echo "retry\n";
 				}
 			} else {
+				$count ++;
+				if ($count >= $C["max_edits_one_time"]) {
+					break 3;
+				}
 				break;
 			}
-		}
-		$count ++;
-		if ($count >= $C["max_edits_one_time"]) {
-			break 2;
 		}
 	}
 }
