@@ -1,5 +1,12 @@
 <?php
 
+$C["DBhost"] = 'localhost';
+$C['DBname'] = 'DBname';
+$C['DBuser'] = 'DBuser';
+$C['DBpass'] = 'DBpass';
+$C['DBTBprefix'] = '';
+$G["db"] = new PDO ('mysql:host='.$C["DBhost"].';dbname='.$C["DBname"].';charset=utf8', $C["DBuser"], $C["DBpass"]);
+
 $C["wikiapi"] = "https://test2.wikipedia.org/w/api.php";
 $C["user"] = "";
 $C["pass"] = "";
