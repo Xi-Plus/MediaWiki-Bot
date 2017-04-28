@@ -11,6 +11,7 @@ $starttime = microtime(true);
 require(__DIR__."/../function/curl.php");
 require(__DIR__."/../function/login.php");
 require(__DIR__."/../function/edittoken.php");
+require(__DIR__."/../function/log.php");
 
 echo "The time now is ".date("Y-m-d H:i:s")." (UTC)\n";
 
@@ -52,9 +53,11 @@ foreach ($C["category"] as $category) {
 		}
 		if (count($pages["fileusage"]) > 1) {
 			echo "use more than 1\n";
+			WriteLog($page["title"]." be used ".count($pages["fileusage"])." times");
 			continue;
 		}
 		$article = $pages["fileusage"][0]["title"];
+		WriteLog("fix ".$page["title"]." to ".$article);
 		echo $article."\n";
 		for ($i=$C["fail_retry"]; $i > 0; $i--) {
 			$starttimestamp = time();
@@ -75,6 +78,7 @@ foreach ($C["category"] as $category) {
 
 			if (preg_match_all("/\| *Article *= *.+$/mi", $text, $m) !== 1) {
 				echo "not match 1 time\n";
+				WriteLog($page["title"]." not match 1 time");
 				break;
 			}
 
