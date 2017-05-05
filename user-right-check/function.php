@@ -55,12 +55,13 @@ function lastlog($username) {
 }
 
 function userright($username) {
+	global $C;
 	$res = cURL($C["wikiapi"]."?".http_build_query(array(
 		"action" => "query",
 		"format" => "json",
 		"list" => "users",
 		"usprop" => "groups",
-		"ususers" => $bot["name"]
+		"ususers" => $username
 	)));
 	if ($res === false) {
 		exit("fetch page fail\n");
