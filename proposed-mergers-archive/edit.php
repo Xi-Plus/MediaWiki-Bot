@@ -12,10 +12,31 @@ require(__DIR__."/../function/curl.php");
 require(__DIR__."/../function/login.php");
 require(__DIR__."/../function/edittoken.php");
 
+function converttime($chitime){
+	if (preg_match("/(\d{4})年(\d{1,2})月(\d{1,2})日 \(.{3}\) (\d{2})\:(\d{2}) \(UTC\)/", $chitime, $m)) {
+		return strtotime($m[1]."/".$m[2]."/".$m[3]." ".$m[4].":".$m[5]);
+	} else {
+		exit("converttime fail\n");
+	}
+}
+function TimediffFormat($time) {
+	if ($time<60) return $time."秒";
+	if ($time<60*50) return round($time/60)."分";
+	if ($time<60*60*23.5) return round($time/(60*60))."小時";
+	return round($time/(60*60*24))."天";
+}
+
 echo "The time now is ".date("Y-m-d H:i:s")." (UTC)\n";
 
 login();
 $edittoken = edittoken();
+
+$retention_time = file_get_contents($C["retention_time"]);
+if ($retention_time === false) {
+	$retention_time = $C["retention_time_default"];
+	echo "Warning: fetch retention_time fail, use default value\n";
+}
+echo "archive before ".$retention_time." ago (".date("Y-m-d H:i:s", time()-$retention_time).")\n";
 
 for ($i=$C["fail_retry"]; $i > 0; $i--) {
 	$starttimestamp = time();
@@ -72,18 +93,29 @@ for ($i=$C["fail_retry"]; $i > 0; $i--) {
 		$count = 0;
 		foreach ($temp as $temp2) {
 			if (preg_match("/{{(完成|Done|Finish|未完成|Undone|Not Done|Notdone)}}/i", $temp2)) {
-				echo "archive ".$temp2."\n";
-				if (!isset($newpagetext[$year])) {
-					$newpagetext[$year] = array();
-					$archive_count[$year] = 0;
+				preg_match_all("/\d{4}年\d{1,2}月\d{1,2}日 \(.{3}\) \d{2}\:\d{2} \(UTC\)/", $temp2, $m);
+				$lasttime = 0;
+				foreach ($m[0] as $timestr) {
+					$time = converttime($timestr);
+					if ($time > $lasttime) $lasttime = $time;
 				}
-				if (!isset($newpagetext[$year][$month])) {
-					$newpagetext[$year][$month] = array();
+				echo "time=".date("Y/m/d H:i:s", $lasttime)."\n";
+				if (time()-$lasttime > $retention_time) {
+					echo "archive ".$temp2."\n";
+					if (!isset($newpagetext[$year])) {
+						$newpagetext[$year] = array();
+						$archive_count[$year] = 0;
+					}
+					if (!isset($newpagetext[$year][$month])) {
+						$newpagetext[$year][$month] = array();
+					}
+					$newpagetext[$year][$month] []= $temp2;
+					$archive_count[$year]++;
+					$archive_count["all"]++;
+					$count++;
+				} else {
+					$oldpagetexttemp .= $temp2;
 				}
-				$newpagetext[$year][$month] []= $temp2;
-				$archive_count[$year]++;
-				$archive_count["all"]++;
-				$count++;
 			} else {
 				$oldpagetexttemp .= $temp2;
 			}
@@ -103,7 +135,7 @@ for ($i=$C["fail_retry"]; $i > 0; $i--) {
 	echo "start edit\n";
 
 	echo "edit main page\n";
-	$summary = $C["summary_prefix"]."：存檔".$archive_count["all"]."請求至".count($newpagetext)."頁面";
+	$summary = $C["summary_prefix"]."：存檔".$archive_count["all"]."請求至".count($newpagetext)."頁面 (".$C["summary_config_page"]."：".TimediffFormat($retention_time).")";
 	$post = array(
 		"action" => "edit",
 		"format" => "json",
