@@ -10,7 +10,7 @@ $C["to_page_prefix"] = "User_talk:A2093064/存檔";
 $C["retention_time"] = "https://zh.wikipedia.org/wiki/User:A2093064-bot/task/2/config/retention_time?action=raw";
 $C["retention_time_default"] = 604800;
 $C["to_page_number"] = "https://zh.wikipedia.org/wiki/User:A2093064-bot/task/2/config/to_page_number?action=raw";
-$C["to_page_number_default"] = 1;
+$C["to_page_number_default"] = "";
 
 $C["fail_retry"] = 5;
 
