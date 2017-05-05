@@ -10,7 +10,7 @@ date_default_timezone_set('UTC');
 @include(__DIR__."/config.php");
 require(__DIR__."/../function/log.php");
 
-$timelimit = date("Y-m-d H:i:s", mktime(date("H"), date("i"), date("s"), date("n"), date("j"), date("Y")-2));
+$timelimit = date("Y-m-d H:i:s", strtotime("-2 years"));
 echo "顯示最後動作 < ".$timelimit."<br>";
 
 if (isset($_POST["owner"])) {
@@ -35,6 +35,7 @@ $sth->bindValue(":userlastedit", $timelimit);
 $sth->bindValue(":userlastlog", $timelimit);
 $sth->execute();
 $row = $sth->fetchAll(PDO::FETCH_ASSOC);
+echo "共有".count($row)."筆<br>";
 $count = 1;
 ?>
 <table>
@@ -43,6 +44,7 @@ $count = 1;
 	<th>bot</th>
 	<th>bot last edit</th>
 	<th>bot last log</th>
+	<th>bot rights</th>
 	<th>owner</th>
 	<th>owner last edit</th>
 	<th>owner last log</th>
@@ -54,6 +56,7 @@ foreach ($row as $bot) {
 		<td><a href="https://zh.wikipedia.org/wiki/User:<?=$bot["botname"]?>" target="_blank"><?=$bot["botname"]?></a></td>
 		<td><a href="https://zh.wikipedia.org/wiki/Special:用户贡献/<?=$bot["botname"]?>" target="_blank"><?=$bot["botlastedit"]?></a></td>
 		<td><a href="https://zh.wikipedia.org/wiki/Special:日志/<?=$bot["botname"]?>" target="_blank"><?=$bot["botlastlog"]?></a></td>
+		<td><a href="https://zh.wikipedia.org/wiki/Special:用户权限/<?=$bot["botname"]?>" target="_blank"><?=$bot["botrights"]?></a></td>
 		<td><a href="https://zh.wikipedia.org/wiki/User:<?=$bot["username"]?>" target="_blank"><?=$bot["username"]?></a></td>
 		<td>
 			<form method="post" style="margin: 0px;">
