@@ -92,7 +92,6 @@ foreach ($C["category"] as $category) {
 				"summary" => $summary,
 				"text" => $text,
 				"token" => $edittoken,
-				"minor" => "",
 				"starttimestamp" => $starttimestamp,
 				"basetimestamp" => $basetimestamp
 			);
