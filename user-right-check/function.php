@@ -39,7 +39,7 @@ function lastlog($username) {
 	$res = cURL($C["wikiapi"]."?".http_build_query(array(
 		"action" => "query",
 		"format" => "json",
-		"list" => "logevents",
+		"list" => "type|logevents",
 		"leprop" => "timestamp",
 		"leuser" => $username,
 		"lelimit" => "1"
@@ -48,6 +48,9 @@ function lastlog($username) {
 		exit("fetch page fail\n");
 	}
 	$res = json_decode($res, true);
+	if (isset($res["query"]["logevents"][0]["type"]) && $res["query"]["logevents"][0]["type"] == "newusers") {
+		return "0000-00-00 00:00:00";
+	}
 	if (isset($res["query"]["logevents"][0]["timestamp"])) {
 		return date("Y-m-d H:i:s", strtotime($res["query"]["logevents"][0]["timestamp"]));
 	}

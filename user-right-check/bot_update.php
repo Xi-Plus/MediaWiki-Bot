@@ -62,7 +62,7 @@ foreach ($botlist as $bot) {
 		$sth->bindValue(":userlastedit", $userlastedit);
 		$sth->bindValue(":userlastlog", $userlastlog);
 		$res = $sth->execute();
-		echo "update bot=".$bot["botname"]." owner lastedit/log\n";
+		echo "update bot=".$bot["botname"]." owner lastedit=".$userlastedit." log=".$userlastlog."\n";
 		WriteLog("update bot=".$bot["botname"]." owner lastedit/log");
 	}
 }
