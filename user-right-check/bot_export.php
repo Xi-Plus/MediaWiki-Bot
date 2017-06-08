@@ -46,7 +46,7 @@ if ($lastaction == "0000-00-00 00:00:00") {
 	echo date("Y年n月j日", $time)." (".$C["day"][date("w", $time)].") ".date("H:i", $time)." (UTC)";
 }
 ?><br>
-*發出通知時間：<br>
+*發出通知時間：~~~~~以前<br>
 *提交的維基人及時間：~~~~<br><br>
 <?php
 }
