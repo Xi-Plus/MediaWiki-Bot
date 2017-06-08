@@ -25,6 +25,9 @@ $count = 1;
 foreach ($row as $user) {
 	$user["rights"] = explode("|", $user["rights"]);
 	$user["rights"] = array_diff($user["rights"], $C["right-whitelist"]);
+	if (count($user["rights"]) == 0) {
+		continue;
+	}
 	?>
 *{{User|<?=$user["name"]?>}}<br>
 *:{{status2|新提案}}<br>
