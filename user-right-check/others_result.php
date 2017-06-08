@@ -33,6 +33,9 @@ $count = 1;
 </tr>
 <?php
 foreach ($row as $user) {
+	if (count(array_diff(explode("|", $user["rights"]), $C["right-whitelist"])) == 0) {
+		continue;
+	}
 	?><tr>
 		<td><?php echo ($count++); ?></td>
 		<td><a href="https://zh.wikipedia.org/wiki/User:<?=$user["name"]?>" target="_blank"><?=$user["name"]?></a></td>
