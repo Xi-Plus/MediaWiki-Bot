@@ -19,8 +19,12 @@ echo "The time now is ".date("Y-m-d H:i:s")." (UTC)\n";
 login();
 $edittoken = edittoken();
 
-// update userid
-$sth = $G["db"]->prepare("SELECT * FROM `{$C['DBTBprefix']}userlist` WHERE `lastusergetrights` = '0000-00-00 00:00:00'");
+$timelimit = date("Y-m-d H:i:s", strtotime("-6 months"));
+
+$sth = $G["db"]->prepare("SELECT * FROM `{$C['DBTBprefix']}userlist` WHERE `lastedit` < :lastedit AND  `lastlog` < :lastlog AND `lastusergetrights` < :lastusergetrights");
+$sth->bindValue(":lastedit", $timelimit);
+$sth->bindValue(":lastlog", $timelimit);
+$sth->bindValue(":lastusergetrights", $timelimit);
 $sth->execute();
 $row = $sth->fetchAll(PDO::FETCH_ASSOC);
 $userlist = array();
@@ -31,14 +35,21 @@ foreach ($row as $user) {
 
 foreach ($userlist as $user) {
 	echo $user["name"]."\n";
+	$lastedit = lastedit($user["name"]);
+	$lastlog = lastlog($user["name"]);
 	$lastusergetrights = lastusergetrights($user["name"]);
-	$sth = $G["db"]->prepare("UPDATE `{$C['DBTBprefix']}userlist` SET `lastusergetrights` = :lastusergetrights WHERE `userid` = :userid");
+	if ($lastedit == $user["lastedit"] && $lastlog == $user["lastlog"] && $lastusergetrights == $user["lastusergetrights"]) {
+		echo "no update\n";
+		continue;
+	}
+	$sth = $G["db"]->prepare("UPDATE `{$C['DBTBprefix']}userlist` SET `lastedit` = :lastedit, `lastlog` = :lastlog, `lastusergetrights` = :lastusergetrights WHERE `userid` = :userid");
 	$sth->bindValue(":userid", $user["userid"]);
+	$sth->bindValue(":lastedit", $lastedit);
+	$sth->bindValue(":lastlog", $lastlog);
 	$sth->bindValue(":lastusergetrights", $lastusergetrights);
 	$res = $sth->execute();
-	echo "update user=".$user["name"]." lastusergetrights=".$lastusergetrights."\n";
-	WriteLog("update user=".$user["name"]." lastusergetrights=".$lastusergetrights);
-	echo "\n";
+	echo "update user=".$user["name"]." lastedit=".$lastedit." lastlog=".$lastlog." lastusergetrights=".$lastusergetrights."\n";
+	WriteLog("update user=".$user["name"]." lastedit=".$lastedit." lastlog=".$lastlog." lastusergetrights=".$lastusergetrights);
 }
 
 $spendtime = (microtime(true)-$starttime);
