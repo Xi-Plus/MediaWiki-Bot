@@ -10,8 +10,8 @@ date_default_timezone_set('UTC');
 @include(__DIR__."/config.php");
 require(__DIR__."/../function/log.php");
 
-$timelimit = date("Y-m-d H:i:s", strtotime("-6 months"));
-echo "顯示最後動作 < ".$timelimit."<br>";
+$timelimit = date("Y-m-d H:i:s", strtotime($_GET["limit"] ?? "-6 months"));
+echo "顯示最後動作 < ".$timelimit." (".($_GET["limit"] ?? "-6 months").")<br>";
 
 $sth = $G["db"]->prepare("SELECT * FROM `{$C['DBTBprefix']}userlist` WHERE `lastedit` < :lastedit AND `lastlog` < :lastlog AND `lastusergetrights` < :lastusergetrights ORDER BY `lastedit` ASC, `lastlog` ASC");
 $sth->bindValue(":lastedit", $timelimit);
