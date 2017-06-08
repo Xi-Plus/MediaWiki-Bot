@@ -13,7 +13,7 @@ require(__DIR__."/../function/log.php");
 $timelimit = date("Y-m-d H:i:s", strtotime("-2 years"));
 echo "顯示最後動作 < ".$timelimit."<br>";
 
-$sth = $G["db"]->prepare("SELECT * FROM `{$C['DBTBprefix']}botlist` WHERE `botlastedit` < :botlastedit AND `botlastlog` < :botlastlog AND `userlastedit` < :userlastedit AND `userlastlog` < :userlastlog ORDER BY `botlastedit` ASC, `botlastlog` ASC, `userlastedit` ASC, `userlastlog` ASC");
+$sth = $G["db"]->prepare("SELECT * FROM `{$C['DBTBprefix']}botlist` WHERE `botlastedit` < :botlastedit AND `botlastlog` < :botlastlog AND `userlastedit` < :userlastedit AND `userlastlog` < :userlastlog AND `reported` = 0 ORDER BY `botlastedit` ASC, `botlastlog` ASC, `userlastedit` ASC, `userlastlog` ASC");
 $sth->bindValue(":botlastedit", $timelimit);
 $sth->bindValue(":botlastlog", $timelimit);
 $sth->bindValue(":userlastedit", $timelimit);

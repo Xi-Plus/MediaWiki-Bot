@@ -28,7 +28,16 @@ if (isset($_POST["owner"])) {
 	}
 }
 
-$sth = $G["db"]->prepare("SELECT * FROM `{$C['DBTBprefix']}botlist` WHERE `botlastedit` < :botlastedit AND `botlastlog` < :botlastlog AND `userlastedit` < :userlastedit AND `userlastlog` < :userlastlog ORDER BY `botlastedit` ASC, `botlastlog` ASC, `userlastedit` ASC, `userlastlog` ASC");
+if (isset($_POST["reported"])) {
+	$sth = $G["db"]->prepare("UPDATE `{$C['DBTBprefix']}botlist` SET `reported` = 1 WHERE `botname` = :botname");
+	$sth->bindValue(":botname", $_POST["bot"]);
+	$sth->execute();
+	WriteLog("update user ".$_POST["bot"]." reported");
+	echo "成功將".$_POST["bot"]."標記為已報告<br>";
+}
+
+
+$sth = $G["db"]->prepare("SELECT * FROM `{$C['DBTBprefix']}botlist` WHERE `botlastedit` < :botlastedit AND `botlastlog` < :botlastlog AND `userlastedit` < :userlastedit AND `userlastlog` < :userlastlog AND `reported` = 0 ORDER BY `botlastedit` ASC, `botlastlog` ASC, `userlastedit` ASC, `userlastlog` ASC");
 $sth->bindValue(":botlastedit", $timelimit);
 $sth->bindValue(":botlastlog", $timelimit);
 $sth->bindValue(":userlastedit", $timelimit);
@@ -48,6 +57,7 @@ $count = 1;
 	<th>owner</th>
 	<th>owner last edit</th>
 	<th>owner last log</th>
+	<th>reported</th>
 </tr>
 <?php
 foreach ($row as $bot) {
@@ -67,6 +77,12 @@ foreach ($row as $bot) {
 			</form>
 		</td>
 		<td><a href="https://zh.wikipedia.org/wiki/Special:日志/<?=$bot["username"]?>" target="_blank"><?=$bot["userlastlog"]?></a></td>
+		<td>
+			<form method="post" style="margin: 0px;">
+				<input type="hidden" name="bot" value="<?=$bot["botname"]?>">
+				<input type="submit" value="reported" name="reported">
+			</form>
+		</td>
 	</tr><?php
 }
 ?>
