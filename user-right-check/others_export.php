@@ -46,10 +46,10 @@ if ($user["lastlog"] == "0000-00-00 00:00:00") {
 	$time = strtotime($user["lastlog"]);
 	echo "最後日誌動作在".date("Y年n月j日", $time)." (".$C["day"][date("w", $time)].") ".date("H:i", $time)." (UTC)";
 }
-?>]]、[https://zh.wikipedia.org/wiki/Special:日志/rights?page=User:<?=$user["name"]?> <?php
+?>]]、[[Special:用户权限/<?=$user["name"]?>|<?php
 $time = strtotime($user["lastusergetrights"]);
 echo "最後授權在".date("Y年n月j日", $time)." (".$C["day"][date("w", $time)].") ".date("H:i", $time)." (UTC)";
-?>]、[[Special:用户权限/<?=$user["name"]?>|檢查用戶權限]]<br>
+?>]]<br>
 *:~~~~<br><br>
 <?php
 }
