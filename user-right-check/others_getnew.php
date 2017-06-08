@@ -68,7 +68,16 @@ foreach ($allusers as $user) {
 		$res = $sth->execute();
 		WriteLog("new user: ".$user["name"]." ".$user["userid"]);
 		echo "\n";
+	} else {
+		unset($userlist[$user["userid"]]);
 	}
+}
+foreach ($userlist as $user) {
+	$sth = $G["db"]->prepare("DELETE FROM `{$C['DBTBprefix']}userlist` WHERE `userid` = :userid");
+	$sth->bindValue(":userid", $user["userid"]);
+	$res = $sth->execute();
+	echo "remove ".$user["name"]."\n";
+	WriteLog("remove user: ".$user["name"]." ".$user["userid"]);
 }
 
 $spendtime = (microtime(true)-$starttime);

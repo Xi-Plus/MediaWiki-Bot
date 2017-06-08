@@ -104,7 +104,16 @@ foreach ($allusers as $bot) {
 		$sth->bindValue(":userlastlog", $userlastlog);
 		$res = $sth->execute();
 		WriteLog("new bot: ".$bot["name"]." ".$bot["userid"]);
+	} else {
+		unset($botlist[$bot["userid"]]);
 	}
+}
+foreach ($botlist as $bot) {
+	$sth = $G["db"]->prepare("DELETE FROM `{$C['DBTBprefix']}botlist` WHERE `botid` = :botid");
+	$sth->bindValue(":botid", $bot["botid"]);
+	$res = $sth->execute();
+	echo "remove ".$bot["botname"]."\n";
+	WriteLog("remove bot: ".$bot["botname"]." ".$bot["botid"]);
 }
 
 $spendtime = (microtime(true)-$starttime);

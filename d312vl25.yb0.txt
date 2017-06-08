@@ -1,0 +1,29 @@
+﻿URC bot mark reported
+
+# Please enter the commit message for your changes. Lines starting
+# with '#' will be ignored, and an empty message aborts the commit.
+#
+# Date:      Thu Jun 8 14:19:16 2017 +0800
+#
+# On branch master
+# Your branch is ahead of 'origin/master' by 2 commits.
+#   (use "git push" to publish your local commits)
+#
+# Changes to be committed:
+#	modified:   user-right-check/bot_export.php
+#	modified:   user-right-check/bot_result.php
+#
+# Changes not staged for commit:
+#	modified:   user-right-check/bot_export.php
+#	modified:   user-right-check/bot_getnew.php
+#	modified:   user-right-check/others_export.php
+#	modified:   user-right-check/others_getnew.php
+#	modified:   user-right-check/others_result.php
+#	modified:   user-right-check/others_update.php
+#
+# Untracked files:
+#	subst/
+#	user-right-check/database.sql
+#	user-right-check/others_export2.php
+#
+
