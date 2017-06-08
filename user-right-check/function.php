@@ -39,8 +39,8 @@ function lastlog($username) {
 	$res = cURL($C["wikiapi"]."?".http_build_query(array(
 		"action" => "query",
 		"format" => "json",
-		"list" => "type|logevents",
-		"leprop" => "timestamp",
+		"list" => "logevents",
+		"leprop" => "type|timestamp",
 		"leuser" => $username,
 		"lelimit" => "1"
 	)));
