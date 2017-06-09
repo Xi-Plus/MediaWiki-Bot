@@ -35,6 +35,7 @@ $res = cURL($C["wikiapi"]."?".http_build_query(array(
 	"format" => "json",
 	"list" => "allusers",
 	"augroup" => "sysop|bureaucrat|checkuser|oversight|ipblock-exempt|rollbacker|patroller|autoreviewer|confirmed",
+	"auprop" => "groups",
 	"aulimit" => "max"
 )));
 if ($res === false) {
@@ -69,6 +70,17 @@ foreach ($allusers as $user) {
 		WriteLog("new user: ".$user["name"]." ".$user["userid"]);
 		echo "\n";
 	} else {
+		sort($user["groups"]);
+		$rights = implode("|", $user["groups"]);
+		$userlist[$user["userid"]]["rights"] = implode("|", $userlist[$user["userid"]]["rights"]);
+		if ($userlist[$user["userid"]]["rights"] != $rights) {
+			echo $userlist[$user["userid"]]["rights"]." -> ".$rights."\n";
+			$sth = $G["db"]->prepare("UPDATE `{$C['DBTBprefix']}userlist` SET `rights` = :rights WHERE `userid` = :userid");
+			$sth->bindValue(":userid", $user["userid"]);
+			$sth->bindValue(":rights", $rights);
+			$res = $sth->execute();
+			WriteLog("update rights: ".$user["name"]." ".$userlist[$user["userid"]]["rights"]."->".$rights);
+		}
 		unset($userlist[$user["userid"]]);
 	}
 }

@@ -35,6 +35,7 @@ $res = cURL($C["wikiapi"]."?".http_build_query(array(
 	"format" => "json",
 	"list" => "allusers",
 	"augroup" => "bot",
+	"auprop" => "groups",
 	"aulimit" => "max"
 )));
 if ($res === false) {
@@ -105,6 +106,17 @@ foreach ($allusers as $bot) {
 		$res = $sth->execute();
 		WriteLog("new bot: ".$bot["name"]." ".$bot["userid"]);
 	} else {
+		sort($bot["groups"]);
+		$rights = implode("|", $bot["groups"]);
+		$botlist[$bot["userid"]]["botrights"] = implode("|", $botlist[$bot["userid"]]["botrights"]);
+		if ($botlist[$bot["userid"]]["botrights"] != $rights) {
+			echo $botlist[$bot["userid"]]["botrights"]." -> ".$rights."\n";
+			$sth = $G["db"]->prepare("UPDATE `{$C['DBTBprefix']}botlist` SET `botrights` = :botrights WHERE `botid` = :botid");
+			$sth->bindValue(":botid", $bot["userid"]);
+			$sth->bindValue(":botrights", $rights);
+			$res = $sth->execute();
+			WriteLog("update bot rights: ".$bot["name"]." ".$botlist[$bot["userid"]]["botrights"]."->".$rights);
+		}
 		unset($botlist[$bot["userid"]]);
 	}
 }
