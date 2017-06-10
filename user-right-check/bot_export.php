@@ -26,6 +26,7 @@ $count = 1;
 foreach ($row as $user) {
 	?>
 ==[[User:<?=$user["botname"]?>|<?=$user["botname"]?>]]==<br>
+*{{status2|新提案}}<br>
 *機器人：{{User-multi|user=<?=$user["botname"]?>|t|c|l|cr}}<br>
 *操作者：{{User-multi|user=<?=$user["username"]?>|t|c|l|sul2}}<br>
 *機器人最後活動時間：<?php
@@ -46,7 +47,7 @@ if ($lastaction == "0000-00-00 00:00:00") {
 	echo date("Y年n月j日", $time)." (".$C["day"][date("w", $time)].") ".date("H:i", $time)." (UTC)";
 }
 ?><br>
-*發出通知時間：~~~~~以前<br>
+*發出通知時間：~~~~~<br>
 *提交的維基人及時間：~~~~<br><br>
 <?php
 }
