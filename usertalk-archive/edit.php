@@ -75,15 +75,19 @@ for ($i=$C["fail_retry"]; $i > 0; $i--) {
 	echo "start split\n";
 	foreach ($text as $temp) {
 		if (preg_match("/(==.+?==)/", $temp, $m)) {
-			echo $m[1]."\t";
+			echo $m[1]."\n";
 		} else {
-			echo "title get fail\t";
+			echo "title get fail\n";
 		}
 		preg_match_all("/\d{4}年\d{1,2}月\d{1,2}日 \(.{3}\) \d{2}\:\d{2} \(UTC\)/", $temp, $m);
 		$firsttime = time();
 		$lasttime = 0;
 		foreach ($m[0] as $timestr) {
 			$time = converttime($timestr);
+			if ($time > time()) {
+				echo "ignore time: ".date("Y/m/d H:i", $time)."\n";
+				continue;
+			}
 			if ($time < $firsttime) $firsttime = $time;
 			if ($time > $lasttime) $lasttime = $time;
 		}
