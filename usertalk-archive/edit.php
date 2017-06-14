@@ -167,6 +167,7 @@ $post = array(
 	"summary" => $summary,
 	"text" => $oldtext."\n".$newpagetext,
 	"token" => $edittoken,
+	"minor" => "",
 	"starttimestamp" => $starttimestamp2
 );
 if ($basetimestamp2 !== null) {
