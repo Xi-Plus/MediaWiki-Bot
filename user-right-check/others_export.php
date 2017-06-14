@@ -8,6 +8,7 @@
 require(__DIR__."/../config/config.php");
 date_default_timezone_set('UTC');
 @include(__DIR__."/config.php");
+require(__DIR__."/function.php");
 require(__DIR__."/../function/log.php");
 
 $timelimit = date("Y-m-d H:i:s", strtotime($_GET["limit"] ?? "-6 months"));
@@ -22,11 +23,38 @@ $row = $sth->fetchAll(PDO::FETCH_ASSOC);
 echo "共有".count($row)."筆<br><br>";
 $count = 1;
 
-foreach ($row as $user) {
-	$user["rights"] = explode("|", $user["rights"]);
-	$user["rights"] = array_diff($user["rights"], $C["right-whitelist"]);
-	if (count($user["rights"]) == 0) {
+foreach ($row as $key => $user) {
+	$row[$key]["rights"] = explode("|", $row[$key]["rights"]);
+	$row[$key]["rights"] = array_diff($row[$key]["rights"], $C["right-whitelist"]);
+	if (count($row[$key]["rights"]) == 0) {
+		unset($row[$key]);
 		continue;
+	}
+	$row[$key]["time"] = 0;
+	if ($row[$key]["lastedit"] !== "0000-00-00 00:00:00") {
+		$row[$key]["time"] = max($row[$key]["time"], strtotime($row[$key]["lastedit"]));
+	}
+	if ($row[$key]["lastlog"] !== "0000-00-00 00:00:00") {
+		$row[$key]["time"] = max($row[$key]["time"], strtotime($row[$key]["lastlog"]));
+	}
+	if ($row[$key]["lastusergetrights"] !== "0000-00-00 00:00:00") {
+		$row[$key]["time"] = max($row[$key]["time"], strtotime($row[$key]["lastusergetrights"]));
+	}
+}
+function cmp($a, $b) {
+    if ($a["time"] == $b["time"]) {
+        return 0;
+    }
+    return ($a["time"] < $b["time"]) ? -1 : 1;
+}
+usort($row, "cmp");
+
+$month = 999;
+foreach ($row as $user) {
+	$nmonth = monthdiff($user["time"]);
+	if ($month != $nmonth) {
+		echo htmlspecialchars("<!-- ".$nmonth."個月 -->")."<br><br>";
+		$month = $nmonth;
 	}
 	?>
 *{{User|<?=$user["name"]?>}}<br>
