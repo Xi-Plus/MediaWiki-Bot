@@ -14,7 +14,7 @@ $C["text1"] = "{{Wikipedia:合併條目/存檔}}";
 
 $C["fail_retry"] = 5;
 
-$C["summary_prefix"] = "[[User:A2093064-bot/task/7|機器人]]";
+$C["summary_prefix"] = "[[User:A2093064-bot/task/7|機器人7]]";
 $C["summary_config_page"] = "[[User:A2093064-bot/task/7/config|門檻]]";
 
 $C["User-Agent"] = "User:A2093064-bot proposed-mergers-archive";

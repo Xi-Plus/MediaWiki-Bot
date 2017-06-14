@@ -12,7 +12,7 @@ $C["category"] = array(
 $C["max_edits_one_time"] = 3;
 $C["fail_retry"] = 5;
 
-$C["summary_prefix"] = "[[User:A2093064-bot/task/8|機器人]]";
+$C["summary_prefix"] = "[[User:A2093064-bot/task/8|機器人8]]";
 
 $C["User-Agent"] = "User:A2093064-bot fix-non-free-files-backlink";
 

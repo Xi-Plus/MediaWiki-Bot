@@ -14,7 +14,7 @@ $C["to_page_number_default"] = "";
 
 $C["fail_retry"] = 5;
 
-$C["summary_prefix"] = "[[User:A2093064-bot/task/2|機器人]]";
+$C["summary_prefix"] = "[[User:A2093064-bot/task/2|機器人2]]";
 $C["summary_config_page"] = "[[User:A2093064-bot/task/2/config|門檻]]";
 
 $C["User-Agent"] = "User:A2093064-bot usertalk-archive";
