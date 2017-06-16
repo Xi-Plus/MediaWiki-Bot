@@ -38,7 +38,7 @@ foreach ($userlist as $user) {
 	$lastedit = lastedit($user["name"]);
 	$lastlog = lastlog($user["name"]);
 	$lastusergetrights = lastusergetrights($user["name"]);
-	if ($lastedit == $user["lastedit"] && $lastlog == $user["lastlog"] && $lastusergetrights == $user["lastusergetrights"]) {
+	if ($lastedit <= $user["lastedit"] && $lastlog <= $user["lastlog"] && $lastusergetrights <= $user["lastusergetrights"]) {
 		echo "no update\n";
 		continue;
 	}
