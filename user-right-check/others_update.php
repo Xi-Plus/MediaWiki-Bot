@@ -30,11 +30,14 @@ $row = $sth->fetchAll(PDO::FETCH_ASSOC);
 $userlist = array();
 foreach ($row as $user) {
 	$user["rights"] = explode("|", $user["rights"]);
-	$userlist[$user["userid"]] = $user;
+	$userlist[$user["name"]] = $user;
 }
 
+echo "result count: ".count($userlist)."\n";
+
+$count = 0;
 foreach ($userlist as $user) {
-	echo $user["name"]."\n";
+	echo (++$count)." ".$user["name"]."\t";
 	$lastedit = lastedit($user["name"]);
 	$lastlog = lastlog($user["name"]);
 	$lastusergetrights = lastusergetrights($user["name"]);
@@ -42,13 +45,13 @@ foreach ($userlist as $user) {
 		echo "no update\n";
 		continue;
 	}
-	$sth = $G["db"]->prepare("UPDATE `{$C['DBTBprefix']}userlist` SET `lastedit` = :lastedit, `lastlog` = :lastlog, `lastusergetrights` = :lastusergetrights WHERE `userid` = :userid");
-	$sth->bindValue(":userid", $user["userid"]);
+	$sth = $G["db"]->prepare("UPDATE `{$C['DBTBprefix']}userlist` SET `lastedit` = :lastedit, `lastlog` = :lastlog, `lastusergetrights` = :lastusergetrights WHERE `name` = :name");
+	$sth->bindValue(":name", $user["name"]);
 	$sth->bindValue(":lastedit", $lastedit);
 	$sth->bindValue(":lastlog", $lastlog);
 	$sth->bindValue(":lastusergetrights", $lastusergetrights);
 	$res = $sth->execute();
-	echo "update user=".$user["name"]." lastedit=".$lastedit." lastlog=".$lastlog." lastusergetrights=".$lastusergetrights."\n";
+	echo " update lastedit=".$lastedit." lastlog=".$lastlog." lastusergetrights=".$lastusergetrights."\n";
 	WriteLog("update user=".$user["name"]." lastedit=".$lastedit." lastlog=".$lastlog." lastusergetrights=".$lastusergetrights);
 }
 
