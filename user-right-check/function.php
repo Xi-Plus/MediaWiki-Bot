@@ -57,7 +57,7 @@ function lastlog($username) {
 	return "0000-00-00 00:00:00";
 }
 
-function userright($username) {
+function userright($username, $checkawb = true) {
 	global $C;
 	$res = cURL($C["wikiapi"]."?".http_build_query(array(
 		"action" => "query",
@@ -70,7 +70,19 @@ function userright($username) {
 		exit("fetch page fail\n");
 	}
 	$res = json_decode($res, true);
-	return $res["query"]["users"][0]["groups"] ?? array();
+	$rights = $res["query"]["users"][0]["groups"] ?? array();
+	
+	if ($checkawb) {
+		$res2 = file_get_contents($C["AWBpage"]);
+		if ($res2 === false) {
+			exit("fetch page fail\n");
+		}
+		if (preg_match("/^\* *{$username} *$/m", $res2)) {
+			$rights[]= $C["AWBright"];
+		}
+	}
+		
+	return $rights;
 }
 
 function lastusergetrights($username) {

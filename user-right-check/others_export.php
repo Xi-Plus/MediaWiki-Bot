@@ -26,6 +26,7 @@ $count = 1;
 foreach ($row as $key => $user) {
 	$row[$key]["rights"] = explode("|", $row[$key]["rights"]);
 	$row[$key]["rights"] = array_diff($row[$key]["rights"], $C["right-whitelist"]);
+	$row[$key]["rights"] = array_values($row[$key]["rights"]);
 	if (count($row[$key]["rights"]) == 0) {
 		unset($row[$key]);
 		continue;
@@ -59,7 +60,18 @@ foreach ($row as $user) {
 	?>
 *{{User|<?=$user["name"]?>}}<br>
 *:{{status2|新提案}}<br>
-*:需複審或解除之權限：{{subst:int:group-<?php echo implode("}}、{{subst:int:group-", $user["rights"]); ?>}}<br>
+*:需複審或解除之權限：<?php
+foreach ($user["rights"] as $key => $value) {
+	if ($key) {
+		echo "、";
+	}
+	if ($value == $C["AWBright"]) {
+		echo $C["AWBname"];
+	} else {
+		echo '{{subst:int:group-'.$value.'}}';
+	}
+}
+?><br>
 *:理由：逾六個月沒有任何編輯活動、[[Special:用户贡献/<?=$user["name"]?>|<?php
 if ($user["lastedit"] == "0000-00-00 00:00:00") {
 	echo "從未編輯過";
