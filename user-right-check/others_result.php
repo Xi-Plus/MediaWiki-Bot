@@ -19,7 +19,36 @@ $sth->bindValue(":lastlog", $timelimit);
 $sth->bindValue(":lastusergetrights", $timelimit);
 $sth->execute();
 $row = $sth->fetchAll(PDO::FETCH_ASSOC);
+
+foreach ($row as $key => $user) {
+	$row[$key]["rights"] = explode("|", $row[$key]["rights"]);
+	$row[$key]["rights"] = array_diff($row[$key]["rights"], $C["right-whitelist"]);
+	$row[$key]["rights"] = array_values($row[$key]["rights"]);
+	if (count($row[$key]["rights"]) == 0) {
+		unset($row[$key]);
+		continue;
+	}
+	$row[$key]["time"] = 0;
+	if ($row[$key]["lastedit"] !== "0000-00-00 00:00:00") {
+		$row[$key]["time"] = max($row[$key]["time"], strtotime($row[$key]["lastedit"]));
+	}
+	if ($row[$key]["lastlog"] !== "0000-00-00 00:00:00") {
+		$row[$key]["time"] = max($row[$key]["time"], strtotime($row[$key]["lastlog"]));
+	}
+	if ($row[$key]["lastusergetrights"] !== "0000-00-00 00:00:00") {
+		$row[$key]["time"] = max($row[$key]["time"], strtotime($row[$key]["lastusergetrights"]));
+	}
+}
+function cmp($a, $b) {
+    if ($a["time"] == $b["time"]) {
+        return 0;
+    }
+    return ($a["time"] < $b["time"]) ? -1 : 1;
+}
+usort($row, "cmp");
+
 echo "共有".count($row)."筆<br>";
+
 $count = 1;
 ?>
 <table>
@@ -33,16 +62,13 @@ $count = 1;
 </tr>
 <?php
 foreach ($row as $user) {
-	if (count(array_diff(explode("|", $user["rights"]), $C["right-whitelist"])) == 0) {
-		continue;
-	}
 	?><tr>
 		<td><?php echo ($count++); ?></td>
 		<td><a href="https://zh.wikipedia.org/wiki/User:<?=$user["name"]?>" target="_blank"><?=$user["name"]?></a></td>
 		<td><a href="https://zh.wikipedia.org/wiki/Special:用户贡献/<?=$user["name"]?>" target="_blank"><?=$user["lastedit"]?></a></td>
 		<td><a href="https://zh.wikipedia.org/wiki/Special:日志/<?=$user["name"]?>" target="_blank"><?=$user["lastlog"]?></a></td>
 		<td><a href="https://zh.wikipedia.org/wiki/Special:日志/rights?page=User:<?=$user["name"]?>" target="_blank"><?=$user["lastusergetrights"]?></a></td>
-		<td><a href="https://zh.wikipedia.org/wiki/Special:用户权限/<?=$user["name"]?>" target="_blank"><?=$user["rights"]?></a></td>
+		<td><a href="https://zh.wikipedia.org/wiki/Special:用户权限/<?=$user["name"]?>" target="_blank"><?=implode("|",$user["rights"])?></a></td>
 	</tr><?php
 }
 ?>

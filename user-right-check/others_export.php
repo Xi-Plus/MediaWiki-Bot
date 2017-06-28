@@ -20,8 +20,6 @@ $sth->bindValue(":lastlog", $timelimit);
 $sth->bindValue(":lastusergetrights", $timelimit);
 $sth->execute();
 $row = $sth->fetchAll(PDO::FETCH_ASSOC);
-echo "共有".count($row)."筆<br><br>";
-$count = 1;
 
 foreach ($row as $key => $user) {
 	$row[$key]["rights"] = explode("|", $row[$key]["rights"]);
@@ -49,6 +47,8 @@ function cmp($a, $b) {
     return ($a["time"] < $b["time"]) ? -1 : 1;
 }
 usort($row, "cmp");
+
+echo "共有".count($row)."筆<br><br>";
 
 $month = 999;
 foreach ($row as $user) {
