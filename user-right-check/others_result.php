@@ -13,6 +13,20 @@ require(__DIR__."/../function/log.php");
 $timelimit = date("Y-m-d H:i:s", strtotime($_GET["limit"] ?? "-6 months"));
 echo "顯示最後動作 < ".$timelimit." (".($_GET["limit"] ?? "-6 months").")<br>";
 
+if (isset($_POST["name"])) {
+	if (preg_match("/(\d+)年(\d+)月(\d+)日 (?:.+?) (\d+):(\d+)/", $_POST["time"], $m)) {
+		$time = date("Y-m-d H:i:s", strtotime("{$m[1]}/{$m[2]}/{$m[3]} {$m[4]}:{$m[5]}")-60*60*8);
+		$sth = $G["db"]->prepare("UPDATE `{$C['DBTBprefix']}userlist` SET `lastedit` = :lastedit WHERE `name` = :name");
+		$sth->bindValue(":lastedit", $time);
+		$sth->bindValue(":name", $_POST["name"]);
+		$sth->execute();
+		WriteLog("update user ".$_POST["name"]." lastedit = ".$time);
+		echo "成功更新".$_POST["name"]."的最後編輯時間為".$time."<br>";
+	} else {
+		echo "更新".$_POST["name"]."的最後編輯時間失敗<br>";
+	}
+}
+
 $sth = $G["db"]->prepare("SELECT * FROM `{$C['DBTBprefix']}userlist` WHERE `lastedit` < :lastedit AND `lastlog` < :lastlog AND `lastusergetrights` < :lastusergetrights ORDER BY `lastedit` ASC, `lastlog` ASC");
 $sth->bindValue(":lastedit", $timelimit);
 $sth->bindValue(":lastlog", $timelimit);
@@ -65,7 +79,13 @@ foreach ($row as $user) {
 	?><tr>
 		<td><?php echo ($count++); ?></td>
 		<td><a href="https://zh.wikipedia.org/wiki/User:<?=$user["name"]?>" target="_blank"><?=$user["name"]?></a></td>
-		<td><a href="https://zh.wikipedia.org/wiki/Special:用户贡献/<?=$user["name"]?>" target="_blank"><?=$user["lastedit"]?></a></td>
+		<td>
+			<form method="post" style="margin: 0px;">
+				<a href="https://zh.wikipedia.org/wiki/Special:用户贡献/<?=$user["name"]?>" target="_blank"><?=$user["lastedit"]?></a>
+				<input type="text" name="time">
+				<input type="hidden" name="name" value="<?=$user["name"]?>">
+			</form>
+		</td>
 		<td><a href="https://zh.wikipedia.org/wiki/Special:日志/<?=$user["name"]?>" target="_blank"><?=$user["lastlog"]?></a></td>
 		<td><a href="https://zh.wikipedia.org/wiki/Special:日志/rights?page=User:<?=$user["name"]?>" target="_blank"><?=$user["lastusergetrights"]?></a></td>
 		<td><a href="https://zh.wikipedia.org/wiki/Special:用户权限/<?=$user["name"]?>" target="_blank"><?=implode("|",$user["rights"])?></a></td>
