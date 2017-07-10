@@ -52,6 +52,29 @@ if ($retention_bytes === false) {
 }
 echo "archive more than ".$retention_bytes." bytes\n";
 
+$res = cURL($C["wikiapi"]."?".http_build_query(array(
+	"action" => "query",
+	"format" => "json",
+	"prop" => "redirects",
+	"titles" => "Template:Editprotected",
+	"rdprop" => "title",
+	"rdlimit" => "max"
+)));
+if ($res === false) {
+	exit("fetch page fail\n");
+}
+$res = json_decode($res, true);
+$pages = current($res["query"]["pages"]);
+$redirects = $pages["redirects"];
+$ep = [];
+foreach ($redirects as $redirect) {
+	if (preg_match("/^Template:(.+?)$/", $redirect["title"], $m)) {
+		$ep []= $m[1];
+	}
+}
+$ep = "/{{(".implode("|", $ep).")[}\|]/i";
+echo "EP match: ".$ep."\n";
+
 for ($i=$C["fail_retry"]; $i > 0; $i--) {
 	$starttimestamp = time();
 	$res = cURL($C["wikiapi"]."?".http_build_query(array(
@@ -97,7 +120,10 @@ for ($i=$C["fail_retry"]; $i > 0; $i--) {
 			if ($time > $lasttime) $lasttime = $time;
 		}
 		echo "time=".date("Y/m/d H:i:s", $firsttime)."-".date("Y/m/d H:i:s", $lasttime)."\tsize=".strlen($temp)."\n";
-		if (time()-$lasttime > $retention_time || $pagesize > $retention_bytes) {
+		if (preg_match($ep, $temp)) {
+			$oldpagetext.=$temp;
+			echo "not archive (EP)\t";
+		} else if (time()-$lasttime > $retention_time || $pagesize > $retention_bytes) {
 			$date = date("Y年n月j日", $firsttime);
 			if (!isset($newpagetext[$date])) {
 				$newpagetext[$date] = "";
