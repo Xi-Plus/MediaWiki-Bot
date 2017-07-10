@@ -75,8 +75,12 @@ $count = 1;
 	<th>user rights</th>
 </tr>
 <?php
-foreach ($row as $user) {
-	?><tr>
+foreach ($row as $key => $user) {
+	?><tr <?php
+		if ($key % 10 >= 5) {
+			echo 'style="background: #ddd;"';
+		}
+	?>>
 		<td><?php echo ($count++); ?></td>
 		<td><a href="https://zh.wikipedia.org/wiki/User:<?=$user["name"]?>" target="_blank"><?=$user["name"]?></a></td>
 		<td>
