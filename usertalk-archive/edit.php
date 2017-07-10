@@ -92,7 +92,10 @@ for ($i=$C["fail_retry"]; $i > 0; $i--) {
 			if ($time > $lasttime) $lasttime = $time;
 		}
 		echo "time=".date("Y/m/d H:i:s", $firsttime)."-".date("Y/m/d H:i:s", $lasttime)."\n";
-		if (time()-$lasttime > $retention_time) {
+		if ($lasttime == 0) {
+			$oldpagetext.=$temp."\n{{null| bot archive time: ~~~~~ }}\n";
+			echo "not archive (bot)\t";
+		} else if (time()-$lasttime > $retention_time) {
 			$newpagetext .= $temp;
 			$archive_count++;
 			echo "archive\t";
