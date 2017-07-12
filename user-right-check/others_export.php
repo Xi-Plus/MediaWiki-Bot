@@ -14,7 +14,11 @@ require(__DIR__."/../function/log.php");
 $timelimit = date("Y-m-d H:i:s", strtotime($_GET["limit"] ?? "-6 months"));
 echo "顯示最後動作 < ".$timelimit." (".($_GET["limit"] ?? "-6 months").")<br>";
 
-$sth = $G["db"]->prepare("SELECT * FROM `{$C['DBTBprefix']}userlist` WHERE `lastedit` < :lastedit AND `lastlog` < :lastlog AND `lastusergetrights` < :lastusergetrights ORDER BY `lastedit` ASC, `lastlog` ASC");
+$noeditonly = "";
+if (isset($_GET["noeditonly"])) {
+	$noeditonly = " AND `lastedit` = '0000-00-00 00:00:00' ";
+}
+$sth = $G["db"]->prepare("SELECT * FROM `{$C['DBTBprefix']}userlist` WHERE `lastedit` < :lastedit AND `lastlog` < :lastlog AND `lastusergetrights` < :lastusergetrights {$noeditonly} ORDER BY `lastedit` ASC, `lastlog` ASC");
 $sth->bindValue(":lastedit", $timelimit);
 $sth->bindValue(":lastlog", $timelimit);
 $sth->bindValue(":lastusergetrights", $timelimit);

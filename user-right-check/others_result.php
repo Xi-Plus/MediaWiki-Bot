@@ -27,7 +27,11 @@ if (isset($_POST["name"])) {
 	}
 }
 
-$sth = $G["db"]->prepare("SELECT * FROM `{$C['DBTBprefix']}userlist` WHERE `lastedit` < :lastedit AND `lastlog` < :lastlog AND `lastusergetrights` < :lastusergetrights ORDER BY `lastedit` ASC, `lastlog` ASC");
+$noeditonly = "";
+if (isset($_GET["noeditonly"])) {
+	$noeditonly = " AND `lastedit` = '0000-00-00 00:00:00' ";
+}
+$sth = $G["db"]->prepare("SELECT * FROM `{$C['DBTBprefix']}userlist` WHERE `lastedit` < :lastedit AND `lastlog` < :lastlog AND `lastusergetrights` < :lastusergetrights {$noeditonly} ORDER BY `lastedit` ASC, `lastlog` ASC");
 $sth->bindValue(":lastedit", $timelimit);
 $sth->bindValue(":lastlog", $timelimit);
 $sth->bindValue(":lastusergetrights", $timelimit);
@@ -36,7 +40,9 @@ $row = $sth->fetchAll(PDO::FETCH_ASSOC);
 
 foreach ($row as $key => $user) {
 	$row[$key]["rights"] = explode("|", $row[$key]["rights"]);
-	$row[$key]["rights"] = array_diff($row[$key]["rights"], $C["right-whitelist"]);
+	if (!isset($_GET["fullright"])) {
+		$row[$key]["rights"] = array_diff($row[$key]["rights"], $C["right-whitelist"]);
+	}
 	$row[$key]["rights"] = array_values($row[$key]["rights"]);
 	if (count($row[$key]["rights"]) == 0) {
 		unset($row[$key]);
