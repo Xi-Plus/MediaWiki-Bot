@@ -161,6 +161,8 @@ if (!isset($pages["missing"])) {
 } else {
 	echo $page." not exist\n";
 }
+$oldtext .= "\n".$newpagetext;
+$oldtext = preg_replace("/\n{3,}/", "\n\n", $oldtext);
 
 $summary = $C["summary_prefix"]."：存檔自[[".$C["from_page"]."]]共".$archive_count."個章節";
 $post = array(
@@ -168,7 +170,7 @@ $post = array(
 	"format" => "json",
 	"title" => $page,
 	"summary" => $summary,
-	"text" => $oldtext."\n".$newpagetext,
+	"text" => $oldtext,
 	"token" => $edittoken,
 	"minor" => "",
 	"starttimestamp" => $starttimestamp2
