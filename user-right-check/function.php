@@ -109,10 +109,10 @@ function lastusergetrights($username) {
 function monthdiff($time) {
 	$oy = date("Y", $time);
 	$om = date("m", $time);
-	$od = date("m", $time);
+	$od = date("d", $time);
 	$ny = date("Y");
 	$nm = date("m");
-	$nd = date("m");
+	$nd = date("d");
 	$res = $nm - $om;
 	$res += ($ny - $oy) * 12;
 	$res -= ($nd < $od);
