@@ -27,6 +27,9 @@ $row = $sth->fetchAll(PDO::FETCH_ASSOC);
 
 foreach ($row as $key => $user) {
 	$row[$key]["rights"] = explode("|", $row[$key]["rights"]);
+	if (in_array("bot", $row[$key]["rights"])) {
+		$row[$key]["rights"] = array_diff($row[$key]["rights"], ["AWB"]);
+	}
 	$row[$key]["rights"] = array_diff($row[$key]["rights"], $C["right-whitelist"]);
 	$row[$key]["rights"] = array_values($row[$key]["rights"]);
 	if (count($row[$key]["rights"]) == 0) {

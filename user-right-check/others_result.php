@@ -40,6 +40,9 @@ $row = $sth->fetchAll(PDO::FETCH_ASSOC);
 
 foreach ($row as $key => $user) {
 	$row[$key]["rights"] = explode("|", $row[$key]["rights"]);
+	if (in_array("bot", $row[$key]["rights"])) {
+		$row[$key]["rights"] = array_diff($row[$key]["rights"], ["AWB"]);
+	}
 	if (!isset($_GET["fullright"])) {
 		$row[$key]["rights"] = array_diff($row[$key]["rights"], $C["right-whitelist"]);
 	}
