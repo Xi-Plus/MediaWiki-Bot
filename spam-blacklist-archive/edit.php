@@ -72,7 +72,7 @@ foreach ($redirects as $redirect) {
 		$ep []= $m[1];
 	}
 }
-$ep = "/{{(".implode("|", $ep).")[}\|]/i";
+$ep = "/{{(".implode("|", $ep).")}}/i";
 echo "EP match: ".$ep."\n";
 
 for ($i=$C["fail_retry"]; $i > 0; $i--) {
