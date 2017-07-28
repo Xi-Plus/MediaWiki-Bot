@@ -73,7 +73,7 @@ for ($i=0; $i < $C["fail_retry"]; $i++) {
 		$res = cURL($C["wikiapi"], $post);
 	} else {
 		$res = false;
-		file_put_contents("out.txt", $out);
+		file_put_contents(__DIR__."/out.txt", $out);
 	}
 	$res = json_decode($res, true);
 	if (isset($res["error"])) {
