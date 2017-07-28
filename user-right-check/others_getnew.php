@@ -112,7 +112,7 @@ foreach ($userlist as $user) {
 	$sth->bindValue(":name", $user["name"]);
 	$res = $sth->execute();
 	echo "remove ".$user["name"]." (".implode("|", $user["rights"]).")\n";
-	WriteLog("remove user: ".$user["name"]);
+	WriteLog("remove user: ".$user["name"]." ".implode("|", $user["rights"]));
 }
 
 $spendtime = (microtime(true)-$starttime);
