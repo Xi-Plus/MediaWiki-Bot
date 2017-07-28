@@ -1,6 +1,7 @@
 <?php
 function login() {
 	global $C;
+	echo "login as ".$C["user"]."\n";
 	$res = cURL($C["wikiapi"]."?action=query&assert=user&format=json");
 	if ($res === false) {
 		exit("fetch page error 1\n");
