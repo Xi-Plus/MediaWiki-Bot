@@ -210,7 +210,7 @@ foreach ($newpagetext as $year => $newtext) {
 		echo "split ok\n";
 
 		foreach ($newtext as $section => $newtext2) {
-			$text[$section] .= implode("\n", $newtext2);
+			$text[$section] .= "\n".implode("\n", $newtext2);
 		}
 
 		$text = implode("\n", $text);
