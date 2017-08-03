@@ -14,16 +14,21 @@ $timelimit = date("Y-m-d H:i:s", strtotime($_GET["limit"] ?? "-6 months"));
 echo "顯示最後動作 < ".$timelimit." (".($_GET["limit"] ?? "-6 months").")<br>";
 
 if (isset($_POST["name"])) {
+	$time = false;
 	if (preg_match("/(\d+)年(\d+)月(\d+)日 (?:.+?) (\d+):(\d+)/", $_POST["time"], $m)) {
 		$time = date("Y-m-d H:i:s", strtotime("{$m[1]}/{$m[2]}/{$m[3]} {$m[4]}:{$m[5]}")-60*60*8);
+	} else if (strtotime($_POST["time"])) {
+		$time = date("Y-m-d H:i:s", strtotime($_POST["time"])-60*60*8);
+	} else {
+		echo "更新".$_POST["name"]."的最後編輯時間失敗<br>";
+	}
+	if ($time !== false) {
 		$sth = $G["db"]->prepare("UPDATE `{$C['DBTBprefix']}userlist` SET `lastedit` = :lastedit WHERE `name` = :name");
 		$sth->bindValue(":lastedit", $time);
 		$sth->bindValue(":name", $_POST["name"]);
 		$sth->execute();
 		WriteLog("update user ".$_POST["name"]." lastedit = ".$time);
 		echo "成功更新".$_POST["name"]."的最後編輯時間為".$time."<br>";
-	} else {
-		echo "更新".$_POST["name"]."的最後編輯時間失敗<br>";
 	}
 }
 
