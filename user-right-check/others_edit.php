@@ -63,6 +63,7 @@ echo "共有".count($row)."筆\n\n";
 $count = 0;
 $out = "";
 foreach ($row as $user) {
+	echo $user["name"]."\t".$user["lastedit"]."\t".$user["lastlog"]."\t".$user["lastusergetrights"]."\n";
 	$count ++;
 	$out .= "*{{User|".$user["name"]."}}
 *:{{status2|新提案}}
@@ -103,6 +104,10 @@ $out .= "]]
 		break;
 	}
 }
+
+echo "press any key to continue\n";
+fgets(STDIN);
+
 
 for ($i=$C["fail_retry"]; $i > 0; $i--) {
 	$starttimestamp = time();
