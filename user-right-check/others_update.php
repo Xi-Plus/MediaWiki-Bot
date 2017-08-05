@@ -21,10 +21,8 @@ $edittoken = edittoken();
 
 $timelimit = date("Y-m-d H:i:s", strtotime("-6 months"));
 
-$sth = $G["db"]->prepare("SELECT * FROM `{$C['DBTBprefix']}userlist` WHERE `lastedit` < :lastedit AND  `lastlog` < :lastlog AND `lastusergetrights` < :lastusergetrights");
-$sth->bindValue(":lastedit", $timelimit);
-$sth->bindValue(":lastlog", $timelimit);
-$sth->bindValue(":lastusergetrights", $timelimit);
+$sth = $G["db"]->prepare("SELECT * FROM `{$C['DBTBprefix']}userlist` WHERE `lasttime` < :lasttime");
+$sth->bindValue(":lasttime", $timelimit);
 $sth->execute();
 $row = $sth->fetchAll(PDO::FETCH_ASSOC);
 $userlist = array();
@@ -41,15 +39,17 @@ foreach ($userlist as $user) {
 	$lastedit = lastedit($user["name"]);
 	$lastlog = lastlog($user["name"]);
 	$lastusergetrights = lastusergetrights($user["name"]);
+	$lasttime = $user["lasttime"];
 	if ($lastedit <= $user["lastedit"] && $lastlog <= $user["lastlog"] && $lastusergetrights <= $user["lastusergetrights"]) {
 		echo "no update\n";
 		continue;
 	}
-	$sth = $G["db"]->prepare("UPDATE `{$C['DBTBprefix']}userlist` SET `lastedit` = :lastedit, `lastlog` = :lastlog, `lastusergetrights` = :lastusergetrights WHERE `name` = :name");
+	$sth = $G["db"]->prepare("UPDATE `{$C['DBTBprefix']}userlist` SET `lastedit` = :lastedit, `lastlog` = :lastlog, `lastusergetrights` = :lastusergetrights , `lasttime` = :lasttime WHERE `name` = :name");
 	$sth->bindValue(":name", $user["name"]);
 	$sth->bindValue(":lastedit", $lastedit);
 	$sth->bindValue(":lastlog", $lastlog);
 	$sth->bindValue(":lastusergetrights", $lastusergetrights);
+	$sth->bindValue(":lasttime", max($lastedit, $lastlog, $lastusergetrights, $lasttime));
 	$res = $sth->execute();
 	echo " update lastedit=".$lastedit." lastlog=".$lastlog." lastusergetrights=".$lastusergetrights."\n";
 	WriteLog("update user=".$user["name"]." lastedit=".$lastedit." lastlog=".$lastlog." lastusergetrights=".$lastusergetrights);

@@ -82,11 +82,12 @@ foreach ($newuserlist as $name => $rights) {
 		$rights = implode("|", $rights);
 		echo "rights: ".$rights."\n";
 
-		$sth = $G["db"]->prepare("INSERT INTO `{$C['DBTBprefix']}userlist` (`name`, `lastedit`, `lastlog`, `lastusergetrights`, `rights`) VALUES (:name, :lastedit, :lastlog, :lastusergetrights, :rights)");
+		$sth = $G["db"]->prepare("INSERT INTO `{$C['DBTBprefix']}userlist` (`name`, `lastedit`, `lastlog`, `lastusergetrights`, `lasttime`, `rights`) VALUES (:name, :lastedit, :lastlog, :lastusergetrights, :lasttime, :rights)");
 		$sth->bindValue(":name", $name);
 		$sth->bindValue(":lastedit", $lastedit);
 		$sth->bindValue(":lastlog", $lastlog);
 		$sth->bindValue(":lastusergetrights", $lastusergetrights);
+		$sth->bindValue(":lasttime", max($lastedit, $lastlog, $lastusergetrights));
 		$sth->bindValue(":rights", $rights);
 		$res = $sth->execute();
 		WriteLog("new user: ".$name." ".$rights);
