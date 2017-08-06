@@ -24,7 +24,7 @@ for ($i=0; $i < $C["fail_retry"]; $i++) {
 		continue;
 	}
 
-	preg_match_all("/^(\* |: inactive\|)(.+)$/m", $text, $m);
+	preg_match_all("/^(\* |: inactive\||: nouser\|)(.+)$/m", $text, $m);
 	$out = '{| class="wikitable sortable"
 !使用者
 !簽名
@@ -34,10 +34,10 @@ for ($i=0; $i < $C["fail_retry"]; $i++) {
 ';
 	foreach ($m[0] as $key => $temp) {
 		$status = $m[1][$key];
-		if (strpos($status, "inactive") !== false) {
-			$status = "inactive";
-		} else {
+		if ($status[0] === "*") {
 			$status = "";
+		} else {
+			$status = substr($status, 2, -1);
 		}
 		$sign = $m[2][$key];
 		$user = "";
