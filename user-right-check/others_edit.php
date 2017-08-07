@@ -21,10 +21,8 @@ $edittoken = edittoken();
 $timelimit = date("Y-m-d H:i:s", strtotime($C["other_timelimit"]));
 echo "timelimit < ".$timelimit." (".$C["other_timelimit"].")\n";
 
-$sth = $G["db"]->prepare("SELECT * FROM `{$C['DBTBprefix']}userlist` WHERE `lastedit` < :lastedit AND `lastlog` < :lastlog AND `lastusergetrights` < :lastusergetrights ORDER BY `lastedit` ASC, `lastlog` ASC");
-$sth->bindValue(":lastedit", $timelimit);
-$sth->bindValue(":lastlog", $timelimit);
-$sth->bindValue(":lastusergetrights", $timelimit);
+$sth = $G["db"]->prepare("SELECT * FROM `{$C['DBTBprefix']}userlist` WHERE `lasttime` < :lasttime ORDER BY `lasttime` ASC, `lastlog` ASC");
+$sth->bindValue(":lasttime", $timelimit);
 $sth->execute();
 $row = $sth->fetchAll(PDO::FETCH_ASSOC);
 
@@ -39,24 +37,8 @@ foreach ($row as $key => $user) {
 		unset($row[$key]);
 		continue;
 	}
-	$row[$key]["time"] = 0;
-	if ($row[$key]["lastedit"] !== "0000-00-00 00:00:00") {
-		$row[$key]["time"] = max($row[$key]["time"], strtotime($row[$key]["lastedit"]));
-	}
-	if ($row[$key]["lastlog"] !== "0000-00-00 00:00:00") {
-		$row[$key]["time"] = max($row[$key]["time"], strtotime($row[$key]["lastlog"]));
-	}
-	if ($row[$key]["lastusergetrights"] !== "0000-00-00 00:00:00") {
-		$row[$key]["time"] = max($row[$key]["time"], strtotime($row[$key]["lastusergetrights"]));
-	}
 }
-function cmp($a, $b) {
-    if ($a["time"] == $b["time"]) {
-        return 0;
-    }
-    return ($a["time"] < $b["time"]) ? -1 : 1;
-}
-usort($row, "cmp");
+$row = array_values($row);
 
 echo "共有".count($row)."筆\n\n";
 
