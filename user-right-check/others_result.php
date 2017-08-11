@@ -49,17 +49,23 @@ $sth->execute();
 $row = $sth->fetchAll(PDO::FETCH_ASSOC);
 
 foreach ($row as $key => $user) {
+	if (isset($_GET["fullright"])) {
+		$row[$key]["fullrights"] = $row[$key]["rights"];
+	}
 	$row[$key]["rights"] = explode("|", $row[$key]["rights"]);
 	if (in_array("bot", $row[$key]["rights"])) {
 		$row[$key]["rights"] = array_diff($row[$key]["rights"], ["AWB"]);
 	}
-	if (!isset($_GET["fullright"])) {
-		$row[$key]["rights"] = array_diff($row[$key]["rights"], $C["right-whitelist"]);
-	}
+	$row[$key]["rights"] = array_diff($row[$key]["rights"], $C["right-whitelist"]);
 	$row[$key]["rights"] = array_values($row[$key]["rights"]);
 	if (count($row[$key]["rights"]) == 0) {
 		unset($row[$key]);
 		continue;
+	}
+	if (isset($_GET["fullright"])) {
+		$row[$key]["rights"] = $row[$key]["fullrights"];
+	} else {
+		$row[$key]["rights"] = implode("|", $row[$key]["rights"]);
 	}
 }
 $row = array_values($row);
@@ -102,7 +108,7 @@ foreach ($row as $key => $user) {
 				<input type="hidden" name="name" value="<?=$user["name"]?>">
 			</form>
 		</td>
-		<td><a href="https://zh.wikipedia.org/wiki/Special:用户权限/<?=$user["name"]?>" target="_blank"><?=implode("|",$user["rights"])?></a></td>
+		<td><a href="https://zh.wikipedia.org/wiki/Special:用户权限/<?=$user["name"]?>" target="_blank"><?=$user["rights"]?></a></td>
 	</tr><?php
 }
 ?>
