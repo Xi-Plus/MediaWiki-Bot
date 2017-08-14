@@ -132,6 +132,9 @@ for ($i=$C["fail_retry"]; $i > 0; $i--) {
 		exit("no change\n");
 	}
 
+	echo "press any key to continue\n";
+	fgets(STDIN);
+
 	echo "start edit\n";
 
 	echo "edit main page\n";
