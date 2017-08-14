@@ -21,7 +21,7 @@ $edittoken = edittoken();
 $timelimit = date("Y-m-d H:i:s", strtotime($C["other_timelimit"]));
 echo "timelimit < ".$timelimit." (".$C["other_timelimit"].")\n";
 
-$sth = $G["db"]->prepare("SELECT * FROM `{$C['DBTBprefix']}userlist` WHERE `lasttime` < :lasttime ORDER BY `lasttime` ASC, `lastlog` ASC");
+$sth = $G["db"]->prepare("SELECT * FROM `{$C['DBTBprefix']}userlist` WHERE `lasttime` < :lasttime AND `noticetime` < '".date("Y-m-d H:i:s", time()-86400*7)."' ORDER BY `lasttime` ASC, `lastlog` ASC");
 $sth->bindValue(":lasttime", $timelimit);
 $sth->execute();
 $row = $sth->fetchAll(PDO::FETCH_ASSOC);
@@ -41,6 +41,9 @@ foreach ($row as $key => $user) {
 $row = array_values($row);
 
 echo "共有".count($row)."筆\n\n";
+if (count($row) === 0) {
+	exit("nothing to report\n");
+}
 
 $count = 0;
 $out = "";

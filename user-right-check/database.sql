@@ -29,11 +29,12 @@ CREATE TABLE `user_right_check_log` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `user_right_check_userlist` (
-  `userid` int(11) NOT NULL,
-  `name` varchar(255) NOT NULL,
+  `name` varchar(255) CHARACTER SET utf8mb4 NOT NULL,
   `lastedit` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
   `lastlog` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
   `lastusergetrights` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `lasttime` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `noticetime` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
   `rights` varchar(255) NOT NULL DEFAULT ''
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -43,9 +44,6 @@ ALTER TABLE `user_right_check_botlist`
 
 ALTER TABLE `user_right_check_log`
   ADD UNIQUE KEY `hash` (`hash`);
-
-ALTER TABLE `user_right_check_userlist`
-  ADD UNIQUE KEY `userid` (`userid`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
