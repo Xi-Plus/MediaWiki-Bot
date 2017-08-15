@@ -18,8 +18,8 @@ echo "The time now is ".date("Y-m-d H:i:s")." (UTC)\n";
 login();
 $edittoken = edittoken();
 
-$timelimit = date("Y-m-d H:i:s", strtotime($C["other_timelimit"]));
-echo "timelimit < ".$timelimit." (".$C["other_timelimit"].")\n";
+$timelimit = date("Y-m-d H:i:s", strtotime($C["other_report_timelimit"]));
+echo "timelimit < ".$timelimit." (".$C["other_report_timelimit"].")\n";
 
 $sth = $G["db"]->prepare("SELECT * FROM `{$C['DBTBprefix']}userlist` WHERE `lasttime` < :lasttime AND `noticetime` < '".date("Y-m-d H:i:s", time()-86400*7)."' ORDER BY `lasttime` ASC, `lastlog` ASC");
 $sth->bindValue(":lasttime", $timelimit);
@@ -85,7 +85,7 @@ $out .= "]]
 *:~~~~
 
 ";
-	if ($count >= $C["report_limit"]) {
+	if ($count >= $C["other_report_limit"]) {
 		break;
 	}
 }
@@ -101,7 +101,7 @@ for ($i=$C["fail_retry"]; $i > 0; $i--) {
 		"prop" => "revisions",
 		"format" => "json",
 		"rvprop" => "content|timestamp",
-		"titles" => $C["page"]
+		"titles" => $C["other_report_page"]
 	)));
 	if ($res === false) {
 		exit("fetch page fail\n");
@@ -112,17 +112,17 @@ for ($i=$C["fail_retry"]; $i > 0; $i--) {
 	$basetimestamp = $pages["revisions"][0]["timestamp"];
 	echo "get main page\n";
 
-	$start = strpos($text, $C["text"]);
+	$start = strpos($text, $C["other_report_text"]);
 	if ($start === false) {
 		exit("split fail\n");
 	}
 	$newtext = substr($text, 0, $start).$out.substr($text, $start);
 
-	$summary = $C["summary_prefix"];
+	$summary = $C["other_report_summary_prefix"];
 	$post = array(
 		"action" => "edit",
 		"format" => "json",
-		"title" => $C["page"],
+		"title" => $C["other_report_page"],
 		"summary" => $summary,
 		"text" => $newtext,
 		"token" => $edittoken,
@@ -130,7 +130,7 @@ for ($i=$C["fail_retry"]; $i > 0; $i--) {
 		"basetimestamp" => $basetimestamp
 	);
 
-	echo "edit ".$C["page"]." summary=".$summary."\n";
+	echo "edit ".$C["other_report_page"]." summary=".$summary."\n";
 	if (!$C["test"]) {
 		$res = cURL($C["wikiapi"], $post);
 	} else {
