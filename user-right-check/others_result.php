@@ -10,8 +10,8 @@ date_default_timezone_set('UTC');
 @include(__DIR__."/config.php");
 require(__DIR__."/../function/log.php");
 
-$timelimit = date("Y-m-d H:i:s", strtotime($_GET["limit"] ?? "-6 months"));
-echo "顯示最後動作 < ".$timelimit." (".($_GET["limit"] ?? "-6 months").")<br>";
+$timelimit = date("Y-m-d H:i:s", strtotime($_GET["limit"] ?? $C["other_result_timelimit"]));
+echo "顯示最後動作 < ".$timelimit." (".($_GET["limit"] ?? $C["other_result_timelimit"]).")<br>";
 
 if (isset($_POST["name"])) {
 	$time = false;

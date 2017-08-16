@@ -11,8 +11,8 @@ date_default_timezone_set('UTC');
 require(__DIR__."/function.php");
 require(__DIR__."/../function/log.php");
 
-$timelimit = date("Y-m-d H:i:s", strtotime($_GET["limit"] ?? "-6 months"));
-echo "顯示最後動作 < ".$timelimit." (".($_GET["limit"] ?? "-6 months").")<br>";
+$timelimit = date("Y-m-d H:i:s", strtotime($_GET["limit"] ?? $C["other_export_timelimit"]));
+echo "顯示最後動作 < ".$timelimit." (".($_GET["limit"] ?? $C["other_export_timelimit"]).")<br>";
 
 $noeditonly = "";
 if (isset($_GET["noeditonly"])) {

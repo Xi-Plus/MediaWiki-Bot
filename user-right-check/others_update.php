@@ -19,7 +19,7 @@ echo "The time now is ".date("Y-m-d H:i:s")." (UTC)\n";
 login();
 $edittoken = edittoken();
 
-$timelimit = date("Y-m-d H:i:s", strtotime("-6 months 14 days"));
+$timelimit = date("Y-m-d H:i:s", strtotime($C["other_update_timelimit"]));
 
 $sth = $G["db"]->prepare("SELECT * FROM `{$C['DBTBprefix']}userlist` WHERE `lasttime` < :lasttime");
 $sth->bindValue(":lasttime", $timelimit);

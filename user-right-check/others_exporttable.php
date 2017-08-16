@@ -12,10 +12,10 @@ echo "The time now is ".date("Y-m-d H:i:s")." (UTC)\n";
 login();
 $edittoken = edittoken();
 
-$timelimit = date("Y-m-d H:i:s", strtotime("-5 months"));
+$timelimit = date("Y-m-d H:i:s", strtotime($C["other_exporttable_timelimit1"]));
 echo "顯示最後動作 < ".$timelimit." (".("-5 months").")\n";
-$timelimit2 = date("Y-m-d H:i:s", strtotime("-6 months"));
-$timelimit3 = date("Y-m-d H:i:s", strtotime("-6 months + 7 days"));
+$timelimit2 = date("Y-m-d H:i:s", strtotime($C["other_exporttable_timelimit2"]));
+$timelimit3 = date("Y-m-d H:i:s", strtotime($C["other_exporttable_timelimit3"]));
 
 $sth = $G["db"]->prepare("SELECT * FROM `{$C['DBTBprefix']}userlist` WHERE `lasttime` < :lasttime ORDER BY `lasttime` ASC");
 $sth->bindValue(":lasttime", $timelimit);

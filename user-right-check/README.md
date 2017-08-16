@@ -10,8 +10,9 @@
 * `database.sql` 資料庫格式
 * `function.php` 共用函數
 * `log.php` 紀錄函數
-* `others_edit.php` 不活躍用戶自動提報
 * `others_export.php` 用戶提報格式產出
+* `others_exporttable.php` 不活躍用戶狀態(維基頁面)
 * `others_getnew.php` 更新用戶列表
+* `others_report.php` 不活躍用戶自動提報
 * `others_result.php` 不活躍用戶狀態(網頁)
 * `others_update.php` 更新用戶最後動作時間
