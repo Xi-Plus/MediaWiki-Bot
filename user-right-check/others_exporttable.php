@@ -38,8 +38,7 @@ $row = array_values($row);
 echo "共有".count($row)."筆\n\n";
 $out = "";
 $count = 1;
-$out .= '
-{| class="wikitable"
+$out .= '{| class="wikitable"
 |-
 ! 用戶 !! width="80"|權限 !! 最後編輯 !! 最後日誌動作 !! 最後授權';
 foreach ($row as $user) {
@@ -85,13 +84,33 @@ $out .= '
 |}';
 
 for ($i=$C["fail_retry"]; $i > 0; $i--) {
+	$starttimestamp = time();
+	$res = cURL($C["wikiapi"]."?".http_build_query(array(
+		"action" => "query",
+		"prop" => "revisions",
+		"format" => "json",
+		"rvprop" => "content|timestamp",
+		"titles" => $C["other_exporttable_page"]
+	)));
+	if ($res === false) {
+		exit("fetch page fail\n");
+	}
+	$res = json_decode($res, true);
+	$pages = current($res["query"]["pages"]);
+	$text = $pages["revisions"][0]["*"];
+	$basetimestamp = $pages["revisions"][0]["timestamp"];
+
+	$start = strpos($text, $C["other_exporttable_text1"]);
+	$end = strpos($text, $C["other_exporttable_text2"]);
+	$text = substr($text, 0, $start).$C["other_exporttable_text1"].$out.substr($text, $end);
+
 	$summary = $C["other_exporttable_summary_prefix"]."更新";
 	$post = array(
 		"action" => "edit",
 		"format" => "json",
 		"title" => $C["other_exporttable_page"],
 		"summary" => $summary,
-		"text" => $out,
+		"text" => $text,
 		"token" => $edittoken
 	);
 	echo "edit ".$C["other_exporttable_page"]." summary=".$summary."\n";
