@@ -19,7 +19,7 @@ echo "The time now is ".date("Y-m-d H:i:s")." (UTC)\n";
 login();
 $edittoken = edittoken();
 
-// get user list from database
+echo "fetch from database\n";
 $sth = $G["db"]->prepare("SELECT * FROM `{$C['DBTBprefix']}userlist`");
 $sth->execute();
 $row = $sth->fetchAll(PDO::FETCH_ASSOC);
@@ -29,7 +29,7 @@ foreach ($row as $user) {
 	$userlist[$user["name"]] = $user;
 }
 
-// query user list
+echo "fetch userlist\n";
 $res = cURL($C["wikiapi"]."?".http_build_query(array(
 	"action" => "query",
 	"format" => "json",
@@ -43,11 +43,12 @@ if ($res === false) {
 }
 $res = json_decode($res, true);
 $allusers = $res["query"]["allusers"];
-
 $newuserlist = [];
 foreach ($allusers as $user) {
 	$newuserlist[$user["name"]] = $user["groups"];
 }
+
+echo "fetch AWB list\n";
 $res = file_get_contents($C["AWBpage"]);
 if ($res === false) {
 	exit("fetch page fail\n");
@@ -63,6 +64,7 @@ if (preg_match_all("/^\* *([^ \n]+) *$/m", $res, $m)) {
 		$newuserlist[$value] []= $C["AWBright"];
 	}
 }
+
 echo "result count: ".count($newuserlist)."\n";
 
 $count = 0;
@@ -90,6 +92,9 @@ foreach ($newuserlist as $name => $rights) {
 		$sth->bindValue(":lasttime", max($lastedit, $lastlog, $lastusergetrights));
 		$sth->bindValue(":rights", $rights);
 		$res = $sth->execute();
+		if ($res === false) {
+			echo $sth->errorInfo()[2]."\n";
+		}
 		WriteLog("new user: ".$name." ".$rights);
 		echo "\n";
 	} else {
@@ -102,6 +107,10 @@ foreach ($newuserlist as $name => $rights) {
 			$sth->bindValue(":name", $name);
 			$sth->bindValue(":rights", $rights);
 			$res = $sth->execute();
+			$res = $sth->execute();
+			if ($res === false) {
+				echo $sth->errorInfo()[2]."\n";
+			}
 			WriteLog("update rights: ".$name." ".$userlist[$name]["rights"]."->".$rights);
 		}
 		unset($userlist[$name]);
