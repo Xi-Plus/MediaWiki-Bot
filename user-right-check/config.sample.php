@@ -14,6 +14,8 @@ $C["right-whitelist"] = array(
 	"bot"
 );
 
+$C['TIME_MIN'] = '1970-01-01 08:00:01';
+
 $C["AWBright"] = "AWB";
 $C["AWBname"] = "自動維基瀏覽器使用權";
 

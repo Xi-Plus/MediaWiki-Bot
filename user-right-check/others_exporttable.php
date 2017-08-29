@@ -62,14 +62,14 @@ if ($user["lasttime"] < $timelimit2) {
 		}
 	}
 	$out .= ']] || [[Special:用户贡献/'.$user["name"].'|';
-	if ($user["lastedit"] == "0000-00-00 00:00:00") {
+	if ($user["lastedit"] == $C['TIME_MIN']) {
 		$out .= "從未編輯過";
 	} else {
 		$time = strtotime($user["lastedit"]);
 		$out .= date("Y年n月j日", $time)." (".$C["day"][date("w", $time)].") ".date("H:i", $time)." (UTC)";
 	}
 	$out .= ']] || [[Special:日志/'.$user["name"].'|';
-	if ($user["lastlog"] == "0000-00-00 00:00:00") {
+	if ($user["lastlog"] == $C['TIME_MIN']) {
 		$out .= "從未有日誌動作";
 	} else {
 		$time = strtotime($user["lastlog"]);

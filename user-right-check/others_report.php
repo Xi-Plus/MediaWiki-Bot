@@ -21,8 +21,9 @@ $edittoken = edittoken();
 $timelimit = date("Y-m-d H:i:s", strtotime($C["other_report_timelimit"]));
 echo "timelimit < ".$timelimit." (".$C["other_report_timelimit"].")\n";
 
-$sth = $G["db"]->prepare("SELECT * FROM `{$C['DBTBprefix']}userlist` WHERE `lasttime` < :lasttime AND `noticetime` < '".date("Y-m-d H:i:s", time()-86400*7)."' ORDER BY `lasttime` ASC, `lastlog` ASC");
+$sth = $G["db"]->prepare("SELECT * FROM `{$C['DBTBprefix']}userlist` WHERE `lasttime` < :lasttime AND `noticetime` != '{$C['TIME_MIN']}' AND `noticetime` < :noticetime ORDER BY `lasttime` ASC, `lastlog` ASC");
 $sth->bindValue(":lasttime", $timelimit);
+$sth->bindValue(":noticetime", date("Y-m-d H:i:s", time()-86400*7));
 $sth->execute();
 $row = $sth->fetchAll(PDO::FETCH_ASSOC);
 
@@ -65,14 +66,14 @@ foreach ($user["rights"] as $key => $value) {
 }
 $out .= "
 *:理由：逾六個月沒有任何編輯活動、[[Special:用户贡献/".$user["name"]."|";
-if ($user["lastedit"] == "0000-00-00 00:00:00") {
+if ($user["lastedit"] == $C['TIME_MIN']) {
 	$out .= "從未編輯過";
 } else {
 	$time = strtotime($user["lastedit"]);
 	$out .= "最後編輯在".date("Y年n月j日", $time)." (".$C["day"][date("w", $time)].") ".date("H:i", $time)." (UTC)";
 }
 $out .= "]]、[[Special:日志/".$user["name"]."|";
-if ($user["lastlog"] == "0000-00-00 00:00:00") {
+if ($user["lastlog"] == $C['TIME_MIN']) {
 	$out .= "從未有日誌動作";
 } else {
 	$time = strtotime($user["lastlog"]);

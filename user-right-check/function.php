@@ -31,7 +31,7 @@ function lastedit($username) {
 	if (isset($res["query"]["usercontribs"][0]["timestamp"])) {
 		return date("Y-m-d H:i:s", strtotime($res["query"]["usercontribs"][0]["timestamp"]));
 	}
-	return "0000-00-00 00:00:00";
+	return $C['TIME_MIN'];
 }
 
 function lastlog($username) {
@@ -49,12 +49,12 @@ function lastlog($username) {
 	}
 	$res = json_decode($res, true);
 	if (isset($res["query"]["logevents"][0]["type"]) && $res["query"]["logevents"][0]["type"] == "newusers") {
-		return "0000-00-00 00:00:00";
+		return $C['TIME_MIN'];
 	}
 	if (isset($res["query"]["logevents"][0]["timestamp"])) {
 		return date("Y-m-d H:i:s", strtotime($res["query"]["logevents"][0]["timestamp"]));
 	}
-	return "0000-00-00 00:00:00";
+	return $C['TIME_MIN'];
 }
 
 function userright($username, $checkawb = true) {
@@ -103,7 +103,7 @@ function lastusergetrights($username) {
 	if (isset($res["query"]["logevents"][0]["timestamp"])) {
 		return date("Y-m-d H:i:s", strtotime($res["query"]["logevents"][0]["timestamp"]));
 	}
-	return "0000-00-00 00:00:00";
+	return $C['TIME_MIN'];
 }
 
 function monthdiff($time) {

@@ -37,13 +37,13 @@ foreach ($row as $key => $user) {
 		continue;
 	}
 	$row[$key]["time"] = 0;
-	if ($row[$key]["lastedit"] !== "0000-00-00 00:00:00") {
+	if ($row[$key]["lastedit"] !== $C['TIME_MIN']) {
 		$row[$key]["time"] = max($row[$key]["time"], strtotime($row[$key]["lastedit"]));
 	}
-	if ($row[$key]["lastlog"] !== "0000-00-00 00:00:00") {
+	if ($row[$key]["lastlog"] !== $C['TIME_MIN']) {
 		$row[$key]["time"] = max($row[$key]["time"], strtotime($row[$key]["lastlog"]));
 	}
-	if ($row[$key]["lastusergetrights"] !== "0000-00-00 00:00:00") {
+	if ($row[$key]["lastusergetrights"] !== $C['TIME_MIN']) {
 		$row[$key]["time"] = max($row[$key]["time"], strtotime($row[$key]["lastusergetrights"]));
 	}
 }
@@ -80,14 +80,14 @@ foreach ($user["rights"] as $key => $value) {
 }
 ?><br>
 *:理由：逾六個月沒有任何編輯活動、[[Special:用户贡献/<?=$user["name"]?>|<?php
-if ($user["lastedit"] == "0000-00-00 00:00:00") {
+if ($user["lastedit"] == $C['TIME_MIN']) {
 	echo "從未編輯過";
 } else {
 	$time = strtotime($user["lastedit"]);
 	echo "最後編輯在".date("Y年n月j日", $time)." (".$C["day"][date("w", $time)].") ".date("H:i", $time)." (UTC)";
 }
 ?>]]、[[Special:日志/<?=$user["name"]?>|<?php
-if ($user["lastlog"] == "0000-00-00 00:00:00") {
+if ($user["lastlog"] == $C['TIME_MIN']) {
 	echo "從未有日誌動作";
 } else {
 	$time = strtotime($user["lastlog"]);
