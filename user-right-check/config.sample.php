@@ -36,6 +36,8 @@ $C["other_exporttable_page"] = "User:A2093064-bot/task/13/output/revoke";
 $C["other_exporttable_summary_prefix"] = "[[User:A2093064-bot/task/13|機器人13]]：檢查持權用戶活躍狀況：";
 $C["other_exporttable_text1"] = "<!--revoke table start-->";
 $C["other_exporttable_text2"] = "<!--revoke table end-->";
+$C["other_exporttable_text3"] = "<!--sign start-->";
+$C["other_exporttable_text4"] = "<!--sign end-->";
 
 $C["other_export_timelimit"] = "-6 months";
 

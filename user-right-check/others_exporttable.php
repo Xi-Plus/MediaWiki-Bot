@@ -104,6 +104,10 @@ for ($i=$C["fail_retry"]; $i > 0; $i--) {
 	$end = strpos($text, $C["other_exporttable_text2"]);
 	$text = substr($text, 0, $start).$C["other_exporttable_text1"].$out.substr($text, $end);
 
+	$start = strpos($text, $C["other_exporttable_text3"]);
+	$end = strpos($text, $C["other_exporttable_text4"]);
+	$text = substr($text, 0, $start).$C["other_exporttable_text3"]."~~~~".substr($text, $end);
+
 	$summary = $C["other_exporttable_summary_prefix"]."更新";
 	$post = array(
 		"action" => "edit",
