@@ -94,37 +94,39 @@ foreach ($pagelist as $page) {
 	}
 }
 
-for ($i=$C["fail_retry"]; $i > 0; $i--) {
-	$text = "";
-	foreach ($logpage as $page) {
-		$text .= "*[[".$page."]]\n";
-	}
-	$text .= "~~~~";
-
-	$summary = $C["summary_prefix"]."，紀錄編輯頁面";
-	$post = array(
-		"action" => "edit",
-		"format" => "json",
-		"title" => $C["log_page"],
-		"summary" => $summary,
-		"text" => $text,
-		"token" => $edittoken
-	);
-	echo "edit ".$C["log_page"]." summary=".$summary."\n";
-
-	if (!$C["test"]) $res = cURL($C["wikiapi"], $post);
-	else $res = false;
-	$res = json_decode($res, true);
-	if (isset($res["error"])) {
-		echo "edit fail\n";
-		var_dump($res);
-		if ($i === 1) {
-			exit("quit\n");
-		} else {
-			echo "retry\n";
+if (count($logpage) != 0) {
+	for ($i=$C["fail_retry"]; $i > 0; $i--) {
+		$text = "";
+		foreach ($logpage as $page) {
+			$text .= "*[[".$page."]]\n";
 		}
-	} else {
-		break;
+		$text .= "~~~~";
+
+		$summary = $C["summary_prefix"]."，紀錄編輯頁面";
+		$post = array(
+			"action" => "edit",
+			"format" => "json",
+			"title" => $C["log_page"],
+			"summary" => $summary,
+			"text" => $text,
+			"token" => $edittoken
+		);
+		echo "edit ".$C["log_page"]." summary=".$summary."\n";
+
+		if (!$C["test"]) $res = cURL($C["wikiapi"], $post);
+		else $res = false;
+		$res = json_decode($res, true);
+		if (isset($res["error"])) {
+			echo "edit fail\n";
+			var_dump($res);
+			if ($i === 1) {
+				exit("quit\n");
+			} else {
+				echo "retry\n";
+			}
+		} else {
+			break;
+		}
 	}
 }
 
