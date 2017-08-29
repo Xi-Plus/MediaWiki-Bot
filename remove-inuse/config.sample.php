@@ -6,6 +6,8 @@ $C["pass"] = "";
 
 $C["category"] = "Category:被擱置的條目";
 
+$C["log_page"] = "User:A2093064-bot/task/6/output/log";
+
 $C["max_edits_one_time"] = 3;
 $C["fail_retry"] = 5;
 
