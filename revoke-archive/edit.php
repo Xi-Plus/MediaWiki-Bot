@@ -145,6 +145,7 @@ for ($i=$C["fail_retry"]; $i > 0; $i--) {
 		"text" => $oldpagetext,
 		"token" => $edittoken,
 		"minor" => "",
+		"bot" => "",
 		"starttimestamp" => $starttimestamp,
 		"basetimestamp" => $basetimestamp
 	);
@@ -225,6 +226,7 @@ foreach ($newpagetext as $year => $newtext) {
 			"text" => $text,
 			"token" => $edittoken,
 			"minor" => "",
+			"bot" => "",
 			"starttimestamp" => $starttimestamp2
 		);
 		if ($basetimestamp2 !== null) {

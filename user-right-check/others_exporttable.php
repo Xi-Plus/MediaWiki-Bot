@@ -115,6 +115,7 @@ for ($i=$C["fail_retry"]; $i > 0; $i--) {
 		"title" => $C["other_exporttable_page"],
 		"summary" => $summary,
 		"text" => $text,
+		"minor" => "",
 		"token" => $edittoken
 	);
 	echo "edit ".$C["other_exporttable_page"]." summary=".$summary."\n";

@@ -91,6 +91,7 @@ foreach ($C["category"] as $category) {
 				"pageid" => $page["pageid"],
 				"summary" => $summary,
 				"text" => $text,
+				"minor" => "",
 				"token" => $edittoken,
 				"starttimestamp" => $starttimestamp,
 				"basetimestamp" => $basetimestamp

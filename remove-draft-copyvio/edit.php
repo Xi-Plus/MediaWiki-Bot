@@ -59,6 +59,7 @@ foreach ($pagelist as $page) {
 			"text" => $text,
 			"token" => $edittoken,
 			"minor" => "",
+			"bot" => "",
 			"starttimestamp" => $starttimestamp,
 			"basetimestamp" => $basetimestamp
 		);

@@ -156,6 +156,8 @@ for ($i=$C["fail_retry"]; $i > 0; $i--) {
 		"title" => $C["from_page"],
 		"summary" => $summary,
 		"text" => $oldpagetext,
+		"minor" => "",
+		"bot" => "",
 		"token" => $edittoken,
 		"starttimestamp" => $starttimestamp,
 		"basetimestamp" => $basetimestamp
@@ -206,6 +208,8 @@ foreach ($newpagetext as $date => $newtext) {
 		"title" => $page,
 		"summary" => $summary,
 		"text" => $oldtext."\n".$newtext,
+		"minor" => "",
+		"bot" => "",
 		"token" => $edittoken,
 		"starttimestamp" => $starttimestamp2
 	);

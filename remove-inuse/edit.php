@@ -69,6 +69,7 @@ foreach ($pagelist as $page) {
 			"text" => $text,
 			"token" => $edittoken,
 			"minor" => "",
+			"bot" => "",
 			"starttimestamp" => $starttimestamp,
 			"basetimestamp" => $basetimestamp
 		);
@@ -118,7 +119,6 @@ if (count($logpage) != 0) {
 		$res = json_decode($res, true);
 		if (isset($res["error"])) {
 			echo "edit fail\n";
-			var_dump($res);
 			if ($i === 1) {
 				exit("quit\n");
 			} else {
