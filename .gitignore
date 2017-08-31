@@ -1,2 +1,4 @@
 tmp/
 config.php
+out.txt
+bad-image-list/remove.txt
