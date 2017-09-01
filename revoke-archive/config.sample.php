@@ -21,6 +21,7 @@ $C["text2"] = "逾六个月没有任何编辑活动";
 $C["text3"] = "已封禁或除权用户覆审";
 $C["text4"] = "請辭或棄去無用權限";
 $C["text5"] = "{{Rules}}";
+$C["status2done"] = ["Done", "done", "完成", "-", "Not done", "not done", "拒絕", "拒绝", "驳回", "駁回", "未完成"];
 
 $C["fail_retry"] = 5;
 

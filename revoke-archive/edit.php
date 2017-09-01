@@ -90,7 +90,7 @@ for ($i=$C["fail_retry"]; $i > 0; $i--) {
 				echo $m[1]."\t";
 				preg_match("/{{status2\|(.+?)(\||}})/", $temp, $m);
 				echo "status ".$m[1]."\t";
-				if ($m[1] == "+" || $m[1] == "-") {
+				if (in_array($m[1], $C["status2done"])) {
 					preg_match_all("/\d{4}年\d{1,2}月\d{1,2}日 \(.{3}\) \d{2}\:\d{2} \(UTC\)/", $temp, $m);
 					$firsttime = time();
 					$lasttime = 0;
