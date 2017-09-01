@@ -45,17 +45,19 @@ foreach ($pagelist as $pagelist2) {
 
 	foreach ($results as $result) {
 		$protect = ["edit" => "", "move" => ""];
+		$redirect = isset($result["redirect"]);
 		foreach ($result["protection"] as $protection) {
 			$protect[$protection["type"]] = $protection["level"];
 		}
 
-		$sth = $G["db"]->prepare("UPDATE `{$C['DBTBprefix']}page` SET `protectedit` = :protectedit, `protectmove` = :protectmove, `time` = :time WHERE `title` = :title");
+		$sth = $G["db"]->prepare("UPDATE `{$C['DBTBprefix']}page` SET `protectedit` = :protectedit, `protectmove` = :protectmove, `redirect` = :redirect, `time` = :time WHERE `title` = :title");
 		$sth->bindValue(":title", $result["title"]);
 		$sth->bindValue(":protectedit", $protect["edit"]);
 		$sth->bindValue(":protectmove", $protect["move"]);
+		$sth->bindValue(":redirect", $redirect);
 		$sth->bindValue(":time", date("Y-m-d H:i:s"));
 		$res = $sth->execute();
-		echo $result["title"]." edit=".$protect["edit"]." move=".$protect["move"]."\n";
+		echo $result["title"]." edit=".$protect["edit"]." move=".$protect["move"]." ".($redirect?"(redirect)":"")."\n";
 	}
 }
 
