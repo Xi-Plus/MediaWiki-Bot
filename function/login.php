@@ -32,9 +32,11 @@ function login() {
 			if($res["login"]["result"] === "Success") {
 				echo "login success.\n";
 			} else {
+				var_dump($res);
 				exit("login fail 1\n");
 			}
 		} else {
+			var_dump($res);
 			exit("login fail 2\n");
 		}
 	} else {
