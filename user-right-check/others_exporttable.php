@@ -50,7 +50,7 @@ if ($user["lasttime"] < $timelimit2) {
 	$out .= ' style="background: #ffc;"';
 }
 	$out .= '
-| [[User:'.$user["name"].'|'.$user["name"].']] [[User talk:'.$user["name"].'|T]] || [[Special:用户权限/'.$user["name"].'|';
+| [[User talk:'.$user["name"].'|'.$user["name"].']] || [[Special:用户权限/'.$user["name"].'|';
 	foreach ($user["rights"] as $key => $value) {
 		if ($key) {
 			$out .= '、';
