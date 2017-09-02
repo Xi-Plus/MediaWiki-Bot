@@ -17,7 +17,8 @@ echo "The time now is ".date("Y-m-d H:i:s")." (UTC)\n";
 login();
 $edittoken = edittoken();
 
-$sth = $G["db"]->prepare("SELECT * FROM `{$C['DBTBprefix']}page`");
+$sth = $G["db"]->prepare("SELECT * FROM `{$C['DBTBprefix']}page` WHERE `time` < :time");
+$sth->bindValue(":time", date("Y-m-d H:i:s", strtotime($C["protection_update"])));
 $sth->execute();
 $pagelist = $sth->fetchAll(PDO::FETCH_ASSOC);
 

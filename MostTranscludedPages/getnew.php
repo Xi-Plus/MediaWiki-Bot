@@ -44,26 +44,28 @@ $results = $res["query"]["querypage"]["results"];
 foreach ($results as $page) {
 	$title = $page["title"];
 	if (!isset($pagelist[$title])) {
-		$sth = $G["db"]->prepare("INSERT INTO `{$C['DBTBprefix']}page` (`title`, `count`, `protectedit`, `protectmove`, `time`) VALUES (:title, :count, :protectedit, :protectmove, :time)");
+		$sth = $G["db"]->prepare("INSERT INTO `{$C['DBTBprefix']}page` (`title`, `count`, `protectedit`, `protectmove`, `redirect`, `time`) VALUES (:title, :count, :protectedit, :protectmove, :redirect, :time)");
 		$sth->bindValue(":title", $title);
 		$sth->bindValue(":count", $page["value"]);
 		$sth->bindValue(":protectedit", "");
 		$sth->bindValue(":protectmove", "");
-		$sth->bindValue(":time", date("Y-m-d H:i:s"));
+		$sth->bindValue(":redirect", 2);
+		$sth->bindValue(":time", $C["TIME_MIN"]);
 		$res = $sth->execute();
 		if ($res === false) {
 			echo $sth->errorInfo()[2]."\n";
 		}
+		echo "new ".$page["title"]." (".$page["value"].")\n";
 	} else {
 		if ($pagelist[$title]["count"] != $page["value"]) {
-			$sth = $G["db"]->prepare("UPDATE `{$C['DBTBprefix']}page` SET `count` = :count, `time` = :time WHERE `title` = :title");
+			$sth = $G["db"]->prepare("UPDATE `{$C['DBTBprefix']}page` SET `count` = :count WHERE `title` = :title");
 			$sth->bindValue(":count", $page["value"]);
 			$sth->bindValue(":title", $title);
-			$sth->bindValue(":time", date("Y-m-d H:i:s"));
 			$res = $sth->execute();
 			if ($res === false) {
 				echo $sth->errorInfo()[2]."\n";
 			}
+			echo "update ".$page["title"]." (".$pagelist[$title]["count"]."->".$page["value"].")\n";
 		}
 		unset($pagelist[$title]);
 	}
@@ -71,7 +73,7 @@ foreach ($results as $page) {
 
 foreach ($pagelist as $page) {
 	$sth = $G["db"]->prepare("DELETE FROM `{$C['DBTBprefix']}page` WHERE `title` = :title");
-	$sth->bindValue(":name", $page["title"]);
+	$sth->bindValue(":title", $page["title"]);
 	$res = $sth->execute();
 	echo "remove ".$page["title"]." (".$page["count"].")\n";
 }
