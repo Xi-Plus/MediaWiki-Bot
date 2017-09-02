@@ -53,22 +53,24 @@ foreach ($results as $page) {
 		if ($res === false) {
 			echo $sth->errorInfo()[2]."\n";
 		}
+		echo "new ".$title."\n";
 	} else {
 		unset($pagelist[$title]);
 	}
 }
 
 foreach ($pagelist as $page) {
-	$count = file_get_contents($C["templatecount"].$page["title"]);
-	if ($res !== false) {
-		$res = json_decode($res, true);
-		if ($res["status"] && $res["result"] > $page["maxcount"]) {
-			$sth = $G["db"]->prepare("UPDATE `{$C['DBTBprefix']}page` SET `maxcount` = :maxcount, `starttime` = :starttime, `time` = :time WHERE `title` = :title");
-			$sth->bindValue(":title", $result["title"]);
-			$sth->bindValue(":maxcount", $res["result"]);
-			$sth->bindValue(":starttime", date("Y-m-d H:i:s"));
+	$count = @file_get_contents($C["templatecount"].urlencode($page["title"]));
+	if ($count !== false) {
+		$count = json_decode($count, true);
+		if ($count["status"] && $count["result"] > $page["maxused"]) {
+			$sth = $G["db"]->prepare("UPDATE `{$C['DBTBprefix']}page` SET `maxused` = :maxused, `starttime` = :starttime, `maxtime` = :maxtime WHERE `title` = :title");
+			$sth->bindValue(":title", $page["title"]);
+			$sth->bindValue(":maxused", $count["result"]);
+			$sth->bindValue(":starttime", ($page["maxused"]==0?date("Y-m-d H:i:s"):$page["starttime"]));
 			$sth->bindValue(":maxtime", date("Y-m-d H:i:s"));
 			$res = $sth->execute();
+			echo "used ".$page["title"]." (".$page["maxused"]."->".$count["result"].")\n";
 		}
 	} else {
 		echo "fetch ".$page["title"]." fail\n";
