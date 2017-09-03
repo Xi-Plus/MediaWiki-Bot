@@ -89,6 +89,7 @@ for ($i=0; $i < $C["fail_retry"]; $i++) {
 		"title" => $C["outpage"],
 		"summary" => $summary,
 		"text" => $out,
+		"minor" => "",
 		"token" => $edittoken
 	);
 	echo "edit ".$C["outpage"]." summary=".$summary."\n";
