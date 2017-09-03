@@ -46,7 +46,7 @@ $C["other_notice_timelimit2"] = "-3 months";
 $C["other_notice_text1"] = "Template:Inactive IPBE";
 $C["other_notice_text2"] = "Template:Inactive right";
 $C["other_notice_limit"] = 10;
-$C["other_notice_summary_prefix"] = "[[User:A2093064-bot/task/13|機器人13]]：通知不活躍用戶除權通知";
+$C["other_notice_summary_prefix"] = "[[User:A2093064-bot/task/12|機器人12]]：通知不活躍用戶除權通知";
 
 $C["other_result_timelimit"] = "-183 days";
 
