@@ -116,7 +116,12 @@ foreach ($row as $user) {
 		}
 		$res = json_decode($res, true);
 		if (isset($res["error"])) {
+			if ($res["error"]["code"] == "no-direct-editing") {
+				echo "flow page. pass.\n";
+				break;
+			}
 			echo "edit fail\n";
+			var_dump($res);
 			if ($i === 1) {
 				echo "quit\n";
 				break;
