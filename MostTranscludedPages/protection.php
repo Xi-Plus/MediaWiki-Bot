@@ -21,6 +21,11 @@ $sth = $G["db"]->prepare("SELECT * FROM `{$C['DBTBprefix']}page` WHERE `time` < 
 $sth->bindValue(":time", date("Y-m-d H:i:s", strtotime($C["protection_update"])));
 $sth->execute();
 $pagelist = $sth->fetchAll(PDO::FETCH_ASSOC);
+$pages = [];
+foreach ($pagelist as $temp) {
+	$pages[$temp["title"]] = $temp;
+}
+echo "update ".count($pagelist)." pages\n";
 
 $pagelist = array_chunk($pagelist, 500, true);
 
@@ -31,6 +36,7 @@ foreach ($pagelist as $pagelist2) {
 	}
 	$titles = implode("|", $titles);
 
+	echo "fetching\n";
 	$res = cURL($C["wikiapi"], array(
 		"action" => "query",
 		"format" => "json",
@@ -38,6 +44,7 @@ foreach ($pagelist as $pagelist2) {
 		"titles" => $titles,
 		"inprop" => "protection"
 	));
+	echo "fetched\n";
 	if ($res === false) {
 		exit("fetch fail\n");
 	}
@@ -45,20 +52,30 @@ foreach ($pagelist as $pagelist2) {
 	$results = $res["query"]["pages"];
 
 	foreach ($results as $result) {
+		$title = $result["title"];
 		$protect = ["edit" => "", "move" => ""];
-		$redirect = isset($result["redirect"]);
+		$redirect = (isset($result["redirect"])?1:0);
 		foreach ($result["protection"] as $protection) {
 			$protect[$protection["type"]] = $protection["level"];
 		}
-
-		$sth = $G["db"]->prepare("UPDATE `{$C['DBTBprefix']}page` SET `protectedit` = :protectedit, `protectmove` = :protectmove, `redirect` = :redirect, `time` = :time WHERE `title` = :title");
-		$sth->bindValue(":title", $result["title"]);
-		$sth->bindValue(":protectedit", $protect["edit"]);
-		$sth->bindValue(":protectmove", $protect["move"]);
-		$sth->bindValue(":redirect", $redirect);
-		$sth->bindValue(":time", date("Y-m-d H:i:s"));
-		$res = $sth->execute();
-		echo $result["title"]." edit=".$protect["edit"]." move=".$protect["move"]." ".($redirect?"(redirect)":"")."\n";
+		if ($protect["edit"] != $pages[$title]["protectedit"] || $protect["move"] != $pages[$title]["protectmove"] || $redirect != $pages[$title]["redirect"]) {
+			$sth = $G["db"]->prepare("UPDATE `{$C['DBTBprefix']}page` SET `protectedit` = :protectedit, `protectmove` = :protectmove, `redirect` = :redirect, `time` = :time WHERE `title` = :title");
+			$sth->bindValue(":title", $title);
+			$sth->bindValue(":protectedit", $protect["edit"]);
+			$sth->bindValue(":protectmove", $protect["move"]);
+			$sth->bindValue(":redirect", $redirect);
+			$sth->bindValue(":time", date("Y-m-d H:i:s"));
+			$res = $sth->execute();
+			echo $result["title"]." edit=".$protect["edit"]." move=".$protect["move"]." ".($redirect?"(redirect)":"")."\n";
+			if ($res === false) {
+				echo $sth->errorInfo()[2]."\n";
+			}
+		} else {
+			$sth = $G["db"]->prepare("UPDATE `{$C['DBTBprefix']}page` SET `time` = :time WHERE `title` = :title");
+			$sth->bindValue(":title", $title);
+			$sth->bindValue(":time", date("Y-m-d H:i:s"));
+			$res = $sth->execute();
+		}
 	}
 }
 
