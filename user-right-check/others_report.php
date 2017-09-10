@@ -46,55 +46,6 @@ if (count($row) === 0) {
 	exit("nothing to report\n");
 }
 
-$count = 0;
-$out = "";
-foreach ($row as $user) {
-	echo $user["name"]."\t".$user["lastedit"]."\t".$user["lastlog"]."\t".$user["lastusergetrights"]."\n";
-	$count ++;
-	$out .= "*{{User|".$user["name"]."}}
-*:{{status2|新提案}}
-*:需複審或解除之權限：";
-foreach ($user["rights"] as $key => $value) {
-	if ($key) {
-		$out .= "、";
-	}
-	if ($value == $C["AWBright"]) {
-		$out .= $C["AWBname"];
-	} else {
-		$out .= '{{subst:int:group-'.$value.'}}';
-	}
-}
-$out .= "
-*:理由：逾六個月沒有任何編輯活動、[[Special:用户贡献/".$user["name"]."|";
-if ($user["lastedit"] == $C['TIME_MIN']) {
-	$out .= "從未編輯過";
-} else {
-	$time = strtotime($user["lastedit"]);
-	$out .= "最後編輯在".date("Y年n月j日", $time)." (".$C["day"][date("w", $time)].") ".date("H:i", $time)." (UTC)";
-}
-$out .= "]]、[[Special:日志/".$user["name"]."|";
-if ($user["lastlog"] == $C['TIME_MIN']) {
-	$out .= "從未有日誌動作";
-} else {
-	$time = strtotime($user["lastlog"]);
-	$out .= "最後日誌動作在".date("Y年n月j日", $time)." (".$C["day"][date("w", $time)].") ".date("H:i", $time)." (UTC)";
-}
-$out .= "]]、[[Special:用户权限/".$user["name"]."|";
-$time = strtotime($user["lastusergetrights"]);
-$out .= "最後授權在".date("Y年n月j日", $time)." (".$C["day"][date("w", $time)].") ".date("H:i", $time)." (UTC)";
-$out .= "]]
-*:~~~~
-
-";
-	if ($count >= $C["other_report_limit"]) {
-		break;
-	}
-}
-
-echo "press any key to continue\n";
-fgets(STDIN);
-
-
 for ($i=$C["fail_retry"]; $i > 0; $i--) {
 	$starttimestamp = time();
 	$res = cURL($C["wikiapi"]."?".http_build_query(array(
@@ -117,6 +68,58 @@ for ($i=$C["fail_retry"]; $i > 0; $i--) {
 	if ($start === false) {
 		exit("split fail\n");
 	}
+
+	$count = 0;
+	$out = "";
+	foreach ($row as $user) {
+		echo $user["name"]."\t".$user["lastedit"]."\t".$user["lastlog"]."\t".$user["lastusergetrights"];
+		if (strpos($text, "{{User|".$user["name"]."}}") !== false) {
+			echo "\talready report\n";
+			continue;
+		}
+		$count ++;
+		$out .= "*{{User|".$user["name"]."}}\n*:{{status2|新提案}}\n*:需複審或解除之權限：";
+		foreach ($user["rights"] as $key => $value) {
+			if ($key) {
+				$out .= "、";
+			}
+			if ($value == $C["AWBright"]) {
+				$out .= $C["AWBname"];
+			} else {
+				$out .= '{{subst:int:group-'.$value.'}}';
+			}
+		}
+		$out .= "\n*:理由：逾六個月沒有任何編輯活動、[[Special:用户贡献/".$user["name"]."|";
+		if ($user["lastedit"] == $C['TIME_MIN']) {
+			$out .= "從未編輯過";
+		} else {
+			$time = strtotime($user["lastedit"]);
+			$out .= "最後編輯在".date("Y年n月j日", $time)." (".$C["day"][date("w", $time)].") ".date("H:i", $time)." (UTC)";
+		}
+		$out .= "]]、[[Special:日志/".$user["name"]."|";
+		if ($user["lastlog"] == $C['TIME_MIN']) {
+			$out .= "從未有日誌動作";
+		} else {
+			$time = strtotime($user["lastlog"]);
+			$out .= "最後日誌動作在".date("Y年n月j日", $time)." (".$C["day"][date("w", $time)].") ".date("H:i", $time)." (UTC)";
+		}
+		$out .= "]]、[[Special:用户权限/".$user["name"]."|";
+		$time = strtotime($user["lastusergetrights"]);
+		$out .= "最後授權在".date("Y年n月j日", $time)." (".$C["day"][date("w", $time)].") ".date("H:i", $time)." (UTC)";
+		$out .= "]]\n*:~~~~\n\n";
+		echo "\n";
+		if ($count >= $C["other_report_limit"]) {
+			break;
+		}
+	}
+
+	if ($out === "") {
+		exit("nothing to report\n");
+	}
+
+	echo "press any key to continue\n";
+	fgets(STDIN);
+
 	$newtext = substr($text, 0, $start).$out.substr($text, $start);
 
 	$summary = $C["other_report_summary_prefix"];
