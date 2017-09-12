@@ -107,7 +107,6 @@ foreach ($newuserlist as $name => $rights) {
 			$sth->bindValue(":name", $name);
 			$sth->bindValue(":rights", $rights);
 			$res = $sth->execute();
-			$res = $sth->execute();
 			if ($res === false) {
 				echo $sth->errorInfo()[2]."\n";
 			}
