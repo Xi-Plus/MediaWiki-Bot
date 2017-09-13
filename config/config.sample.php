@@ -17,3 +17,4 @@ $C["User-Agent"] = "User:A2093064-bot";
 $C["allowsapi"] = array("cli");
 
 $C["test"] = false;
+$C["check"] = false;
