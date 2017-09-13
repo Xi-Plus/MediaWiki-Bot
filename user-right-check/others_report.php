@@ -117,8 +117,10 @@ for ($i=$C["fail_retry"]; $i > 0; $i--) {
 		exit("nothing to report\n");
 	}
 
-	echo "press any key to continue\n";
-	fgets(STDIN);
+	if ($C["check"]) {
+		echo "press any key to continue\n";
+		fgets(STDIN);
+	}
 
 	$newtext = substr($text, 0, $start).$out.substr($text, $start);
 
