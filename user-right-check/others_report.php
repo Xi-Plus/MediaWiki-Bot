@@ -124,7 +124,7 @@ for ($i=$C["fail_retry"]; $i > 0; $i--) {
 
 	$newtext = substr($text, 0, $start).$out.substr($text, $start);
 
-	$summary = $C["other_report_summary_prefix"];
+	$summary = $C["other_report_summary_prefix"]."，共".$count."位用戶";
 	$post = array(
 		"action" => "edit",
 		"format" => "json",
