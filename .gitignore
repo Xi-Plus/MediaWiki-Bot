@@ -1,6 +1,6 @@
 tmp/
 config.php
 input.txt
-out.txt
-out.csv
+out*.txt
+out*.csv
 bad-image-list/remove.txt
