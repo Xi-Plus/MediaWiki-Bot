@@ -67,10 +67,9 @@ for ($i=$C["fail_retry"]; $i > 0; $i--) {
 	$text = preg_replace("/^( *== *{$C['text2']} *== *)$/m", $hash."$1", $text);
 	$text = preg_replace("/^( *== *{$C['text3']} *== *)$/m", $hash."$1", $text);
 	$text = preg_replace("/^( *== *{$C['text4']} *== *)$/m", $hash."$1", $text);
-	$text = preg_replace("/^( *{$C['text5']} *)$/m", $hash."$1", $text);
 
 	$text = explode($hash, $text);
-	if (count($text) != 6) {
+	if (count($text) != 5) {
 		exit("split error\n");
 	}
 	echo "split ok\n";
@@ -127,7 +126,6 @@ for ($i=$C["fail_retry"]; $i > 0; $i--) {
 			}
 		}
 	}
-	$oldpagetext .= $text[5];
 
 	if ($archive_count["all"] === 0) {
 		exit("no change\n");
