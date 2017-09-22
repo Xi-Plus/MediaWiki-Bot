@@ -29,6 +29,7 @@ for ($i=0; $i < $C["fail_retry"]; $i++) {
 !使用者
 !簽名
 !狀態
+!最後編輯
 !字數
 !位元組
 ';
@@ -42,17 +43,34 @@ for ($i=0; $i < $C["fail_retry"]; $i++) {
 		$sign = $m[2][$key];
 		$user = "";
 		if (preg_match_all("/\[\[(?:User:|用户:|User talk:|User_talk:|用户讨论:|Special:Contributions\/|Special:用户贡献\/|Special:用戶貢獻\/|特殊:用户贡献\/|特殊:用戶貢獻\/)([^|\/]+)/i", $sign, $m2)) {
-			$user = "{{User|".$m2[1][0]."}}";
+			$user = $m2[1][0];
 		}
+		$res = cURL($C["wikiapi"]."?".http_build_query(array(
+			"action" => "query",
+			"format" => "json",
+			"list" => "usercontribs",
+			"uclimit" => "1",
+			"ucuser" => $user,
+			"ucprop" => "timestamp"
+		)));
+		if ($res === false) {
+			exit("fetch page fail\n");
+		}
+		$res = json_decode($res, true);
+		$time = strtotime($res["query"]["usercontribs"][0]["timestamp"]);
+		$date = date("Y年m月d日", $time)." (".$C["day"][date("w", $time)].") ".date("H:i", $time)." (UTC)";
 		$len = mb_strlen($sign);
 		$byte = strlen($sign);
 		if ($byte > 255) {
 			$byte = "{{red|'''".$byte."'''}}";
 		}
+		echo ($key+1)."\t".$user."\t".$status."\t".$date."\t".$len."\t".$byte."\n";
+		$user = "{{User|".$user."}}";
 		$out .= '|-
 |'.$user.'
 | '.$sign.'
 |'.$status.'
+|'.$date.'
 |'.$len.'
 |'.$byte.'
 ';
