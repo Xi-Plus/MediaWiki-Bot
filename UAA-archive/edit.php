@@ -69,7 +69,7 @@ for ($i=$C["fail_retry"]; $i > 0; $i--) {
 	$newpagetext = "";
 
 	$hash = md5(uniqid(rand(), true));
-	$text = preg_replace("/^(\*{{user-uaa\|.+?}})/mi", $hash."$1", $text);
+	$text = preg_replace("/^(\*[^*:])/mi", $hash."$1", $text);
 	$text = explode($hash, $text);
 	unset($text[0]);
 	echo "find ".count($text)." reports\n";
