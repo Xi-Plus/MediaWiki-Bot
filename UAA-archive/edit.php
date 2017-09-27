@@ -96,6 +96,9 @@ for ($i=$C["fail_retry"]; $i > 0; $i--) {
 				$blocked = true;
 				$lasttime = strtotime($res["query"]["users"][0]["blockedtimestamp"]);
 			}
+		} else  if (preg_match("/^\* *{{deltalk|/i", $temp)) {
+			echo "Deltalk\t";
+			$blocked = true;
 		} else {
 			echo "Unknown user\t";
 		}
