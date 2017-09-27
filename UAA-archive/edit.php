@@ -77,6 +77,7 @@ for ($i=$C["fail_retry"]; $i > 0; $i--) {
 	$archive_count = 0;
 	foreach ($text as $temp) {
 		$blocked = false;
+		$lasttime = 0;
 		if (preg_match("/{{user-uaa\|(?:1=)?(.+?)}}/", $temp, $m)) {
 			$user = $m[1];
 			echo "User:".$user."\t";
@@ -91,14 +92,16 @@ for ($i=$C["fail_retry"]; $i > 0; $i--) {
 				exit("fetch page fail\n");
 			}
 			$res = json_decode($res, true);
-			$blocked = isset($res["query"]["users"][0]["blockexpiry"]) && $res["query"]["users"][0]["blockexpiry"] === "infinity";
+			if (isset($res["query"]["users"][0]["blockexpiry"]) && $res["query"]["users"][0]["blockexpiry"] === "infinity") {
+				$blocked = true;
+				$lasttime = strtotime($res["query"]["users"][0]["blockedtimestamp"]);
+			}
 		} else {
 			echo "Unknown user\t";
 		}
 		echo ($blocked?"blocked":"not blocked")."\t";
 
 		if (preg_match_all("/\d{4}年\d{1,2}月\d{1,2}日 \(.{3}\) \d{2}\:\d{2} \(UTC\)/", $temp, $m)) {
-			$lasttime = 0;
 			foreach ($m[0] as $timestr) {
 				$time = converttime($timestr);
 				if ($time > $lasttime) $lasttime = $time;
