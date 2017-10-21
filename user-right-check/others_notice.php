@@ -53,22 +53,6 @@ $sthnot = $G["db"]->prepare("UPDATE `{$C['DBTBprefix']}userlist` SET `noticetime
 $sthnot->bindValue(":noticetime", date("Y-m-d H:i:s"));
 foreach ($row as $user) {
 	echo $user["name"]."\t".$user["lastedit"]."\t".$user["lastlog"]."\t".$user["lastusergetrights"]."\n";
-	if ($user["rights"] == ["ipblock-exempt"]) {
-		$out = "{{subst:inactive IPBE}}";
-	} else {
-		$out = "{{subst:inactive right|";
-		foreach ($user["rights"] as $key => $value) {
-			if ($key) {
-				$out .= "、";
-			}
-			if ($value == $C["AWBright"]) {
-				$out .= $C["AWBname"];
-			} else {
-				$out .= '{{subst:int:group-'.$value.'}}';
-			}
-		}
-		$out .= "}}";
-	}
 	for ($i=$C["fail_retry"]; $i > 0; $i--) {
 		$starttimestamp = time();
 		$page = "User_talk:".$user["name"];
@@ -86,27 +70,68 @@ foreach ($row as $user) {
 		$pages = current($res["query"]["pages"]);
 		$text = $pages["revisions"][0]["*"];
 		$basetimestamp = $pages["revisions"][0]["timestamp"];
+		$contentmodel = $pages["revisions"][0]["contentmodel"];
+		$isflow = ($contentmodel == "flow-board");
 
-		if (strpos($text, $C["other_notice_text1"]) || strpos($text, $C["other_notice_text2"])) {
-			echo "already notice\n";
+		if ($user["rights"] == ["ipblock-exempt"]) {
+			$out = "{{subst:inactive IPBE".($isflow?"|flow=1|sig=n":"")."}}";
+			$topic = "因不活躍而取消[[WP:IPBE|IP封禁例外]]權限的通知";
+		} else {
+			$out = "{{subst:inactive right".($isflow?"|flow=1|sig=n":"")."|";
+			$topic = "因不活躍而取消";
+			foreach ($user["rights"] as $key => $value) {
+				if ($key) {
+					$out .= "、";
+					$topic = "、";
+				}
+				if ($value == $C["AWBright"]) {
+					$out .= $C["AWBname"];
+					$topic = $C["AWBname"];
+				} else {
+					$out .= '{{subst:int:group-'.$value.'}}';
+					$topic = '{{subst:int:group-'.$value.'}}';
+				}
+			}
+			$out .= "}}";
+			$topic .= "權限的通知";
+		}
+
+		if ($contentmodel == "wikitext") {
+			if (strpos($text, $C["other_notice_text1"]) || strpos($text, $C["other_notice_text2"])) {
+				echo "already notice\n";
+				break;
+			}
+			$text .= "\n".$out;
+
+			$summary = $C["other_notice_summary_prefix"];
+			$post = array(
+				"action" => "edit",
+				"format" => "json",
+				"title" => $page,
+				"summary" => $summary,
+				"text" => $text,
+				"token" => $edittoken,
+				"bot" => "",
+				"starttimestamp" => $starttimestamp,
+				"basetimestamp" => $basetimestamp
+			);
+			echo "edit ".$page." summary=".$summary."\n";
+		} else if ($contentmodel == "flow-board") {
+			$post = array(
+				"action" => "flow",
+				"format" => "json",
+				"submodule" => "new-topic",
+				"page" => $page,
+				"token" => $edittoken,
+				"nttopic" => $topic,
+				"ntcontent" => $out,
+				"ntformat" => "wikitext"
+			);
+			echo "edit ".$page." topic=".$topic."\n";
+		} else {
+			echo "cannot check contentmodel\n";
 			break;
 		}
-		$text .= "\n".$out;
-
-		$summary = $C["other_notice_summary_prefix"];
-		$post = array(
-			"action" => "edit",
-			"format" => "json",
-			"title" => $page,
-			"summary" => $summary,
-			"text" => $text,
-			"token" => $edittoken,
-			"bot" => "",
-			"starttimestamp" => $starttimestamp,
-			"basetimestamp" => $basetimestamp
-		);
-
-		echo "edit ".$page." summary=".$summary."\n";
 
 		if (!$C["test"]) {
 			$res = cURL($C["wikiapi"], $post);
@@ -116,10 +141,6 @@ foreach ($row as $user) {
 		}
 		$res = json_decode($res, true);
 		if (isset($res["error"])) {
-			if ($res["error"]["code"] == "no-direct-editing") {
-				echo "flow page. pass.\n";
-				break;
-			}
 			echo "edit fail\n";
 			var_dump($res);
 			if ($i === 1) {
