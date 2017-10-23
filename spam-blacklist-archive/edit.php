@@ -149,7 +149,7 @@ for ($i=$C["fail_retry"]; $i > 0; $i--) {
 	echo "start edit\n";
 
 	echo "edit main page\n";
-	$summary = $C["summary_prefix"]."：存檔".$archive_count["all"]."章節至".count($newpagetext)."頁面 (".$C["summary_config_page"]."：".TimediffFormat($retention_time)."/".$retention_bytes."位元組)";
+	$summary = $C["summary_prefix"]."：存檔".$archive_count["all"]."章節至".count($newpagetext)."頁面 (".$C["summary_config_page"]."：".TimediffFormat($retention_time)."無留言或頁面長度超過".$retention_bytes."位元組)";
 	$post = array(
 		"action" => "edit",
 		"format" => "json",

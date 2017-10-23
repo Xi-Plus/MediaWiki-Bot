@@ -134,7 +134,7 @@ for ($i=$C["fail_retry"]; $i > 0; $i--) {
 	echo "start edit\n";
 
 	echo "edit main page\n";
-	$summary = $C["summary_prefix"]."：存檔".$archive_count["all"]."請求至".count($newpagetext)."頁面 (".$C["summary_config_page"]."：".TimediffFormat($retention_time[1]).",".TimediffFormat($retention_time[2]).",".TimediffFormat($retention_time[3]).",".TimediffFormat($retention_time[4]).")";
+	$summary = $C["summary_prefix"]."：存檔".$archive_count["all"]."請求至".count($newpagetext)."頁面 (".$C["summary_config_page"]."：各段落分別".TimediffFormat($retention_time[1]).",".TimediffFormat($retention_time[2]).",".TimediffFormat($retention_time[3]).",".TimediffFormat($retention_time[4])."無回應)";
 	$post = array(
 		"action" => "edit",
 		"format" => "json",
