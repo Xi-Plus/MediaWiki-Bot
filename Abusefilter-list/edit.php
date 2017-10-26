@@ -29,7 +29,8 @@ if ($res === false) {
 }
 $res = json_decode($res, true);
 
-$out = '{| class="wikitable sortable" style="background-color: #fff;"
+$out = '__NOINDEX__
+{| class="wikitable sortable" style="background-color: #fff;"
 |- 
 ! style="background-color: #ddf;"| {{int:abusefilter-list-id}}
 ! style="background-color: #ddf;"| {{int:abusefilter-list-public}}
