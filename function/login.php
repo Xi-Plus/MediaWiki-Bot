@@ -1,13 +1,14 @@
 <?php
-function login() {
+function login($assert = "user") {
 	global $C;
 	echo "login as ".$C["user"]."\n";
-	$res = cURL($C["wikiapi"]."?action=query&assert=user&format=json");
+	$res = cURL($C["wikiapi"]."?action=query&assert=".$assert."&format=json");
 	if ($res === false) {
 		exit("fetch page error 1\n");
 	}
 	$res = json_decode($res, true);
 	if (isset($res["error"])) {
+		echo $res["error"]["code"]."\n";
 		$post = array(
 			"lgname" => $C["user"],
 			"lgpassword" => $C["pass"]
@@ -31,6 +32,14 @@ function login() {
 			$res = json_decode($res, true);
 			if($res["login"]["result"] === "Success") {
 				echo "login success.\n";
+				$res = cURL($C["wikiapi"]."?action=query&assert=".$assert."&format=json");
+				if ($res === false) {
+					exit("fetch page error 1\n");
+				}
+				$res = json_decode($res, true);
+				if (isset($res["error"])) {
+					exit($res["error"]["code"]."\n");
+				}
 			} else {
 				var_dump($res);
 				exit("login fail 1\n");
