@@ -45,6 +45,7 @@ foreach ($res["query"]["abusefilters"] as $AF) {
 	$action = str_replace("tag", "{{int:abusefilter-action-tag}}", $action);
 	$action = str_replace("disallow", "{{int:abusefilter-action-disallow}}", $action);
 	$action = str_replace("throttle", "{{int:abusefilter-action-throttle}}", $action);
+	$action = str_replace("blockautopromote", "{{int:abusefilter-action-blockautopromote}}", $action);
 	$action = str_replace(",", "、", $action);
 	$out .= '|- style="color: '.(isset($AF["enabled"])?"#000":(isset($AF["deleted"])?"#aaa":"#666")).';"
 | [[Special:AbuseFilter/'.$AF["id"].'|'.$AF["id"].']]
