@@ -15,7 +15,7 @@ require(__DIR__."/function.php");
 
 echo "The time now is ".date("Y-m-d H:i:s")." (UTC)\n";
 
-login();
+login("bot");
 $edittoken = edittoken();
 
 echo "fetch from database\n";

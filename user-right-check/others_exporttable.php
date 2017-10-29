@@ -9,7 +9,7 @@ require(__DIR__."/../function/log.php");
 
 echo "The time now is ".date("Y-m-d H:i:s")." (UTC)\n";
 
-login();
+login("bot");
 $edittoken = edittoken();
 
 $timelimit = date("Y-m-d H:i:s", strtotime($C["other_exporttable_timelimit1"]));

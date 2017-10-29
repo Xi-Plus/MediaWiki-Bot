@@ -14,7 +14,7 @@ require(__DIR__."/../function/edittoken.php");
 
 echo "The time now is ".date("Y-m-d H:i:s")." (UTC)\n";
 
-login();
+login("bot");
 $edittoken = edittoken();
 
 for ($i=0; $i < $C["fail_retry"]; $i++) { 

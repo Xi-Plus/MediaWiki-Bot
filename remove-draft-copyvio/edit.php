@@ -14,7 +14,7 @@ require(__DIR__."/../function/edittoken.php");
 
 echo "The time now is ".date("Y-m-d H:i:s")." (UTC)\n";
 
-login();
+login("bot");
 $edittoken = edittoken();
 
 $res = cURL($C["wikiapi"]."?".http_build_query(array(

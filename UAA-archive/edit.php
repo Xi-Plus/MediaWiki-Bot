@@ -28,7 +28,7 @@ function TimediffFormat($time) {
 
 echo "The time now is ".date("Y-m-d H:i:s")." (UTC)\n";
 
-login();
+login("bot");
 $edittoken = edittoken();
 
 $blocked_retention_time = file_get_contents($C["blocked_retention_time"]);
