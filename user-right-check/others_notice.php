@@ -68,9 +68,15 @@ foreach ($row as $user) {
 		}
 		$res = json_decode($res, true);
 		$pages = current($res["query"]["pages"]);
-		$text = $pages["revisions"][0]["*"];
-		$basetimestamp = $pages["revisions"][0]["timestamp"];
-		$contentmodel = $pages["revisions"][0]["contentmodel"];
+		if (isset($pages["missing"])) {
+			$text = "";
+			$basetimestamp = 0;
+			$contentmodel = "wikitext";
+		} else {
+			$text = $pages["revisions"][0]["*"];
+			$basetimestamp = $pages["revisions"][0]["timestamp"];
+			$contentmodel = $pages["revisions"][0]["contentmodel"];
+		}
 		$isflow = ($contentmodel == "flow-board");
 
 		if ($user["rights"] == ["ipblock-exempt"]) {
