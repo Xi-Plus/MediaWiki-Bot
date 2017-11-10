@@ -20,10 +20,12 @@ $edittoken = edittoken();
 
 $timelimit = date("Y-m-d H:i:s", strtotime($C["other_report_timelimit"]));
 echo "timelimit < ".$timelimit." (".$C["other_report_timelimit"].")\n";
+$notice_timelimit = date("Y-m-d H:i:s", strtotime($C["other_report_notice_timelimit"]));
+echo "notice_timelimit < ".$notice_timelimit." (".$C["other_report_notice_timelimit"].")\n";
 
 $sth = $G["db"]->prepare("SELECT * FROM `{$C['DBTBprefix']}userlist` WHERE `lasttime` < :lasttime AND `noticetime` != '{$C['TIME_MIN']}' AND `noticetime` < :noticetime ORDER BY `lasttime` ASC, `lastlog` ASC");
 $sth->bindValue(":lasttime", $timelimit);
-$sth->bindValue(":noticetime", date("Y-m-d H:i:s", time()-86400*7));
+$sth->bindValue(":noticetime", $notice_timelimit);
 $sth->execute();
 $row = $sth->fetchAll(PDO::FETCH_ASSOC);
 

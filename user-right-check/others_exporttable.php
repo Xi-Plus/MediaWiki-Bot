@@ -13,7 +13,7 @@ login("bot");
 $edittoken = edittoken();
 
 $timelimit = date("Y-m-d H:i:s", strtotime($C["other_exporttable_timelimit1"]));
-echo "顯示最後動作 < ".$timelimit." (".("-5 months").")\n";
+echo "顯示最後動作 < ".$timelimit." (".$C["other_exporttable_timelimit1"].")\n";
 $timelimit2 = date("Y-m-d H:i:s", strtotime($C["other_exporttable_timelimit2"]));
 $timelimit3 = date("Y-m-d H:i:s", strtotime($C["other_exporttable_timelimit3"]));
 
@@ -40,8 +40,8 @@ $out = "";
 $count = 1;
 $out .= '{| class="wikitable"
 |-
-! 用戶 !! width="80"|權限 !! 最後編輯 !! 最後日誌動作 !! 最後授權';
-foreach ($row as $user) {
+! # !! 用戶 !! width="80"|權限 !! 最後編輯 !! 最後日誌動作 !! 最後授權';
+foreach ($row as $cnt => $user) {
 	$out .= '
 |-';
 if ($user["lasttime"] < $timelimit2) {
@@ -50,7 +50,7 @@ if ($user["lasttime"] < $timelimit2) {
 	$out .= ' style="background: #ffc;"';
 }
 	$out .= '
-| [[User talk:'.$user["name"].'|'.$user["name"].']] || [[Special:用户权限/'.$user["name"].'|';
+| '.($cnt+1).' || [[User talk:'.$user["name"].'|'.$user["name"].']] || [[Special:用户权限/'.$user["name"].'|';
 	foreach ($user["rights"] as $key => $value) {
 		if ($key) {
 			$out .= '、';
@@ -116,6 +116,7 @@ for ($i=$C["fail_retry"]; $i > 0; $i--) {
 		"summary" => $summary,
 		"text" => $text,
 		"minor" => "",
+		"bot" => "",
 		"token" => $edittoken
 	);
 	echo "edit ".$C["other_exporttable_page"]." summary=".$summary."\n";

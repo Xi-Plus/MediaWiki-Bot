@@ -50,7 +50,7 @@ if (isset($_GET["noeditonly"])) {
 	$noeditonly = " AND `lastedit` = '0000-00-00 00:00:00' ";
 }
 if (!isset($_GET["ignorenotice"])) {
-	$noeditonly = " AND `noticetime` < '".date("Y-m-d H:i:s", time()-86400*7)."' ";
+	$noeditonly = " AND `noticetime` < '".date("Y-m-d H:i:s", strtotime($C["other_result_notice_timelimit"]))."' ";
 }
 $sth = $G["db"]->prepare("SELECT * FROM `{$C['DBTBprefix']}userlist` WHERE `lasttime` < :lasttime {$noeditonly} ORDER BY `lasttime` ASC");
 $sth->bindValue(":lasttime", $timelimit);

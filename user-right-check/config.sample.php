@@ -25,6 +25,7 @@ $C["other_report_page"] = "Wikipedia:申请解除权限";
 $C["other_report_text"] = "==已封禁或除权用户覆审==";
 $C["other_report_summary_prefix"] = "/* 逾六个月没有任何编辑活动 */ [[User:A2093064-bot/task/12|機器人12]]：新提案";
 $C["other_report_timelimit"] = "-184 days";
+$C["other_report_notice_timelimit"] = "-31 days";
 $C["other_report_limit"] = 10;
 
 $C["other_update_timelimit"] = "-5 months";
