@@ -96,7 +96,7 @@ for ($i=$C["fail_retry"]; $i > 0; $i--) {
 	echo "page size: ".$pagesize."\n";
 
 	$hash = md5(uniqid(rand(), true));
-	$text = preg_replace("/^( *==.+?== *)$/m", $hash."$1", $text);
+	$text = preg_replace("/^( *==[^=]+?== *)$/m", $hash."$1", $text);
 	$text = explode($hash, $text);
 	echo "find ".count($text)." sections\n";
 
@@ -106,7 +106,7 @@ for ($i=$C["fail_retry"]; $i > 0; $i--) {
 	unset($text[0]);
 	echo "start split\n";
 	foreach ($text as $temp) {
-		if (preg_match("/(==.+?==)/", $temp, $m)) {
+		if (preg_match("/(==[^=]+?==)/", $temp, $m)) {
 			echo $m[1]."\t";
 		} else {
 			echo "title get fail\t";
