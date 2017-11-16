@@ -8,9 +8,12 @@ function parsediff($diff) {
 
 	if (preg_match('/diff-deletedline"><div>\*{{Status2\|(新申請|on hold|擱置|搁置|等待|等待中|OH|oh|hold|Hold|\*|\?).*?}}/', $diff) && preg_match('/diff-addedline"><div>\*{{Status2\|(?:\+|Done|done|完成)\|?(.*?)}}/', $diff, $m)) {
 		$status = $m[1];
-		preg_match_all('/<div>(== *\[\[:?([^\]]+?)]] *==)<\/div>/', $diff, $m);
+		preg_match_all('/<div>(== *\[\[:?(.+?)]] *==)<\/div>/', $diff, $m);
 		$section = $m[1][1];
 		$page = $m[2][1];
+		if (strpos($page, "]") !== false) {
+			$page = "";
+		}
 		return ["result"=>true, "status"=>$status, "page"=>$page, "section"=>$section];
 	} else {
 		return ["result"=>false];
@@ -64,6 +67,15 @@ function getfirsttime($text, $section) {
 
 function tagtalkpage($title, $date, $diff, $result) {
 	global $C;
+	if (trim($result) === "") {
+		$result = "完成";
+	}
+	$add = "{{Drv-kept|$date|$diff|$result}}";
+	echo $add."\n";
+	if ($title === "") {
+		echo "bad title\n";
+		return false;
+	}
 	$res = cURL($C["wikiapi"]."?".http_build_query(array(
 		"action" => "query",
 		"format" => "json",
@@ -122,11 +134,6 @@ function tagtalkpage($title, $date, $diff, $result) {
 		echo "already tagged\n";
 		return false;
 	}
-	if (trim($result) === "") {
-		$result = "完成";
-	}
-	$add = "{{Drv-kept|$date|$diff|$result}}";
-	echo "add ".$add."\n";
 	$text = $add."\n".trim($text);
 
 	$summary = $C["summary_prefix"]."[[Special:diff/".$diff."|".$result."]]";
@@ -144,7 +151,7 @@ function tagtalkpage($title, $date, $diff, $result) {
 
 	$check = "";
 	while ($check !== "y") {
-		echo "continue? (y/n)";
+		echo "continue? (y/n) ";
 		$check = strtolower(trim(fgets(STDIN)));
 		if ($check === "n") {
 			echo "skip\n";

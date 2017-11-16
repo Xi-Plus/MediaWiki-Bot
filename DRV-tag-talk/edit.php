@@ -24,6 +24,7 @@ file_put_contents($lasttimefile, date("Y-m-d\TH:i:s\Z"));
 if ($lasttime === false) {
 	$lasttime = date("Y-m-d\TH:i:s\Z", strtotime("-1 weeks"));
 }
+file_put_contents(__DIR__."/lasttime-old.txt", $lasttime);
 echo "lasttime: ".$lasttime."\n";
 $res = cURL($C["wikiapi"]."?".http_build_query(array(
 	"action" => "query",
@@ -58,7 +59,7 @@ foreach ($revisions as $revision) {
 	$diff = $res["compare"]["*"];
 	$result = parsediff($diff);
 	if ($result["result"]) {
-		echo $result["page"]." ".$result["status"]." ";
+		echo $result["section"]." ".$result["status"]." ";
 		$text = getrevcontent($revision["revid"]);
 		$firsttime = getfirsttime($text, $result["section"]);
 		$date = date("Y/m/d", $firsttime);
