@@ -12,7 +12,7 @@ require(__DIR__."/../function/curl.php");
 require(__DIR__."/../function/login.php");
 require(__DIR__."/../function/edittoken.php");
 
-$options = getopt("", ["summary:", "file:"]);
+$options = getopt("", ["summary:", "file:", "wp", "github:"]);
 if ($options === false) {
 	exit("解析參數失敗\n");
 }
@@ -39,24 +39,39 @@ if (isset($options["file"])) {
 } else {
 	$files = array_keys($C["list"]);
 }
+if (isset($options["wp"])) {
+	$C["wikiapi"] = "https://zh.wikipedia.org/w/api.php";
+	$C["cookiefile"] = __DIR__."/../tmp/push-wp-cookie.txt";
+}
+echo "target = ".$C["wikiapi"]."\n";
+if (isset($options["github"])) {
+	echo "source: ".$C["githubprefix"].$options["github"]."\n";
+} else {
+	echo "source: ".$C["localprefix"]."\n";
+}
 echo "summary = \"".$C["summary_prefix"]."\"\n";
 echo "files = (".count($files).")\n  ".implode("\n  ", $files)."\n";
+
+login($C["bot"]?"bot":"user");
+$edittoken = edittoken();
+
 echo "\npress any key to continue\n";
 fgets(STDIN);
 
 echo "The time now is ".date("Y-m-d H:i:s")." (UTC)\n";
 
-login();
-$edittoken = edittoken();
-
 foreach ($C["list"] as $local => $remote) {
 	if (!in_array($local, $files)) {
 		continue;
 	}
-	$local = $C["localprefix"].$remote;
+	if (isset($options["github"])) {
+		$local = $C["githubprefix"].$options["github"]."/".$local;
+	} else {
+		$local = $C["localprefix"].$local;
+	}
 	$remote = $C["remoteprefix"].$remote;
 	echo $local." -> ".$remote."\n";
-	$text = file_get_contents($local);
+	$text = @file_get_contents($local);
 	if ($text === false) {
 		echo "fetch local fail\n";
 		continue;
@@ -87,5 +102,6 @@ foreach ($C["list"] as $local => $remote) {
 	$res = json_decode($res, true);
 	if (isset($res["error"])) {
 		echo "edit fail\n";
+		var_dump($res["error"]);
 	}
 }

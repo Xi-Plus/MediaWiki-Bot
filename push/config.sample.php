@@ -9,6 +9,7 @@ $C["minor"] = true;
 $C["summary_prefix"] = "push";
 
 $C["localprefix"] = "/home/user/sample/";
+$C["githubprefix"] = "https://raw.githubusercontent.com/user/repo/";
 $C["remoteprefix"] = "User:Example/sample/";
 $C["list"] = [
 	"sample.js" => "sample.js"
