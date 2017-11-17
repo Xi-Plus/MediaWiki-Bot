@@ -44,6 +44,7 @@ if ($other_retention_time === false) {
 }
 echo "other archive before ".$other_retention_time." ago (".date("Y-m-d H:i:s", time()-$other_retention_time).")\n";
 $year = date("Y");
+$half = (date("n")>6 ? 2 : 1);
 
 for ($i=$C["fail_retry"]; $i > 0; $i--) {
 	$starttimestamp = time();
@@ -163,7 +164,7 @@ for ($i=$C["fail_retry"]; $i > 0; $i--) {
 	}
 
 	echo "edit archive page\n";
-	$page = $C["to_page_prefix"].$year."年";
+	$page = $C["to_page_prefix"].$year."年/".$half;
 	$starttimestamp2 = time();
 	$res = cURL($C["wikiapi"]."?".http_build_query(array(
 		"action" => "query",
@@ -177,7 +178,7 @@ for ($i=$C["fail_retry"]; $i > 0; $i--) {
 
 	$oldtext = "{{存档页}}
 {{Wikipedia:需要管理員注意的用戶名/Archive}}
-=== {$year}年 ===\n";
+=== {$year}年".($half==1 ? "上半" : "下半")." ===\n";
 
 	$basetimestamp2 = null;
 	if (!isset($pages["missing"])) {
