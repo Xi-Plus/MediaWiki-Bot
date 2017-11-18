@@ -12,9 +12,20 @@ require(__DIR__."/../function/curl.php");
 require(__DIR__."/../function/login.php");
 require(__DIR__."/../function/edittoken.php");
 
-$options = getopt("", ["summary:", "file:", "wp", "github:"]);
+$options = getopt("", ["target:", "summary:", "file:", "github:"]);
 if ($options === false) {
-	exit("解析參數失敗\n");
+	exit("parse parameter failed\n");
+}
+if (isset($options["target"])) {
+	$target = $options["target"];
+	if (!isset($C["target"][$target])) {
+		exit("target not accepted: ".implode("、", array_keys($C["target"]))."\n");
+	}
+	foreach ($C["target"][$target] as $key => $value) {
+		$C[$key] = $value;
+	}
+} else {
+	exit("target requireed: ".implode("、", array_keys($C["target"]))."\n");
 }
 if (isset($options["summary"])) {
 	$C["summary_prefix"] = $options["summary"];
@@ -39,16 +50,12 @@ if (isset($options["file"])) {
 } else {
 	$files = array_keys($C["list"]);
 }
-if (isset($options["wp"])) {
-	$C["wikiapi"] = "https://zh.wikipedia.org/w/api.php";
-	$C["cookiefile"] = __DIR__."/../tmp/push-wp-cookie.txt";
-}
-echo "target = ".$C["wikiapi"]."\n";
 if (isset($options["github"])) {
 	echo "source: ".$C["githubprefix"].$options["github"]."\n";
 } else {
 	echo "source: ".$C["localprefix"]."\n";
 }
+echo "target = ".$C["wikiapi"]."\t".$C["remoteprefix"]."\n";
 echo "summary = \"".$C["summary_prefix"]."\"\n";
 echo "files = (".count($files).")\n  ".implode("\n  ", $files)."\n";
 
