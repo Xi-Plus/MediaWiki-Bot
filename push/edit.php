@@ -99,6 +99,9 @@ foreach ($C["list"] as $local => $remote) {
 	if (isset($C["bot"])) {
 		$post["bot"] = "";
 	}
+	if (isset($C["nocreate"])) {
+		$post["nocreate"] = "";
+	}
 	echo "edit ".$remote." summary=".$summary."\n";
 	if (!$C["test"]) {
 		$res = cURL($C["wikiapi"], $post);
