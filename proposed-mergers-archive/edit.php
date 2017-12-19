@@ -92,7 +92,7 @@ for ($i=$C["fail_retry"]; $i > 0; $i--) {
 
 		$count = 0;
 		foreach ($temp as $temp2) {
-			if (preg_match("/{{(完成|Done|Finish|未完成|Undone|Not Done|Notdone)}}/i", $temp2)) {
+			if (preg_match("/{{(完成|Done|Finish|未完成|Undone|Not Done|Notdone|Withdrawn|撤回|取消請求|取消请求)}}/i", $temp2)) {
 				preg_match_all("/\d{4}年\d{1,2}月\d{1,2}日 \(.{3}\) \d{2}\:\d{2} \(UTC\)/", $temp2, $m);
 				$lasttime = 0;
 				foreach ($m[0] as $timestr) {
