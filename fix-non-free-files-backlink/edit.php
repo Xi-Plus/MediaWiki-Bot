@@ -82,7 +82,11 @@ foreach ($C["category"] as $category) {
 				break;
 			}
 
-			$text = preg_replace("/(\| *Article *=).+$/mi", '${1} '.$article, $text);
+			$newtext = preg_replace("/(\| *Article *=).+$/mi", '${1} '.$article, $text);
+			if (preg_replace("/\s/", "", $text) === preg_replace("/\s/", "", $newtext)) {
+				echo "no changed\n";
+				$newtext = $text;
+			}
 
 			$summary = $C["summary_prefix"]."，修正[[:".$category."]]";
 			$post = array(
@@ -90,7 +94,7 @@ foreach ($C["category"] as $category) {
 				"format" => "json",
 				"pageid" => $page["pageid"],
 				"summary" => $summary,
-				"text" => $text,
+				"text" => $newtext,
 				"minor" => "",
 				"token" => $edittoken,
 				"starttimestamp" => $starttimestamp,
