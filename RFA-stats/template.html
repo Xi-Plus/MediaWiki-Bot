@@ -1,0 +1,49 @@
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title><!--title--></title>
+		<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+		<script type="text/javascript">
+			google.charts.load('current', {'packages':['corechart']});
+			google.charts.setOnLoadCallback(drawVisualization);
+
+			function drawVisualization() {
+					var data = new google.visualization.DataTable();
+			data.addColumn('string', '時間');
+			data.addColumn('number', '支持');
+			data.addColumn('number', '反對');
+			data.addColumn('number', '中立');
+			data.addColumn('number', '支持率');
+			data.addColumn('number', '通過');
+			data.addColumn({type:'string', role:'tooltip'});
+			data.addRows([
+			/*data*/
+				]);
+
+				var options = {
+					title: ''/*title*/,
+					vAxis: {title: '支持率'},
+					isStacked: true,
+					seriesType: 'line',
+					series: {3: {type: 'steppedArea'}}
+				};
+
+				var chart = new google.visualization.ComboChart(document.getElementById('chart_div'));
+				chart.draw(data, options);
+
+			}
+			function redraw() {
+				chart_div.style.width=chart_width.value+"px";
+				chart_div.style.height=chart_height.value+"px";
+				drawVisualization();
+			}
+		</script>
+	</head>
+	<body>
+		寬度<input type="number" id="chart_width" value="1300" min="100">
+		高度<input type="number" id="chart_height" value="600" min="100">
+		<button onclick="redraw();">重新繪製</button>
+		更新時間<!--time--> (UTC)
+		<div id="chart_div" style="width: 1300px; height: 600px;"></div>
+	</body>
+</html>
