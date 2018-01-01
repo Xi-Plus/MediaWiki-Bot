@@ -132,7 +132,7 @@ for ($i=$C["fail_retry"]; $i > 0; $i--) {
 	echo "start edit\n";
 
 	echo "edit main page\n";
-	$summary = $C["summary_prefix"]."：存檔".$archive_count."提案 (".$C["summary_config_page"]."：已封禁".TimediffFormat($blocked_retention_time)."、未處理".TimediffFormat($other_retention_time).")";
+	$summary = $C["summary_prefix"]."：存檔".$archive_count."提案 (".$C["summary_config_page"]."：已處理".TimediffFormat($blocked_retention_time)."、未處理".TimediffFormat($other_retention_time).")";
 	$post = array(
 		"action" => "edit",
 		"format" => "json",
