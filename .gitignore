@@ -1,7 +1,11 @@
+# global
 tmp/
 config.php
 input.txt
 out*.txt
 out*.csv
+
+# single
+AFD-stats/list/
 bad-image-list/remove.txt
 DRV-tag-talk/lasttime.txt

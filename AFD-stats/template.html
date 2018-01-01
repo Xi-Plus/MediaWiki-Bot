@@ -1,0 +1,43 @@
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>AFD-stats/<!--title--></title>
+		<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+		<script type="text/javascript">
+			google.charts.load('current', {'packages':['corechart']});
+			google.charts.setOnLoadCallback(drawChart);
+			var vote = "nominator";
+			var alldata = {};
+			/*data1*/
+			function drawChart() {
+
+				var data = google.visualization.arrayToDataTable(alldata[vote]);
+				var options = {
+					title: vote+' - result'
+				};
+				var chart1 = new google.visualization.PieChart(document.getElementById('piechart1'));
+				chart1.draw(data, options);
+			}
+		</script>
+		<style type="text/css">
+			table {
+				border-collapse: collapse;
+			}
+			td {
+				padding: 5px;
+				border: 1px solid black;
+			}
+		</style>
+	</head>
+	<body>
+		AFD-stats/<!--title--><br><!--time-->
+		<div id="piechart1" style="width: 900px; height: 500px;"></div>
+		<!-- <div id="piechart2" style="width: 900px; height: 500px;"></div> -->
+		<table>
+			<!--data2-->
+		</table><br>
+		<table>
+			<!--data3-->
+		</table>
+	</body>
+</html>
