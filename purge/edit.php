@@ -29,6 +29,10 @@ function purge($page) {
 	}
 	$res = json_decode($res, true);
 	$pages = current($res["query"]["pages"]);
+	if (isset($pages["missing"])) {
+		echo $page." not found!\n";
+		return;
+	}
 	$text = $pages["revisions"][0]["*"];
 	$basetimestamp = $pages["revisions"][0]["timestamp"];
 
@@ -40,6 +44,7 @@ function purge($page) {
 		"text" => $text,
 		"token" => $edittoken,
 		"minor" => "",
+		"nocreate" => "",
 		"starttimestamp" => $starttimestamp,
 		"basetimestamp" => $basetimestamp
 	);
@@ -66,6 +71,17 @@ echo "The time now is ".date("Y-m-d H:i:s")." (UTC)\n";
 login("user");
 $edittoken = edittoken();
 
+if (count($options) == 0) {
+	echo "no options given, input pages:\n";
+	$options["p"] = [];
+	while (true) {
+		$line = trim(fgets(STDIN));
+		if ($line === "") {
+			break;
+		}
+		$options["p"] []= $line;
+	}
+}
 if (isset($options["p"])) {
 	if (is_string($options["p"])) {
 		$options["p"] = [$options["p"]];
@@ -79,7 +95,7 @@ if (isset($options["t"])) {
 		$options["t"] = [$options["t"]];
 	}
 	foreach ($options["t"] as $template) {
-		if (!preg_match("/^(t|template|模板):/i", $template)) {
+		if (!preg_match("/^(t|template|模板)?:/i", $template)) {
 			$template = "Template:".$template;
 		}
 		echo "template ".$template."\n";
