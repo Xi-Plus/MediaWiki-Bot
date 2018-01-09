@@ -61,17 +61,29 @@ function purge($page) {
 	}
 }
 
-$options = getopt("c:t:p:");
+$options = getopt("c:t:p:", ["target:"]);
 if ($options === false) {
 	exit("parse parameter failed\n");
 }
 
 echo "The time now is ".date("Y-m-d H:i:s")." (UTC)\n";
 
+if (isset($options["target"])) {
+	$target = $options["target"];
+	if (!isset($C["target"][$target])) {
+		exit("target not accepted: ".implode("、", array_keys($C["target"]))."\n");
+	}
+	foreach ($C["target"][$target] as $key => $value) {
+		$C[$key] = $value;
+	}
+}
+
 login("user");
 $edittoken = edittoken();
 
-if (count($options) == 0) {
+echo "wikiapi = ".$C["wikiapi"]."\n";
+
+if (!isset($options["p"]) && !isset($options["c"]) && !isset($options["t"])) {
 	echo "no options given, input pages:\n";
 	$options["p"] = [];
 	while (true) {
