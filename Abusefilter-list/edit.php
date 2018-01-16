@@ -29,8 +29,7 @@ if ($res === false) {
 }
 $res = json_decode($res, true);
 
-$out = '__NOINDEX__
-{| class="wikitable sortable" style="background-color: #fff;"
+$out = '{| class="wikitable sortable" style="background-color: #fff;"
 |- 
 ! style="background-color: #ddf;"| {{int:abusefilter-list-id}}
 ! style="background-color: #ddf;"| {{int:abusefilter-list-public}}
@@ -58,13 +57,37 @@ foreach ($res["query"]["abusefilters"] as $AF) {
 }
 $out .= '|}';
 
+$starttimestamp = time();
+$res = cURL($C["wikiapi"]."?".http_build_query(array(
+	"action" => "query",
+	"prop" => "revisions",
+	"format" => "json",
+	"rvprop" => "content|timestamp",
+	"titles" => $C["outpage"]
+)));
+if ($res === false) {
+	exit("fetch page fail\n");
+}
+$res = json_decode($res, true);
+$pages = current($res["query"]["pages"]);
+$text = $pages["revisions"][0]["*"];
+$basetimestamp = $pages["revisions"][0]["timestamp"];
+
+$start = strpos($text, $C["text1"]);
+$end = strpos($text, $C["text2"]);
+$text = substr($text, 0, $start).$C["text1"].$out.substr($text, $end);
+
+$start = strpos($text, $C["text3"]);
+$end = strpos($text, $C["text4"]);
+$text = substr($text, 0, $start).$C["text3"]."~~~~~".substr($text, $end);
+
 $summary = $C["summary_prefix"]."更新";
 $post = array(
 	"action" => "edit",
 	"format" => "json",
 	"title" => $C["outpage"],
 	"summary" => $summary,
-	"text" => $out,
+	"text" => $text,
 	"minor" => "",
 	"token" => $edittoken
 );
@@ -73,7 +96,7 @@ if (!$C["test"]) {
 	$res = cURL($C["wikiapi"], $post);
 } else {
 	$res = false;
-	file_put_contents(__DIR__."/out.txt", $out);
+	file_put_contents(__DIR__."/out.txt", $text);
 }
 $res = json_decode($res, true);
 if (isset($res["error"])) {
