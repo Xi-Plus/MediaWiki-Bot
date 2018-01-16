@@ -5,12 +5,12 @@ $C["user"] = "";
 $C["pass"] = "";
 
 $C["from_page"] = "Wikipedia:合并请求";
-$C["to_page_prefix"] = "Wikipedia:合併條目/存檔/";
+$C["to_page_prefix"] = "Wikipedia:合并请求/存档/";
 
 $C["retention_time"] = "https://zh.wikipedia.org/wiki/User:A2093064-bot/task/7/config/retention_time?action=raw";
 $C["retention_time_default"] = 604800;
 
-$C["text1"] = "{{Wikipedia:合併條目/存檔}}";
+$C["text1"] = "{{Wikipedia:合并请求/存档}}";
 
 $C["fail_retry"] = 5;
 
