@@ -28,6 +28,10 @@ function purge($page) {
 		exit("fetch page fail\n");
 	}
 	$res = json_decode($res, true);
+	if (!isset($res["query"]["pages"])) {
+		echo $page." not found!\n";
+		return;
+	}
 	$pages = current($res["query"]["pages"]);
 	if (isset($pages["missing"])) {
 		echo $page." not found!\n";
