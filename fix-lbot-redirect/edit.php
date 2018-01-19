@@ -50,7 +50,8 @@ if (preg_match("/#(?:重定向|Redirect) *\[\[(.+?)]]/i", $text, $m)) {
 		"format" => "json",
 		"list" => "backlinks",
 		"bltitle" => $page,
-		"blnamespace" => "0|118"
+		"bllimit" => "max",
+		"blnamespace" => $C["fix_ns"]
 	)));
 	if ($res === false) {
 		exit("fetch page fail\n");
@@ -58,7 +59,7 @@ if (preg_match("/#(?:重定向|Redirect) *\[\[(.+?)]]/i", $text, $m)) {
 	$res = json_decode($res, true);
 	foreach ($res["query"]["backlinks"] as $backlink) {
 		$title = $backlink["title"];
-		echo "backlink:\"".$title."\"\n";
+		echo "backlink:\"".$title."\"\n\n";
 
 		$starttimestamp = time();
 		$res2 = cURL($C["wikiapi"]."?".http_build_query(array(
@@ -79,11 +80,11 @@ if (preg_match("/#(?:重定向|Redirect) *\[\[(.+?)]]/i", $text, $m)) {
 		$newtext = $oldtext;
 		if (preg_match_all("/\[\[(".$pageregex.")(?:\|.+?)?]]/", $newtext, $m)) {
 			foreach ($m[0] as $key => $value) {
-				echo "find:\"".$m[0][$key]."\"\n";
-				echo "context:".substr($newtext, strpos($newtext, $m[0][$key])-$C["context_before"], $C["context_before"]+strlen($m[0][$key])+$C["context_after"])."\n";
+				echo "find:\"\033[32m".$m[0][$key]."\033[37m\"\n\n";
+				echo "context:".substr($newtext, strpos($newtext, $m[0][$key])-$C["context_before"], $C["context_before"]+strlen($m[0][$key])+$C["context_after"])."\n\n";
 				$replace = str_replace($m[1][$key], $target, $m[0][$key]);
 				$replace = str_replace("[[".$target."|".$target."]]", "[[".$target."]]", $replace);
-				echo "replace to \"".$replace."\"\n";
+				echo "replace to \"\033[32m".$replace."\033[37m\"\n";
 				echo "check (y/n)?";
 				$check = trim(fgets(STDIN));
 				if (strlen($check) > 0 && $check[0] == "y") {
@@ -95,10 +96,10 @@ if (preg_match("/#(?:重定向|Redirect) *\[\[(.+?)]]/i", $text, $m)) {
 		}
 		if (preg_match_all("/{{link-..\|(?:".$pageregex.")\|[^|]+}}/", $newtext, $m)) {
 			foreach ($m[0] as $key => $value) {
-				echo "find:\"".$m[0][$key]."\"\n";
-				echo "context:".substr($newtext, strpos($newtext, $m[0][$key])-$C["context_before"], $C["context_before"]+strlen($m[0][$key])+$C["context_after"])."\n";
+				echo "find:\"\033[32m".$m[0][$key]."\033[37m\"\n\n";
+				echo "context:".substr($newtext, strpos($newtext, $m[0][$key])-$C["context_before"], $C["context_before"]+strlen($m[0][$key])+$C["context_after"])."\n\n";
 				$replace = str_replace($m[0][$key], "[[".$target."]]", $m[0][$key]);
-				echo "replace to \"".$replace."\"\n";
+				echo "replace to \"\033[32m".$replace."\033[37m\"\n";
 				echo "check (y/n)?";
 				$check = trim(fgets(STDIN));
 				if (strlen($check) > 0 && $check[0] == "y") {
@@ -110,14 +111,14 @@ if (preg_match("/#(?:重定向|Redirect) *\[\[(.+?)]]/i", $text, $m)) {
 		}
 		if (preg_match_all("/{{link-..\|(?:".$pageregex.")\|[^|]+\|([^}]+)}}/", $newtext, $m)) {
 			foreach ($m[0] as $key => $value) {
-				echo "find:\"".$m[0][$key]."\"\n";
+				echo "find:\"\033[32m".$m[0][$key]."\033[37m\"\n\n";
 				echo "context:".substr($newtext, strpos($newtext, $m[0][$key])-$C["context_before"], $C["context_before"]+strlen($m[0][$key])+$C["context_after"])."\n";
 				if ($target == $m[1][$key]) {
 					$replace = str_replace($m[0][$key], "[[".$target."]]", $m[0][$key]);
 				} else {
 					$replace = str_replace($m[0][$key], "[[".$target."|".$m[1][$key]."]]", $m[0][$key]);
 				}
-				echo "replace to \"".$replace."\"\n";
+				echo "replace to \"\033[32m".$replace."\033[37m\"\n";
 				echo "check (y/n)?";
 				$check = trim(fgets(STDIN));
 				if (strlen($check) > 0 && $check[0] == "y") {
@@ -141,7 +142,7 @@ if (preg_match("/#(?:重定向|Redirect) *\[\[(.+?)]]/i", $text, $m)) {
 				"starttimestamp" => $starttimestamp,
 				"basetimestamp" => $basetimestamp
 			);
-			echo "edit ".$title." summary=".$summary."\n";
+			echo "edit ".$title." summary=".$summary."\n\n";
 			if (!$C["test"]) $res = cURL($C["wikiapi"], $post);
 			else {
 				file_put_contents("out.txt", $newtext);
