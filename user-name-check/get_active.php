@@ -74,13 +74,13 @@ while (true) {
 	}
 	if (!isset($res["continue"])) {
 		echo "fetch done\n";
-		return;
+		break;
 	}
 	$aufrom = $res["continue"]["aufrom"];
 }
 
 foreach ($userlist as $user) {
-	$sth = $G["db"]->prepare("DELETE FROM `{$C['DBTBprefix']}userlist` WHERE `name` = :name");
+	$sth = $G["db"]->prepare("DELETE FROM `{$C['DBTBprefix']}` WHERE `name` = :name");
 	$sth->bindValue(":name", $user["name"]);
 	$res = $sth->execute();
 	echo "remove ".$user["name"]."\n";
