@@ -5,6 +5,7 @@ $C["nsignore"] = [-2, -1, 2, 3, 2300, 2301, 2302, 2303, 2600];
 $C["rvlimit"] = "max";
 $C["talkpagecache"] = false;
 $C["errormessage"] = false;
+$C["checkedit"] = false;
 
 $C["wikiapi"] = "https://zh.wikipedia.org/w/api.php";
 $C["user"] = "";

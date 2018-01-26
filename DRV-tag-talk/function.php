@@ -313,7 +313,7 @@ function tagtalkpage($title, $date, $diff, $result) {
 	echo "edit ".$title." summary=".$summary."\n";
 
 	$check = "";
-	while ($C["test"] && $check !== "y") {
+	while ($C["checkedit"] && $check !== "y") {
 		echo "continue? (y/n) ";
 		$check = strtolower(trim(fgets(STDIN)));
 		if ($check === "n") {
