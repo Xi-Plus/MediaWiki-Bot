@@ -125,12 +125,16 @@ function getstatus($text) {
 			continue;
 		}
 		$time = getfirsttime($temp);
-		$result[$title] = [
-			"title" => $title,
-			"result" => $ok,
-			"status" => $status,
-			"time" => $time
-		];
+
+		# status=+ override status=-, but status=- not override status=+
+		if (!isset($result[$title]) || (isset($result[$title]) && $result[$title]["result"] === false)) {
+			$result[$title] = [
+				"title" => $title,
+				"result" => $ok,
+				"status" => $status,
+				"time" => $time
+			];
+		}
 	}
 	return $result;
 }
