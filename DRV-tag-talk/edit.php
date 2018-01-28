@@ -15,7 +15,7 @@ require(__DIR__."/../function/edittoken.php");
 
 echo "The time now is ".date("Y-m-d H:i:s")." (UTC)\n";
 
-login();
+login("bot");
 $C["edittoken"] = edittoken();
 
 # get previous process last revid
@@ -107,6 +107,7 @@ foreach ($arRevIndexs as $index => $arRevIndex) {
 			break;
 		}
 		$curRevid = $revs[$curIndex]["revid"];
+		echo $curRevid."\n";
 		$curRev = getrevcontent($curRevid);
 		$curStatus = getstatus($curRev);
 		foreach ($readytotag as $title => $status) {

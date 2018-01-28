@@ -86,6 +86,7 @@ function getpagecontent($title) {
 
 # split to content array by section from wikitext
 function getstatus($text) {
+	global $C;
 	$hash = md5(uniqid(rand(), true));
 	$text = preg_replace("/^(==.+?==\s*)$/m", $hash."$1", $text);
 	$text = explode($hash, $text);
