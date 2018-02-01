@@ -45,6 +45,7 @@ echo "find ".(count($text)-1)." sections\n";
 $oldpagetext .= $text[0];
 unset($text[0]);
 
+$totalcount = 0;
 foreach ($text as $temp) {
 	if (preg_match("/===(\d+)月(\d+)日===\s*/", $temp, $m)) {
 		$year = $m[1];
@@ -89,8 +90,25 @@ foreach ($text as $temp) {
 	foreach ($temp as $temp2) {
 		if (preg_match("/{{CopyvioEntry\|1=([^|]+)\|/", $temp2, $m)) {
 			if (in_array($m[1], $missing)) {
-				echo "remove ".$m[1]."\n";
+				echo "\tremove ".$m[1];
+
+				$res = cURL($C["wikiapi"]."?".http_build_query(array(
+					"action" => "query",
+					"format" => "json",
+					"list" => "logevents",
+					"leprop" => "comment",
+					"letype" => "delete",
+					"letitle" => $m[1],
+					"lelimit" => "1"
+				)));
+				if ($res === false) {
+					exit("fetch page fail\n");
+				}
+				$res = json_decode($res, true);
+				echo "\t".$res["query"]["logevents"][0]["comment"]."\n";
+
 				$count++;
+				$totalcount++;
 			} else {
 				$oldpagetexttemp .= $temp2;
 			}
@@ -105,6 +123,7 @@ foreach ($text as $temp) {
 		echo "empty section\n";
 	}
 }
+echo "total remove ".$totalcount."\n";
 $text = $oldpagetext;
 
 $summary = $C["summary_prefix"];
