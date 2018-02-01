@@ -194,6 +194,11 @@ foreach ($newpagetext as $year => $newtext) {
 			echo $page." exist\n";
 		} else {
 			echo $page." not exist\n";
+			$text = "{{存档页|".$C["from_page"]."}}\n".
+				"==".$C["text1"]."==\n".
+				"==".$C["text2"]."==\n".
+				"==".$C["text3"]."==\n".
+				"==".$C["text4"]."==\n";
 		}
 
 		$hash = md5(uniqid(rand(), true));
