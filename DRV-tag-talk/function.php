@@ -123,7 +123,8 @@ function getstatus($text) {
 				echo "cannot match status:\n";
 				echo trim($temp)."\n";
 			}
-			continue;
+			$status = "未知";
+			$ok = false;
 		}
 		$time = getfirsttime($temp);
 
