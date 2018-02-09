@@ -132,7 +132,9 @@ $output = str_replace("/*title*/", "+'".$C["page"]."'", $output);
 $output = str_replace("/*data*/", $out, $output);
 $output = str_replace("<!--time-->", $time, $output);
 @mkdir(__DIR__."/list");
-file_put_contents(__DIR__."/list/".str_replace(["Wikipedia:申请成为管理员/", "/"], ["", "_"], $C["page"]).".html", $output);
+$outpath = __DIR__."/list/".str_replace([":", "/"], ["_", "_"], $C["page"]).".html";
+echo "output: ".$outpath."\n";
+file_put_contents($outpath, $output);
 
 $spendtime = (microtime(true)-$starttime);
 echo "spend ".$spendtime." s.\n";
