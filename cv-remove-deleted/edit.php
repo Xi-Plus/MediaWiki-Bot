@@ -124,28 +124,37 @@ foreach ($text as $temp) {
 	}
 }
 echo "total remove ".$totalcount."\n";
-$text = $oldpagetext;
+if ($totalcount > 0) {
+	$text = $oldpagetext;
 
-$summary = $C["summary_prefix"];
-$post = array(
-	"action" => "edit",
-	"format" => "json",
-	"title" => $C["page"],
-	"summary" => $summary,
-	"text" => $text,
-	"token" => $edittoken,
-	"starttimestamp" => $starttimestamp,
-	"basetimestamp" => $basetimestamp
-);
-echo "edit ".$C["page"]." summary=".$summary."\n";
-if (!$C["test"]) {
-	$res = cURL($C["wikiapi"], $post);
-} else {
-	$res = false;
-	file_put_contents(__DIR__."/out.txt", $text);
+	$summary = $C["summary_prefix"];
+	$post = array(
+		"action" => "edit",
+		"format" => "json",
+		"title" => $C["page"],
+		"summary" => $summary,
+		"text" => $text,
+		"token" => $edittoken,
+		"starttimestamp" => $starttimestamp,
+		"basetimestamp" => $basetimestamp
+	);
+	echo "edit ".$C["page"]." summary=".$summary."\n";
+
+	echo "Press any key to continue . . .";
+	fgets(STDIN);
+
+	if (!$C["test"]) {
+		$res = cURL($C["wikiapi"], $post);
+	} else {
+		$res = false;
+		file_put_contents(__DIR__."/out.txt", $text);
+	}
+	$res = json_decode($res, true);
+	if (isset($res["error"])) {
+		echo "edit fail\n";
+		var_dump($res["error"]);
+	}
 }
-$res = json_decode($res, true);
-if (isset($res["error"])) {
-	echo "edit fail\n";
-	var_dump($res["error"]);
-}
+
+$spendtime = (microtime(true)-$starttime);
+echo "spend ".$spendtime." s.\n";
