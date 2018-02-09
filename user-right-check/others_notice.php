@@ -103,10 +103,6 @@ foreach ($row as $user) {
 		}
 
 		if ($contentmodel == "wikitext") {
-			if (strpos($text, $C["other_notice_text1"]) || strpos($text, $C["other_notice_text2"])) {
-				echo "already notice\n";
-				break;
-			}
 			$text .= "\n".$out;
 
 			$summary = $C["other_notice_summary_prefix"];
