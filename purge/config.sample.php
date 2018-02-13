@@ -18,6 +18,7 @@ $C["target"] = [
 $C["wikiapi"] = "https://zh.wikipedia.org/w/api.php";
 $C["user"] = "A2093064-bot";
 $C["pass"] = "";
+$C["sleep"] = 0;
 
 $C["User-Agent"] = "User:A2093064-bot purge";
 

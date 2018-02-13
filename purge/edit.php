@@ -63,9 +63,12 @@ function purge($page) {
 		echo "edit fail\n";
 		var_dump($res["error"]);
 	}
+	if ($C["sleep"] !== 0) {
+		usleep($C["sleep"] * 1000);
+	}
 }
 
-$options = getopt("c:t:p:", ["target:"]);
+$options = getopt("c:t:p:", ["target:", "sleep:"]);
 if ($options === false) {
 	exit("parse parameter failed\n");
 }
@@ -80,6 +83,9 @@ if (isset($options["target"])) {
 	foreach ($C["target"][$target] as $key => $value) {
 		$C[$key] = $value;
 	}
+}
+if (isset($options["sleep"])) {
+	$C["sleep"] = $options["sleep"];
 }
 
 login("user");
