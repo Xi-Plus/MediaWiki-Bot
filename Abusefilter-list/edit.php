@@ -46,13 +46,24 @@ foreach ($res["query"]["abusefilters"] as $AF) {
 	$action = str_replace("throttle", "{{int:abusefilter-action-throttle}}", $action);
 	$action = str_replace("blockautopromote", "{{int:abusefilter-action-blockautopromote}}", $action);
 	$action = str_replace(",", "、", $action);
+
+	if ($AF["hits"] > 1000) {
+		$AF["hits"] = (floor($AF["hits"]/1000)*1000);
+		$AFhitstext = $AF["hits"]." 次以上命中";
+	} else if ($AF["hits"] > 100) {
+		$AF["hits"] = (floor($AF["hits"]/100)*100);
+		$AFhitstext = $AF["hits"]." 次以上命中";
+	} else {
+		$AFhitstext = $AF["hits"]." 次命中";
+	}
+
 	$out .= '|- style="color: '.(isset($AF["enabled"])?"#000":(isset($AF["deleted"])?"#aaa":"#666")).';"
 | [[Special:AbuseFilter/'.$AF["id"].'|'.$AF["id"].']]
 | [[Special:AbuseFilter/'.$AF["id"].'|'.$AF["description"].']]
 |'.$action.'
 |'.(isset($AF["enabled"])?"{{int:abusefilter-enabled}}":(isset($AF["deleted"])?"{{int:abusefilter-deleted}}":"{{int:abusefilter-disabled}}")).'
 |'.(isset($AF["private"])?"{{int:abusefilter-hidden}}":"{{int:abusefilter-unhidden}}").'
-|data-sort-value='.$AF["hits"].'| [{{fullurl:Special:AbuseLog|wpSearchFilter='.$AF["id"].'}} {{int:abusefilter-hitcount|'.$AF["hits"].'}}]
+|data-sort-value='.$AF["hits"].'| [{{fullurl:Special:AbuseLog|wpSearchFilter='.$AF["id"].'}} '.$AFhitstext.']
 ';
 }
 $out .= '|}';
