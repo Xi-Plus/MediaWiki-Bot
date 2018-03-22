@@ -7,6 +7,7 @@ $C["pass"] = "";
 $C["nsignore"] = [2, 3];
 
 $C["fetchuser"] = "Xiplus";
+$C["timelimit"] = time()-86400*365;
 
 $C["cookiefile"] = __DIR__."/../tmp/AFD-stats-cookie.txt";
 

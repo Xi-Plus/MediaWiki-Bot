@@ -25,8 +25,16 @@ $C["usersign"] = $C['fetchuser'];
 if (isset($argv[2])) {
 	$C["usersign"] = $argv[2];
 }
+if (isset($argv[3])) {
+	if (preg_match("/^\d+$/", $argv[3])) {
+		$C["timelimit"] = time()-intval($argv[3])*86400;
+	} else if (preg_match("/^\d+\/\d+\/\d+$/", $argv[3])) {
+		$C["timelimit"] = strtotime($argv[3]);
+	}
+}
 echo "fetch ".$C["fetchuser"]."\n";
 echo "sign ".$C["usersign"]."\n";
+echo "timelimit ".date("Y-m-d", $C["timelimit"])."\n";
 
 
 $res = cURL($C["wikiapi"]."?".http_build_query(array(
@@ -67,6 +75,13 @@ echo $nominatorregex."\n";
 $out = "";
 foreach ($pagelist as $key => $page) {
 	echo $key." ".$page."\n";
+	if (!preg_match("/^Wikipedia:頁面存廢討論\/記錄\/(\d{4}\/\d{2}\/\d{2})$/", $page, $m)) {
+		echo "page name error\n";
+		continue;
+	} else if (strtotime($m[1]) < $C["timelimit"]) {
+		echo "time out of limit\n";
+		continue;
+	}
 	$text = file_get_contents("https://zh.wikipedia.org/wiki/".$page."?action=raw");
 
 	$hash = md5(uniqid(rand(), true));

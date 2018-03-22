@@ -65,7 +65,7 @@ function cmpcode($a, $b) {
 }
 uksort($code, "cmpcode");
 
-$output = file_get_contents("template.html");
+$output = file_get_contents(__DIR__."/template.html");
 $output = str_replace("<!--title-->", $C["fetchuser"], $output);
 
 $out = "";
@@ -117,6 +117,7 @@ foreach ($text as $row) {
 	if (mb_strlen($title) > 20) {
 		$title = mb_substr($title, 0, 20)."...";
 	}
+	$row[1] = str_replace(" ", "_", $row[1]);
 	$out .= "<td><a href='https://zh.wikipedia.org/wiki/".$row[0]."#".$row[1]."' target='_blank'>".$title."</a></td>\n";
 	$out .= "<td>".str_replace("Wikipedia:頁面存廢討論/記錄/", "", $row[0])."</td>\n";
 	$out .= "<td>".$v."</td>\n";
