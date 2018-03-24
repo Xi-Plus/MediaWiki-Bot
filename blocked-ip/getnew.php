@@ -35,7 +35,7 @@ while (true) {
 		"list" => "blocks",
 		"bklimit" => "max",
 		"bkprop" => "id|user|expiry",
-		"bkshow" => "temp|!account"
+		"bkshow" => "temp"
 	);
 	if ($bkcontinue !== "") {
 		$post["bkcontinue"] = $bkcontinue;
@@ -48,6 +48,7 @@ while (true) {
 	$blocks = $res["query"]["blocks"];
 	echo "get ".count($blocks)."\n";
 	foreach ($blocks as $block) {
+		$expiry = date("Y-m-d H:i:s", strtotime($block["expiry"]));
 		if (!isset($blocklist[$block["id"]])) {
 			if (!isset($block["user"])) {
 				continue;
@@ -55,13 +56,23 @@ while (true) {
 			$sth = $G["db"]->prepare("INSERT INTO `{$C['DBTBprefix']}` (`id`, `user`, `expiry`) VALUES (:id, :user, :expiry)");
 			$sth->bindValue(":id", $block["id"]);
 			$sth->bindValue(":user", $block["user"]);
-			$sth->bindValue(":expiry", date("Y-m-d H:i:s", strtotime($block["expiry"])));
+			$sth->bindValue(":expiry", $expiry);
 			$res2 = $sth->execute();
 			if ($res2 === false) {
 				echo $sth->errorInfo()[2]."\n";
 			}
 			echo $block["id"]." ".$block["user"]." ".$block["expiry"]."\n";
 		} else {
+			if ($expiry !== $blocklist[$block["id"]]["expiry"]) {
+				$sth = $G["db"]->prepare("UPDATE `{$C['DBTBprefix']}` SET `expiry` = :expiry WHERE `id` = :id");
+				$sth->bindValue(":id", $block["id"]);
+				$sth->bindValue(":expiry", $expiry);
+				$res2 = $sth->execute();
+				if ($res2 === false) {
+					echo $sth->errorInfo()[2]."\n";
+				}
+				echo $block["id"]." ".$block["user"]." ".$block["expiry"]." (update)\n";
+			}
 			unset($blocklist[$block["id"]]);
 		}
 	}
