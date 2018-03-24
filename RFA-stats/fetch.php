@@ -26,8 +26,7 @@ echo "fetch ".$C["page"]."\n";
 
 $result = [];
 
-# support
-echo "support\n";
+echo "section 2\n";
 $res = cURL($C["wikiapi"]."?".http_build_query(array(
 	"action" => "query",
 	"prop" => "revisions",
@@ -46,61 +45,53 @@ if (isset($res["continue"])) {
 }
 $pages = current($res["query"]["pages"]);
 foreach ($pages["revisions"] as $revision) {
-	$count = preg_match_all("/^#[^#:*]/m", $revision["*"]);
 	$result[$revision["revid"]] = [
 		"revid" => $revision["revid"],
 		"user" => $revision["user"],
 		"timestamp" => date("Y-m-d H:i:s", strtotime($revision["timestamp"])),
-		"support" => $count,
+		"support" => 0,
+		"oppose" => 0,
+		"neutral" => 0,
 	];
+	$count = preg_match_all("/^#[^#:*]/m", $revision["*"]);
+	if (strpos($revision["*"], "===支持===") !== false) {
+		$result[$revision["revid"]]["support"] = $count;
+	} else if (strpos($revision["*"], "===反對===") !== false) {
+		$result[$revision["revid"]]["oppose"] = $count;
+	} else if (strpos($revision["*"], "===中立===") !== false) {
+		$result[$revision["revid"]]["neutral"] = $count;
+	}
 }
 
-# oppose
-echo "oppose\n";
-$res = cURL($C["wikiapi"]."?".http_build_query(array(
-	"action" => "query",
-	"prop" => "revisions",
-	"format" => "json",
-	"rvprop" => "ids|timestamp|user|content",
-	"rvlimit" => "max",
-	"rvsection" => "3",
-	"titles" => $C["page"]
-)));
-if ($res === false) {
-	exit("fetch page fail\n");
-}
-$res = json_decode($res, true);
-if (isset($res["continue"])) {
-	echo "Warning! result not all\n";
-}
-$pages = current($res["query"]["pages"]);
-foreach ($pages["revisions"] as $revision) {
-	$count = preg_match_all("/^#[^#:*]/m", $revision["*"]);
-	$result[$revision["revid"]]["oppose"] = $count;
-}
-
-# neutral
-echo "neutral\n";
-$res = cURL($C["wikiapi"]."?".http_build_query(array(
-	"action" => "query",
-	"prop" => "revisions",
-	"format" => "json",
-	"rvprop" => "ids|timestamp|user|content",
-	"rvlimit" => "max",
-	"rvsection" => "4",
-	"titles" => $C["page"]
-)));
-if ($res === false) {
-	exit("fetch page fail\n");
-}
-$res = json_decode($res, true);
-if (isset($res["continue"])) {
-	echo "Warning! result not all\n";
-}
-$pages = current($res["query"]["pages"]);
-foreach ($pages["revisions"] as $revision) {
-	$count = preg_match_all("/^#[^#:*]/m", $revision["*"]);
-	$result[$revision["revid"]]["neutral"] = $count;
+for ($i=3; $i <= 5; $i++) { 
+	echo "section $i\n";
+	$res = cURL($C["wikiapi"]."?".http_build_query(array(
+		"action" => "query",
+		"prop" => "revisions",
+		"format" => "json",
+		"rvprop" => "ids|timestamp|user|content",
+		"rvlimit" => "max",
+		"rvsection" => $i,
+		"titles" => $C["page"]
+	)));
+	if ($res === false) {
+		exit("fetch page fail\n");
+	}
+	$res = json_decode($res, true);
+	if (isset($res["continue"])) {
+		echo "Warning! result not all\n";
+	}
+	$pages = current($res["query"]["pages"]);
+	foreach ($pages["revisions"] as $revision) {
+		$count = preg_match_all("/^#[^#:*]/m", $revision["*"]);
+		if (strpos($revision["*"], "===支持===") !== false) {
+			$result[$revision["revid"]]["support"] = $count;
+		} else if (strpos($revision["*"], "===反對===") !== false) {
+			$result[$revision["revid"]]["oppose"] = $count;
+		} else if (strpos($revision["*"], "===中立===") !== false) {
+			$result[$revision["revid"]]["neutral"] = $count;
+		}
+	}
 }
 
 $out = "";
