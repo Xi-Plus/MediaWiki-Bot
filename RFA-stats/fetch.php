@@ -97,7 +97,8 @@ for ($i=3; $i <= 5; $i++) {
 $out = "";
 $count = 0;
 echo count($result)."\n";
-foreach (array_reverse($result) as $row) {
+ksort($result);
+foreach ($result as $row) {
 	if ($count) {
 		$out .= ",\n";
 	}
@@ -122,6 +123,12 @@ $output = str_replace("<!--title-->", $C["page"], $output);
 $output = str_replace("/*title*/", "+'".$C["page"]."'", $output);
 $output = str_replace("/*data*/", $out, $output);
 $output = str_replace("<!--time-->", $time, $output);
+$result = array_reverse($result);
+if ($result[0]["support"] >= $result[0]["oppose"] * 4) {
+	$output = str_replace("<!--comment-->", "要落選還需".(floor($result[0]["support"]/4)-$result[0]["oppose"]+1)."張反對票", $output);
+} else {
+	$output = str_replace("<!--comment-->", "要獲選還需".($result[0]["oppose"]*4-$result[0]["support"])."張支持票", $output);
+}
 @mkdir(__DIR__."/list");
 $outpath = __DIR__."/list/".str_replace([":", "/"], ["_", "_"], $C["page"]).".html";
 echo "output: ".$outpath."\n";
