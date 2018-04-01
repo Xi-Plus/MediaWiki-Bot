@@ -91,17 +91,19 @@ function lastusergetrights($username) {
 		"action" => "query",
 		"format" => "json",
 		"list" => "logevents",
-		"leprop" => "timestamp",
+		"leprop" => "timestamp|user",
 		"letype" => "rights",
 		"letitle" => "User:".$username,
-		"lelimit" => "1"
+		"lelimit" => "10"
 	)));
 	if ($res === false) {
 		exit("fetch page fail\n");
 	}
 	$res = json_decode($res, true);
-	if (isset($res["query"]["logevents"][0]["timestamp"])) {
-		return date("Y-m-d H:i:s", strtotime($res["query"]["logevents"][0]["timestamp"]));
+	foreach ($res["query"]["logevents"] as $logevent) {
+		if ($logevent["user"] !== "Jimmy-abot") {
+			return date("Y-m-d H:i:s", strtotime($logevent["timestamp"]));
+		}
 	}
 	return $C['TIME_MIN'];
 }
