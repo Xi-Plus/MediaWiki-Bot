@@ -105,11 +105,19 @@ for ($i=$C["fail_retry"]; $i > 0; $i--) {
 			$time = strtotime($user["lastlog"]);
 			$out .= "最後日誌動作在".date("Y年n月j日", $time)." (".$C["day"][date("w", $time)].") ".date("H:i", $time)." (UTC)";
 		}
-		$out .= "]]、[[Special:用户权限/".$user["name"]."|";
-		$time = strtotime($user["lastusergetrights"]);
-		$out .= "最後授權在".date("Y年n月j日", $time)." (".$C["day"][date("w", $time)].") ".date("H:i", $time)." (UTC)";
-		$out .= "]]\n*:~~~~\n\n";
+		$out .= "]]";
+		if ($user["lastusergetrights"] != $C['TIME_MIN']) {
+			$time = strtotime($user["lastusergetrights"]);
+			$out .= "、[[Special:用户权限/".$user["name"]."|最後授權在".date("Y年n月j日", $time)." (".$C["day"][date("w", $time)].") ".date("H:i", $time)." (UTC)]]";
+		}
+		$out .= "\n*:~~~~\n\n";
 		echo "\n";
+
+		$sth = $G["db"]->prepare("UPDATE `{$C['DBTBprefix']}userlist` SET `noticetime` = :noticetime WHERE `name` = :name");
+		$sth->bindValue(":noticetime", date("Y-m-d H:i:s"));
+		$sth->bindValue(":name", $user["name"]);
+		$res = $sth->execute();
+
 		if ($count >= $C["other_report_limit"]) {
 			break;
 		}
