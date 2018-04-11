@@ -62,6 +62,8 @@ foreach ($allusers as $bot) {
 		$pages = current($res["query"]["pages"]);
 		$userid = 0;
 		$username = "";
+		$userlastedit = $C['TIME_MIN'];
+		$userlastlog = $C['TIME_MIN'];
 		if (isset($pages["revisions"][0]["*"])) {
 			$text = $pages["revisions"][0]["*"];
 			if (preg_match("/{{Bot\|([^}]+)/i", $text, $m)) {
