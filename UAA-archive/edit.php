@@ -176,9 +176,9 @@ for ($i=$C["fail_retry"]; $i > 0; $i--) {
 	$res = json_decode($res, true);
 	$pages = current($res["query"]["pages"]);
 
-	$oldtext = "{{存档页}}
+	$oldtext = "{{存档页|Wikipedia:需要管理員注意的用戶名}}
 {{Wikipedia:需要管理員注意的用戶名/Archive}}
-=== {$year}年".($half==1 ? "上半" : "下半")." ===\n";
+=== {$year}年".($half==1 ? "上半年" : "下半年")." ===\n";
 
 	$basetimestamp2 = null;
 	if (!isset($pages["missing"])) {
