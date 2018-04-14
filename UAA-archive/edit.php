@@ -77,6 +77,7 @@ for ($i=$C["fail_retry"]; $i > 0; $i--) {
 
 	$archive_count = 0;
 	foreach ($text as $temp) {
+		$temp = trim($temp);
 		$blocked = false;
 		$lasttime = 0;
 		if (preg_match("/{{user-uaa\|(?:1=)?(.+?)}}/", $temp, $m)) {
@@ -112,16 +113,17 @@ for ($i=$C["fail_retry"]; $i > 0; $i--) {
 			}
 		} else {
 			$lasttime = time();
+			$temp .= "{{subst:Unsigned-before|~~~~~}}";
 		}
 		echo date("Y/m/d H:i", $lasttime)."\t";
 
 		if (time()-$lasttime > ($blocked ? $blocked_retention_time : $other_retention_time)) {
 			echo "archive\n";
-			$newpagetext .= $temp;
+			$newpagetext .= "\n".$temp;
 			$archive_count++;
 		} else {
 			echo "not archive\n";
-			$oldpagetext .= $temp;
+			$oldpagetext .= "\n".$temp;
 		}
 	}
 
@@ -178,18 +180,18 @@ for ($i=$C["fail_retry"]; $i > 0; $i--) {
 
 	$oldtext = "{{存档页|Wikipedia:需要管理員注意的用戶名}}
 {{Wikipedia:需要管理員注意的用戶名/Archive}}
-=== {$year}年".($half==1 ? "上半年" : "下半年")." ===\n";
+=== {$year}年".($half==1 ? "上半年" : "下半年")." ===";
 
 	$basetimestamp2 = null;
 	if (!isset($pages["missing"])) {
-		$oldtext = $pages["revisions"][0]["*"];
+		$oldtext = trim($pages["revisions"][0]["*"]);
 		$basetimestamp2 = $pages["revisions"][0]["timestamp"];
 		echo $page." exist\n";
 	} else {
 		echo $page." not exist\n";
 	}
 
-	$oldtext .= "\n".$newpagetext;
+	$oldtext .= "\n".trim($newpagetext);
 
 	$text = preg_replace("/\n{3,}/", "\n\n", $oldtext);
 
