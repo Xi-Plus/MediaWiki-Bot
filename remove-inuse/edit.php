@@ -53,9 +53,9 @@ foreach ($pagelist as $page) {
 		$text = $pages["revisions"][0]["*"];
 		$basetimestamp = $pages["revisions"][0]["timestamp"];
 
-		$text = preg_replace("/{{under ?construction[^}]*}} *\n?/i", "", $text);
-		$text = preg_replace("/{{inuse[^}]*}} *\n?/i", "", $text);
-		$text = preg_replace("/{{new ?page[^}]*}} *\n?/i", "", $text);
+		$text = preg_replace("/{{under ?construction[^}]*}}\s*/i", "", $text);
+		$text = preg_replace("/{{inuse[^}]*}}\s*/i", "", $text);
+		$text = preg_replace("/{{new ?page[^}]*}}\s*/i", "", $text);
 		if ($pages["revisions"][0]["*"] !== $text) {
 			$logpage []= $page["title"];
 		}
