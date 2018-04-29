@@ -76,15 +76,11 @@ foreach ($allusers as $bot) {
 				}
 				
 				$userid = userid($username);
-				$userlastedit = lastedit($username);
-				$userlastlog = lastlog($username);
 			}
 		}
 
 		echo "owner: ".$username."\n";
 		echo "owner userid: ".$userid."\n";
-		echo "owner lastedit: ".$userlastedit."\n";
-		echo "owner lastlog: ".$userlastlog."\n";
 
 		$botlastedit = lastedit($bot["name"]);
 		$botlastlog = lastlog($bot["name"]);
@@ -95,7 +91,7 @@ foreach ($allusers as $bot) {
 		$botrights = implode("|", userright($bot["name"]));
 		echo "botrights: ".$botrights."\n";
 
-		$sth = $G["db"]->prepare("INSERT INTO `{$C['DBTBprefix']}botlist` (`botid`, `botname`, `botlastedit`, `botlastlog`, `botrights`, `userid`, `username`, `userlastedit`, `userlastlog`) VALUES (:botid, :botname, :botlastedit, :botlastlog, :botrights, :userid, :username, :userlastedit, :userlastlog)");
+		$sth = $G["db"]->prepare("INSERT INTO `{$C['DBTBprefix']}botlist` (`botid`, `botname`, `botlastedit`, `botlastlog`, `botrights`, `userid`, `username`) VALUES (:botid, :botname, :botlastedit, :botlastlog, :botrights, :userid, :username)");
 		$sth->bindValue(":botid", $bot["userid"]);
 		$sth->bindValue(":botname", $bot["name"]);
 		$sth->bindValue(":botlastedit", $botlastedit);
@@ -103,8 +99,6 @@ foreach ($allusers as $bot) {
 		$sth->bindValue(":botrights", $botrights);
 		$sth->bindValue(":userid", $userid);
 		$sth->bindValue(":username", $username);
-		$sth->bindValue(":userlastedit", $userlastedit);
-		$sth->bindValue(":userlastlog", $userlastlog);
 		$res = $sth->execute();
 		WriteLog("new bot: ".$bot["name"]." ".$bot["userid"]);
 	} else {

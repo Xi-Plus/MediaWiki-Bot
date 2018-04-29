@@ -10,14 +10,12 @@ date_default_timezone_set('UTC');
 @include(__DIR__."/config.php");
 require(__DIR__."/../function/log.php");
 
-$timelimit = date("Y-m-d H:i:s", strtotime("-2 years"));
+$timelimit = date("Y-m-d H:i:s", strtotime($C["bot_result_timelimit"]));
 echo "顯示最後動作 < ".$timelimit."<br>";
 
-$sth = $G["db"]->prepare("SELECT * FROM `{$C['DBTBprefix']}botlist` WHERE `botlastedit` < :botlastedit AND `botlastlog` < :botlastlog AND `userlastedit` < :userlastedit AND `userlastlog` < :userlastlog AND `reported` = 0 AND `userid` != -1 ORDER BY `botlastedit` ASC, `botlastlog` ASC, `userlastedit` ASC, `userlastlog` ASC");
+$sth = $G["db"]->prepare("SELECT * FROM `{$C['DBTBprefix']}botlist` WHERE `botlastedit` < :botlastedit AND `botlastlog` < :botlastlog AND `reported` = 0 AND `userid` > 0 ORDER BY `botlastedit` ASC, `botlastlog` ASC");
 $sth->bindValue(":botlastedit", $timelimit);
 $sth->bindValue(":botlastlog", $timelimit);
-$sth->bindValue(":userlastedit", $timelimit);
-$sth->bindValue(":userlastlog", $timelimit);
 $sth->execute();
 $row = $sth->fetchAll(PDO::FETCH_ASSOC);
 echo "共有".count($row)."筆<br><br>";
@@ -38,18 +36,15 @@ if ($lastaction == "0000-00-00 00:00:00") {
 	echo date("Y年n月j日", $time)." (".$C["day"][date("w", $time)].") ".date("H:i", $time)." (UTC)";
 }
 ?><br>
-*操作者最後活動時間：<?php
-$lastaction = max($user["userlastedit"], $user["userlastlog"]);
-if ($lastaction == "0000-00-00 00:00:00") {
-	echo "從未編輯過";
-} else {
-	$time = strtotime($lastaction);
-	echo date("Y年n月j日", $time)." (".$C["day"][date("w", $time)].") ".date("H:i", $time)." (UTC)";
-}
-?><br>
 *發出通知時間：~~~~~<br>
 *提交的維基人及時間：~~~~<br><br>
 <?php
+}
+
+?><hr><?php
+
+foreach ($row as $user) {
+	echo "User talk:".$user["username"]."<br>\n";
 }
 ?>
 </body>

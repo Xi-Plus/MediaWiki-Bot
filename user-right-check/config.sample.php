@@ -49,6 +49,8 @@ $C["other_notice_summary_prefix"] = "[[User:A2093064-bot/task/12|機器人12]]�
 
 $C["other_result_timelimit"] = "-184 days";
 
+$C["bot_result_timelimit"] = "-1 year";
+
 $C["User-Agent"] = "User:A2093064-bot user-right-check";
 
 $C["DBTBprefix"] = "user_right_check_";

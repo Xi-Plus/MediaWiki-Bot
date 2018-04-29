@@ -10,7 +10,7 @@ date_default_timezone_set('UTC');
 @include(__DIR__."/config.php");
 require(__DIR__."/../function/log.php");
 
-$timelimit = date("Y-m-d H:i:s", strtotime("-2 years"));
+$timelimit = date("Y-m-d H:i:s", strtotime($C["bot_result_timelimit"]));
 echo "顯示最後動作 < ".$timelimit."<br>";
 
 if (isset($_POST["owner"])) {
@@ -19,9 +19,9 @@ if (isset($_POST["owner"])) {
 		echo "更新".$_POST["owner"]."的最後編輯時間失敗<br>";
 	} else {
 		$time = date("Y-m-d H:i:s", $time);
-		$sth = $G["db"]->prepare("UPDATE `{$C['DBTBprefix']}botlist` SET `userlastedit` = :userlastedit WHERE `username` = :username");
+		$sth = $G["db"]->prepare("UPDATE `{$C['DBTBprefix']}botlist` SET `userlastedit` = :userlastedit WHERE `botname` = :botname");
 		$sth->bindValue(":userlastedit", $time);
-		$sth->bindValue(":username", $_POST["owner"]);
+		$sth->bindValue(":botname", $_POST["botname"]);
 		$sth->execute();
 		WriteLog("update user ".$_POST["owner"]." lastedit = ".$time);
 		echo "成功更新".$_POST["owner"]."的最後編輯時間為".$time."<br>";
@@ -37,11 +37,9 @@ if (isset($_POST["reported"])) {
 }
 
 
-$sth = $G["db"]->prepare("SELECT * FROM `{$C['DBTBprefix']}botlist` WHERE `botlastedit` < :botlastedit AND `botlastlog` < :botlastlog AND `userlastedit` < :userlastedit AND `userlastlog` < :userlastlog AND `reported` = 0 AND `userid` != -1 ORDER BY `botlastedit` ASC, `botlastlog` ASC, `userlastedit` ASC, `userlastlog` ASC");
+$sth = $G["db"]->prepare("SELECT * FROM `{$C['DBTBprefix']}botlist` WHERE `botlastedit` < :botlastedit AND `botlastlog` < :botlastlog AND `reported` = 0 AND `userid` > 0 ORDER BY `botlastedit` ASC, `botlastlog` ASC");
 $sth->bindValue(":botlastedit", $timelimit);
 $sth->bindValue(":botlastlog", $timelimit);
-$sth->bindValue(":userlastedit", $timelimit);
-$sth->bindValue(":userlastlog", $timelimit);
 $sth->execute();
 $row = $sth->fetchAll(PDO::FETCH_ASSOC);
 echo "共有".count($row)."筆<br>";
@@ -55,8 +53,6 @@ $count = 1;
 	<th>bot last log</th>
 	<th>bot rights</th>
 	<th>owner</th>
-	<th>owner last edit</th>
-	<th>owner last log</th>
 	<th>reported</th>
 </tr>
 <?php
@@ -64,19 +60,16 @@ foreach ($row as $bot) {
 	?><tr>
 		<td><?php echo ($count++); ?></td>
 		<td><a href="https://zh.wikipedia.org/wiki/User:<?=$bot["botname"]?>" target="_blank"><?=$bot["botname"]?></a></td>
-		<td><a href="https://zh.wikipedia.org/wiki/Special:用户贡献/<?=$bot["botname"]?>" target="_blank"><?=$bot["botlastedit"]?></a></td>
+		<td>
+			<form method="post" style="margin: 0px;">
+				<a href="https://zh.wikipedia.org/wiki/Special:用户贡献/<?=$bot["botname"]?>" target="_blank"><?=$bot["botlastedit"]?></a>
+				<input type="text" name="time">
+				<input type="hidden" name="botname" value="<?=$bot["botname"]?>">
+			</form>
+		</td>
 		<td><a href="https://zh.wikipedia.org/wiki/Special:日志/<?=$bot["botname"]?>" target="_blank"><?=$bot["botlastlog"]?></a></td>
 		<td><a href="https://zh.wikipedia.org/wiki/Special:用户权限/<?=$bot["botname"]?>" target="_blank"><?=$bot["botrights"]?></a></td>
 		<td><a href="https://zh.wikipedia.org/wiki/User:<?=$bot["username"]?>" target="_blank"><?=$bot["username"]?></a></td>
-		<td>
-			<form method="post" style="margin: 0px;">
-				<a href="https://zh.wikipedia.org/wiki/Special:用户贡献/<?=$bot["username"]?>" target="_blank"><?=$bot["userlastedit"]?></a>
-				<a href="https://tools.wmflabs.org/guc/?by=date&user=<?=$bot["username"]?>" target="_blank">全域貢獻</a>
-				<input type="text" name="time">
-				<input type="hidden" name="owner" value="<?=$bot["username"]?>">
-			</form>
-		</td>
-		<td><a href="https://zh.wikipedia.org/wiki/Special:日志/<?=$bot["username"]?>" target="_blank"><?=$bot["userlastlog"]?></a></td>
 		<td>
 			<form method="post" style="margin: 0px;">
 				<input type="hidden" name="bot" value="<?=$bot["botname"]?>">
