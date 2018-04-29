@@ -17,6 +17,31 @@ echo "The time now is ".date("Y-m-d H:i:s")." (UTC)\n";
 login("bot");
 $edittoken = edittoken();
 
+$recenteditcount = [];
+$aufrom = "";
+while (true) {
+	$res = cURL($C["wikiapi"]."?".http_build_query(array(
+		"action" => "query",
+		"format" => "json",
+		"list" => "allusers",
+		"aulimit" => "max",
+		"aufrom" => $aufrom,
+		"auactiveusers" => 1
+	)));
+	if ($res === false) {
+		exit("fetch page fail\n");
+	}
+	$res = json_decode($res, true);
+	foreach ($res["query"]["allusers"] as $user) {
+		$recenteditcount[$user["name"]] = $user["recenteditcount"];
+	}
+	if (!isset($res["continue"])) {
+		break;
+	}
+	$aufrom = $res["continue"]["aufrom"];
+}
+echo count($recenteditcount)." active users\n";
+
 for ($i=0; $i < $C["fail_retry"]; $i++) { 
 	$text = file_get_contents($C["page"]);
 	if ($text === false) {
@@ -30,6 +55,7 @@ for ($i=0; $i < $C["fail_retry"]; $i++) {
 !簽名
 !狀態
 !最後編輯
+!30天內編輯
 !字數
 !位元組
 ';
@@ -60,20 +86,26 @@ for ($i=0; $i < $C["fail_retry"]; $i++) {
 		if (!isset($res["query"])) {
 			var_dump($res);
 		}
-		$time = strtotime($res["query"]["usercontribs"][0]["timestamp"]);
+		if (isset($res["query"]["usercontribs"][0])) {
+			$time = strtotime($res["query"]["usercontribs"][0]["timestamp"]);
+		} else {
+			$time = 0;
+		}
 		$date = date("Y年m月d日", $time)." (".$C["day"][date("w", $time)].") ".date("H:i", $time)." (UTC)";
+		$recentedit = $recenteditcount[$user] ?? 0;
 		$len = mb_strlen($sign);
 		$byte = strlen($sign);
 		if ($byte > 255) {
 			$byte = "{{red|'''".$byte."'''}}";
 		}
-		echo ($key+1)."\t".$user."\t".$status."\t".$date."\t".$len."\t".$byte."\n";
+		echo ($key+1)."\t".$user."\t".$status."\t".$date."\t".$recentedit."\t".$len."\t".$byte."\n";
 		$user = "{{User|".$user."}}";
 		$out .= '|-
 |'.$user.'
 | '.$sign.'
 |'.$status.'
-|'.$date.'
+|data-sort-value='.$time.'|'.$date.'
+|'.$recentedit.'
 |'.$len.'
 |'.$byte.'
 ';
