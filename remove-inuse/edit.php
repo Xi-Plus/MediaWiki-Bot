@@ -54,7 +54,7 @@ foreach ($pagelist as $page) {
 		$basetimestamp = $pages["revisions"][0]["timestamp"];
 
 		$text = preg_replace("/{{under ?construction[^}]*}}\s*/i", "", $text);
-		$text = preg_replace("/{{inuse[^}]*}}\s*/i", "", $text);
+		$text = preg_replace("/{{in ?use[^}]*}}\s*/i", "", $text);
 		$text = preg_replace("/{{new ?page[^}]*}}\s*/i", "", $text);
 		if ($pages["revisions"][0]["*"] !== $text) {
 			$logpage []= $page["title"];
