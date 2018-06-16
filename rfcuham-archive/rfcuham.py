@@ -18,6 +18,9 @@ cfg = config_page.text
 cfg = json.loads(cfg)
 print(json.dumps(cfg, indent=4, ensure_ascii=False))
 
+if not cfg["enable"]:
+	exit("disabled\n")
+
 cupage = pywikibot.Page(site, cfg["main_page_name"])
 text = cupage.text
 
