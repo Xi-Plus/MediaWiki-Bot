@@ -1,9 +1,12 @@
 # global
 tmp/
 config.php
+config.py
 input.txt
 out*.txt
 out*.csv
+user-config.py
+user-password.py
 
 # single
 AFD-stats/list/
