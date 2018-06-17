@@ -1,7 +1,7 @@
 <?php
 
 $C["wikiapi"] = "https://zh.wikipedia.org/w/api.php";
-$C["page"] = "Wikipedia:申请解除权限";
+$C["config_page"] = "https://zh.wikipedia.org/w/index.php?title=User:A2093064-bot/task/13/config.json&action=raw";
 $C["AWBpage"] = "https://zh.wikipedia.org/wiki/Wikipedia:AutoWikiBrowser/CheckPage?action=raw";
 $C["user"] = "";
 $C["pass"] = "";
@@ -29,16 +29,6 @@ $C["other_report_notice_timelimit"] = "-31 days";
 $C["other_report_limit"] = 10;
 
 $C["other_update_timelimit"] = "-5 months +7 days";
-
-$C["other_exporttable_timelimit1"] = "-5 months +7 days";
-$C["other_exporttable_timelimit2"] = "-184 days";
-$C["other_exporttable_timelimit3"] = "-153 days";
-$C["other_exporttable_page"] = "User:A2093064-bot/task/13/output/revoke";
-$C["other_exporttable_summary_prefix"] = "[[User:A2093064-bot/task/13|機器人13]]：檢查持權用戶活躍狀況：";
-$C["other_exporttable_text1"] = "<!--revoke table start-->";
-$C["other_exporttable_text2"] = "<!--revoke table end-->";
-$C["other_exporttable_text3"] = "<!--sign start-->";
-$C["other_exporttable_text4"] = "<!--sign end-->";
 
 $C["other_export_timelimit"] = "-184 days";
 
