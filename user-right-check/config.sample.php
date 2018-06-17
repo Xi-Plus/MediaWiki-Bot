@@ -1,7 +1,8 @@
 <?php
 
 $C["wikiapi"] = "https://zh.wikipedia.org/w/api.php";
-$C["config_page"] = "https://zh.wikipedia.org/w/index.php?title=User:A2093064-bot/task/13/config.json&action=raw";
+$C["config_page_notice"] = "https://zh.wikipedia.org/w/index.php?title=User:A2093064-bot/task/12/config.json&action=raw";
+$C["config_page_exporttable"] = "https://zh.wikipedia.org/w/index.php?title=User:A2093064-bot/task/13/config.json&action=raw";
 $C["AWBpage"] = "https://zh.wikipedia.org/wiki/Wikipedia:AutoWikiBrowser/CheckPage?action=raw";
 $C["user"] = "";
 $C["pass"] = "";
@@ -31,11 +32,6 @@ $C["other_report_limit"] = 10;
 $C["other_update_timelimit"] = "-5 months +7 days";
 
 $C["other_export_timelimit"] = "-184 days";
-
-$C["other_notice_timelimit1"] = "-153 days";
-$C["other_notice_timelimit2"] = "-3 months";
-$C["other_notice_limit"] = 10;
-$C["other_notice_summary_prefix"] = "[[User:A2093064-bot/task/12|機器人12]]：通知不活躍用戶除權通知";
 
 $C["other_result_timelimit"] = "-184 days";
 

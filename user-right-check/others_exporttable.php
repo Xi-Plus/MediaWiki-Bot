@@ -9,7 +9,7 @@ require(__DIR__."/../function/log.php");
 
 echo "The time now is ".date("Y-m-d H:i:s")." (UTC)\n";
 
-$config_page = file_get_contents($C["config_page"]);
+$config_page = file_get_contents($C["config_page_exporttable"]);
 if ($config_page === false) {
 	exit("get config failed\n");
 }

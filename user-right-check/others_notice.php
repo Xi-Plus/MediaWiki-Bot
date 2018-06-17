@@ -15,15 +15,25 @@ require(__DIR__."/function.php");
 
 echo "The time now is ".date("Y-m-d H:i:s")." (UTC)\n";
 
+$config_page = file_get_contents($C["config_page_notice"]);
+if ($config_page === false) {
+	exit("get config failed\n");
+}
+$cfg = json_decode($config_page, true);
+
+if (!$cfg["enable"]) {
+	exit("disabled\n");
+}
+
 login("bot");
 $edittoken = edittoken();
 
-$timelimit = date("Y-m-d H:i:s", strtotime($C["other_notice_timelimit1"]));
-echo "timelimit < ".$timelimit." (".$C["other_notice_timelimit1"].")\n";
+$timelimit = date("Y-m-d H:i:s", strtotime($cfg["time_to_notice"]));
+echo "timelimit < ".$timelimit." (".$cfg["time_to_notice"].")\n";
 
 $sth = $G["db"]->prepare("SELECT * FROM `{$C['DBTBprefix']}userlist` WHERE `lasttime` < :lasttime AND `noticetime` < :noticetime ORDER BY `lasttime` ASC, `lastlog` ASC");
 $sth->bindValue(":lasttime", $timelimit);
-$sth->bindValue(":noticetime", date("Y-m-d H:i:s", strtotime($C["other_notice_timelimit2"])));
+$sth->bindValue(":noticetime", date("Y-m-d H:i:s", strtotime($cfg["time_for_do_not_notice_again"])));
 $sth->execute();
 $row = $sth->fetchAll(PDO::FETCH_ASSOC);
 
@@ -32,7 +42,7 @@ foreach ($row as $key => $user) {
 	if (in_array("bot", $row[$key]["rights"])) {
 		$row[$key]["rights"] = array_diff($row[$key]["rights"], ["AWB"]);
 	}
-	$row[$key]["rights"] = array_diff($row[$key]["rights"], $C["right-whitelist"]);
+	$row[$key]["rights"] = array_diff($row[$key]["rights"], $cfg["right_not_to_process"]);
 	$row[$key]["rights"] = array_values($row[$key]["rights"]);
 	if (count($row[$key]["rights"]) == 0) {
 		unset($row[$key]);
@@ -80,32 +90,36 @@ foreach ($row as $user) {
 		$isflow = ($contentmodel == "flow-board");
 
 		if ($user["rights"] == ["ipblock-exempt"]) {
-			$out = "{{subst:inactive IPBE".($isflow?"|flow=1|sig=n":"")."}}";
-			$topic = "因不活躍而取消[[WP:IPBE|IP封禁例外]]權限的通知";
+			if ($isflow) {
+				$out = $cfg["notice_content_ipbe_flow"];
+			} else {
+				$out = $cfg["notice_content_ipbe"];
+			}
+			$topic = $cfg["notice_flow_topic_ipbe"];
 		} else {
-			$out = "{{subst:inactive right".($isflow?"|flow=1|sig=n":"")."|";
-			$topic = "因不活躍而取消";
+			$rightlist = "";
 			foreach ($user["rights"] as $key => $value) {
 				if ($key) {
-					$out .= "、";
-					$topic = "、";
+					$rightlist .= "、";
 				}
 				if ($value == $C["AWBright"]) {
-					$out .= $C["AWBname"];
-					$topic = $C["AWBname"];
+					$rightlist .= $cfg["right_awb_name"];
 				} else {
-					$out .= '{{subst:int:group-'.$value.'}}';
-					$topic = '{{subst:int:group-'.$value.'}}';
+					$rightlist .= '{{subst:int:group-'.$value.'}}';
 				}
 			}
-			$out .= "}}";
-			$topic .= "權限的通知";
+			if ($isflow) {
+				$out = sprintf($cfg["notice_content_flow"], $rightlist);
+			} else {
+				$out = sprintf($cfg["notice_content"], $rightlist);
+			}
+			$topic = sprintf($cfg["notice_flow_topic"], $rightlist);
 		}
 
 		if ($contentmodel == "wikitext") {
 			$text .= "\n".$out;
 
-			$summary = $C["other_notice_summary_prefix"];
+			$summary = $cfg["notice_summary"];
 			$post = array(
 				"action" => "edit",
 				"format" => "json",
@@ -160,8 +174,5 @@ foreach ($row as $user) {
 			}
 			break;
 		}
-	}
-	if ($count >= $C["other_notice_limit"]) {
-		break;
 	}
 }
