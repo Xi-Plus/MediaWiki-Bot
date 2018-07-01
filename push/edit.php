@@ -12,54 +12,126 @@ require(__DIR__."/../function/curl.php");
 require(__DIR__."/../function/login.php");
 require(__DIR__."/../function/edittoken.php");
 
-$options = getopt("", ["target:", "summary:", "file:", "github:"]);
-if ($options === false) {
-	exit("parse parameter failed\n");
+echo "===== project =====\n";
+$project = null;
+if (count(array_keys($C["project"])) == 1) {
+	$project = array_values($C["project"])[0];
 }
-if (isset($options["target"])) {
-	$target = $options["target"];
-	if (!isset($C["target"][$target])) {
-		exit("target not accepted: ".implode("、", array_keys($C["target"]))."\n");
+while (is_null($project)) {
+	echo "project list:\n";
+	foreach (array_keys($C["project"]) as $key => $name) {
+		echo "\t".($key+1)."\t".$name."\n";
 	}
-	foreach ($C["target"][$target] as $key => $value) {
-		$C[$key] = $value;
-	}
-} else {
-	exit("target requireed: ".implode("、", array_keys($C["target"]))."\n");
+	echo "select a project:";
+	$input = (int)fgets(STDIN)-1;
+	$project = @array_values($C["project"])[$input] ?? null;
 }
-if (isset($options["summary"])) {
-	$C["summary_prefix"] = $options["summary"];
-}
-$files = [];
-if (isset($options["file"])) {
-	if (is_array($options["file"])) {
-		foreach ($options["file"] as $file) {
-			if (!isset($C["list"][$file])) {
-				exit("--file ".$file." not found\n");
-			} else {
-				$files[]= $file;
-			}
-		}
-	} else {
-		if (!isset($C["list"][$options["file"]])) {
-			exit("--file ".$options["file"]." not found\n");
-		} else {
-			$files[]= $options["file"];
-		}
-	}
-} else {
-	$files = array_keys($C["list"]);
-}
-if (isset($options["github"])) {
-	echo "source: ".$C["githubprefix"].$options["github"]."\n";
-} else {
-	echo "source: ".$C["localprefix"]."\n";
-}
-echo "target = ".$C["wikiapi"]."\t".$C["remoteprefix"]."\n";
-echo "summary = \"".$C["summary_prefix"]."\"\n";
-echo "files = (".count($files).")\n  ".implode("\n  ", $files)."\n";
+var_dump($project);
+echo "\n";
 
-login($C["bot"]?"bot":"user");
+echo "===== web =====\n";
+$web = null;
+if (count($project["web"]) == 1) {
+	$web = $C["web"][$project["web"][0]];
+}
+while (is_null($web)) {
+	echo "web list:\n";
+	foreach ($project["web"] as $key => $name) {
+		echo "\t".($key+1)."\t".$name."\n";
+	}
+	echo "select a web:";
+	$input = (int)fgets(STDIN)-1;
+	$web = @$C["web"][$project["web"][$input]] ?? null;
+}
+var_dump($web);
+echo "\n";
+
+echo "===== source =====\n";
+$source = null;
+if (count($project["source"]) == 1) {
+	$source = $C["source"][$project["source"][0]];
+}
+while (is_null($source)) {
+	echo "source list:\n";
+	foreach ($project["source"] as $key => $name) {
+		echo "\t".($key+1)."\t".$name."\n";
+	}
+	echo "select a source:";
+	$input = (int)fgets(STDIN)-1;
+	$source = @$C["source"][$project["source"][$input]] ?? null;
+}
+var_dump($source);
+echo "\n";
+
+echo "===== target =====\n";
+$target = null;
+if (count($project["target"]) == 1) {
+	$target = $C["target"][$project["target"][0]];
+}
+while (is_null($target)) {
+	echo "target list:\n";
+	foreach ($project["target"] as $key => $name) {
+		echo "\t".($key+1)."\t".$name."\n";
+	}
+	echo "select a target:";
+	$input = (int)fgets(STDIN)-1;
+	$target = @$C["target"][$project["target"][$input]] ?? null;
+}
+var_dump($target);
+echo "\n";
+
+echo "===== files =====\n";
+$files = [];
+if (count($project["files"]) == 1) {
+	$files = $project["files"];
+}
+echo "files list:\n";
+$key = 0;
+foreach ($project["files"] as $from => $to) {
+	echo "\t".(++$key)."\t".$from."\t".$to."\n";
+}
+echo "select a files:";
+$input = fgets(STDIN);
+$input = str_replace([" ", ","], " ", $input);
+$input = explode(" ", $input);
+foreach ($input as $key) {
+	$key = (int)$key - 1;
+	if (isset(array_keys($project["files"])[$key])) {
+		$files[array_keys($project["files"])[$key]] = array_values($project["files"])[$key];
+	}
+}
+if (count($files) == 0) {
+	$files = $project["files"];
+}
+var_dump($files);
+echo "\n";
+
+$summary = $project["summary"];
+echo "summary:".$summary."\n";
+echo "new summary:";
+$input = trim(fgets(STDIN));
+if ($input !== "") {
+	$summary = $input;
+}
+var_dump($summary);
+echo "\n";
+
+$C["wikiapi"] = $web["wikiapi"];
+$C["user"] = $web["user"];
+$C["pass"] = $web["pass"];
+$C["cookiefile"] = $web["cookiefile"];
+
+echo "wikiapi = ".$C["wikiapi"]."\n";
+echo "source = ".$source."\n";
+echo "target = ".$target."\n";
+echo "summary = \"".$summary."\"\n";
+echo "files (".count($files).") =\n";
+foreach ($files as $from => $to) {
+	echo "\t".$source.$from."\t".$target.$to."\n";
+}
+echo "\n";
+
+login($web["bot"] ? "bot" : "user");
 $edittoken = edittoken();
 
 echo "\npress any key to continue\n";
@@ -67,42 +139,34 @@ fgets(STDIN);
 
 echo "The time now is ".date("Y-m-d H:i:s")." (UTC)\n";
 
-foreach ($C["list"] as $local => $remote) {
-	if (!in_array($local, $files)) {
-		continue;
-	}
-	if (isset($options["github"])) {
-		$local = $C["githubprefix"].$options["github"]."/".$local;
-	} else {
-		$local = $C["localprefix"].$local;
-	}
-	$remote = $C["remoteprefix"].$remote;
-	echo $local." -> ".$remote."\n";
-	$text = @file_get_contents($local);
+foreach ($files as $from => $to) {
+	$from = $source.$from;
+	$to = $target.$to;
+	echo $from." -> ".$to."\n";
+	$text = @file_get_contents($from);
 	if ($text === false) {
-		echo "fetch local fail\n";
+		echo "fetch from fail\n";
 		continue;
 	}
 
-	$summary = $C["summary_prefix"];
 	$post = array(
 		"action" => "edit",
 		"format" => "json",
-		"title" => $remote,
+		"title" => $to,
 		"summary" => $summary,
 		"text" => $text,
 		"token" => $edittoken
 	);
-	if (isset($C["minor"])) {
+	if ($web["minor"]) {
 		$post["minor"] = "";
 	}
-	if (isset($C["bot"])) {
+	if ($web["bot"]) {
 		$post["bot"] = "";
 	}
-	if (isset($C["nocreate"])) {
+	if ($web["nocreate"]) {
 		$post["nocreate"] = "";
 	}
-	echo "edit ".$remote." summary=".$summary."\n";
+	echo "edit ".$to." summary=".$summary."\n";
 	if (!$C["test"]) {
 		$res = cURL($C["wikiapi"], $post);
 	} else {

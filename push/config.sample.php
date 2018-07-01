@@ -1,14 +1,24 @@
 <?php
 
+$C["source"] = [
+	"gadgetlocal" => "/home/user/sample/",
+	"gadgetgithub" => "https://raw.githubusercontent.com/user/repo/master/"
+];
+
 $C["target"] = [
+	"sample" => "User:Example/sample/",
+	"gadget" => "User:Example/gadget/"
+];
+
+$C["web"] = [
 	"beta" => [
 		"wikiapi" => "https://zh.wikipedia.beta.wmflabs.org/w/api.php",
 		"user" => "Example",
 		"pass" => "",
 		"bot" => false,
 		"minor" => true,
-		"cookiefile" =>__DIR__."/../tmp/push-cookie.txt",
-		"remoteprefix" => "User:Example/sample/"
+		"nocreate" => true,
+		"cookiefile" =>__DIR__."/../tmp/push-cookie.txt"
 	],
 	"zhwp" => [
 		"wikiapi" => "https://zh.wikipedia.org/w/api.php",
@@ -16,17 +26,30 @@ $C["target"] = [
 		"pass" => "",
 		"bot" => false,
 		"minor" => true,
-		"cookiefile" => __DIR__."/../tmp/push-wp-cookie.txt",
-		"remoteprefix" => "User:Example/sample/"
+		"nocreate" => true,
+		"cookiefile" => __DIR__."/../tmp/push-wp-cookie.txt"
 	]
 ];
 
-$C["summary_prefix"] = "push";
-
-$C["localprefix"] = "/home/user/sample/";
-$C["githubprefix"] = "https://raw.githubusercontent.com/user/repo/";
-$C["list"] = [
-	"sample.js" => "sample.js"
+$C["project"] = [
+	"sample" => [
+		"source" => [
+			"gadgetlocal",
+			"gadgetgithub",
+		],
+		"target" => [
+			"sample",
+			"gadget"
+		],
+		"web" => [
+			"beta",
+			"zhwp"
+		],
+		"summary" => "deploy new feature",
+		"files" => [
+			'sample.js' => 'sample.js'
+		]
+	]
 ];
 
 $C["User-Agent"] = "";
