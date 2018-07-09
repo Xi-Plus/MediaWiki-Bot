@@ -8,6 +8,7 @@ set_time_limit(600);
 date_default_timezone_set('UTC');
 $starttime = microtime(true);
 @include(__DIR__."/config.php");
+require(__DIR__."/function.php");
 require(__DIR__."/../function/curl.php");
 require(__DIR__."/../function/login.php");
 require(__DIR__."/../function/edittoken.php");
@@ -124,11 +125,8 @@ $output = str_replace("/*title*/", "+'".$C["page"]."'", $output);
 $output = str_replace("/*data*/", $out, $output);
 $output = str_replace("<!--time-->", $time, $output);
 $result = array_reverse($result);
-if ($result[0]["support"] >= $result[0]["oppose"] * 4) {
-	$output = str_replace("<!--comment-->", "要落選還需".(floor($result[0]["support"]/4)-$result[0]["oppose"]+1)."張反對票", $output);
-} else {
-	$output = str_replace("<!--comment-->", "要獲選還需".($result[0]["oppose"]*4-$result[0]["support"])."張支持票", $output);
-}
+$comment = voting_info($result[0]["support"], $result[0]["oppose"]);
+$output = str_replace("<!--comment-->", $comment, $output);
 @mkdir(__DIR__."/list");
 $outpath = __DIR__."/list/".str_replace([":", "/"], ["_", "_"], $C["page"]).".html";
 echo "output: ".$outpath."\n";
