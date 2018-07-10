@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import os
+os.environ['PYWIKIBOT2_DIR'] = os.path.dirname(os.path.realpath(__file__))
 import pywikibot
 import mwparserfromhell
 import json
