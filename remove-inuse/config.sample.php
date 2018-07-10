@@ -1,17 +1,10 @@
 <?php
 
 $C["wikiapi"] = "https://zh.wikipedia.org/w/api.php";
+$C["config_page_notice"] = "https://zh.wikipedia.org/w/index.php?title=User:A2093064-bot/task/6/config.json&action=raw";
+
 $C["user"] = "";
 $C["pass"] = "";
-
-$C["category"] = "Category:被擱置的條目";
-
-$C["log_page"] = "User:A2093064-bot/task/6/output/log";
-
-$C["max_edits_one_time"] = 3;
-$C["fail_retry"] = 5;
-
-$C["summary_prefix"] = "[[User:A2093064-bot/task/6|機器人6]]";
 
 $C["User-Agent"] = "User:A2093064-bot remove-inuse";
 
