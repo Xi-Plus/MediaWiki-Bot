@@ -14,6 +14,18 @@ require(__DIR__."/../function/edittoken.php");
 
 echo "The time now is ".date("Y-m-d H:i:s")." (UTC)\n";
 
+$options = getopt("t", ["test"]);
+if ($options === false) {
+	exit("parse parameter failed\n");
+}
+if (isset($options["t"]) || isset($options["test"])) {
+	$C["test"] = true;
+}
+
+if ($C["test"]) {
+	echo "test mode on.\n";
+}
+
 login();
 $edittoken = edittoken();
 
@@ -38,6 +50,7 @@ $out = '{| class="wikitable sortable" style="background-color: #fff;"
 ! style="background-color: #ddf;"| {{int:abusefilter-list-visibility}}
 ! style="background-color: #ddf;"| {{int:abusefilter-list-hitcount}}
 ';
+$outcsv = [];
 foreach ($res["query"]["abusefilters"] as $AF) {
 	$action = $AF["actions"];
 	$action = str_replace("warn", "{{int:abusefilter-action-warn}}", $action);
@@ -65,8 +78,22 @@ foreach ($res["query"]["abusefilters"] as $AF) {
 |'.(isset($AF["private"])?"{{int:abusefilter-hidden}}":"{{int:abusefilter-unhidden}}").'
 |data-sort-value='.$AF["hits"].'| [{{fullurl:Special:AbuseLog|wpSearchFilter='.$AF["id"].'}} '.$AFhitstext.']
 ';
+	$outcsv []= [
+		$AF["id"],
+		$AF["description"],
+		$AF["actions"],
+		(isset($AF["enabled"])?"enabled":(isset($AF["deleted"])?"deleted":"disabled")),
+		(isset($AF["private"])?"hidden":"unhidden"),
+		$AF["hits"]
+	];
 }
 $out .= '|}';
+
+$fp = fopen(__DIR__."/abusefilter_list.csv", "w");
+foreach ($outcsv as $row) {
+    fputcsv($fp, $row);
+}
+fclose($fp);
 
 $starttimestamp = time();
 $res = cURL($C["wikiapi"]."?".http_build_query(array(
