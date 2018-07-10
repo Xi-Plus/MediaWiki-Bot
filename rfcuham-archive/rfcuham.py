@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import os
+os.environ['PYWIKIBOT2_DIR'] = os.path.dirname(os.path.realpath(__file__))
 import pywikibot
 import mwparserfromhell
 import json
@@ -7,7 +8,6 @@ import re
 from datetime import datetime
 import time
 from config import *
-
 os.environ['TZ'] = 'UTC'
 
 site = pywikibot.Site()
@@ -49,7 +49,7 @@ for section in wikicode.get_sections()[2:]:
 					if target not in archivelist:
 						archivelist[target] = []
 					archivestr = str(section).strip()
-					archivestr = re.sub(r"{{bot-directive-archiver\|no-archive-begin}}.+?{{bot-directive-archiver\|no-archive-end}}\n?", "", archivestr)
+					archivestr = re.sub(r"{{bot-directive-archiver\|no-archive-begin}}[\s\S]+?{{bot-directive-archiver\|no-archive-end}}\n?", "", archivestr)
 					archivelist[target].append(archivestr)
 					count += 1
 					section.remove(section)
