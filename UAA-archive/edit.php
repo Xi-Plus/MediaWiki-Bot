@@ -28,23 +28,23 @@ function TimediffFormat($time) {
 
 echo "The time now is ".date("Y-m-d H:i:s")." (UTC)\n";
 
+$config_page = file_get_contents($C["config_page"]);
+if ($config_page === false) {
+	exit("get config failed\n");
+}
+$cfg = json_decode($config_page, true);
+
+if (!$cfg["enable"]) {
+	exit("disabled\n");
+}
+
+var_dump($cfg);
+
 login("bot");
 $edittoken = edittoken();
 
-$blocked_retention_time = file_get_contents($C["blocked_retention_time"]);
-if ($blocked_retention_time === false) {
-	$blocked_retention_time = $C["blocked_retention_time_default"];
-	echo "Warning: fetch blocked_retention_time fail, use default value\n";
-}
-echo "blocked archive before ".$blocked_retention_time." ago (".date("Y-m-d H:i:s", time()-$blocked_retention_time).")\n";
-$other_retention_time = file_get_contents($C["other_retention_time"]);
-if ($other_retention_time === false) {
-	$other_retention_time = $C["other_retention_time_default"];
-	echo "Warning: fetch other_retention_time fail, use default value\n";
-}
-echo "other archive before ".$other_retention_time." ago (".date("Y-m-d H:i:s", time()-$other_retention_time).")\n";
 $year = date("Y");
-$half = (date("n")>6 ? 2 : 1);
+$half = (date("n")<=6);
 
 for ($i=$C["fail_retry"]; $i > 0; $i--) {
 	$starttimestamp = time();
@@ -53,7 +53,7 @@ for ($i=$C["fail_retry"]; $i > 0; $i--) {
 		"prop" => "revisions",
 		"format" => "json",
 		"rvprop" => "content|timestamp",
-		"titles" => $C["from_page"]
+		"titles" => $cfg["main_page_name"]
 	)));
 	if ($res === false) {
 		exit("fetch page fail\n");
@@ -64,14 +64,11 @@ for ($i=$C["fail_retry"]; $i > 0; $i--) {
 	$basetimestamp = $pages["revisions"][0]["timestamp"];
 	echo "get main page\n";
 
-	$start = strpos($text, $C["text1"]);
-	$oldpagetext = substr($text, 0, $start+strlen($C["text1"]))."\n";
-	$text = substr($text, $start+strlen($C["text1"]));
-	$newpagetext = "";
-
 	$hash = md5(uniqid(rand(), true));
 	$text = preg_replace("/^(\*\s*{{\s*user-uaa\s*\|)/mi", $hash."$1", $text);
 	$text = explode($hash, $text);
+	$oldpagetext = $text[0];
+	$newpagetext = "";
 	unset($text[0]);
 	echo "find ".count($text)." reports\n";
 
@@ -117,7 +114,7 @@ for ($i=$C["fail_retry"]; $i > 0; $i--) {
 		}
 		echo date("Y/m/d H:i", $lasttime)."\t";
 
-		if (time()-$lasttime > ($blocked ? $blocked_retention_time : $other_retention_time)) {
+		if (time()-$lasttime > ($blocked ? $cfg["time_to_live_for_blocked"] : $cfg["minimum_time_to_live_for_not_blocked"])) {
 			echo "archive\n";
 			$newpagetext .= "\n".$temp;
 			$archive_count++;
@@ -134,11 +131,11 @@ for ($i=$C["fail_retry"]; $i > 0; $i--) {
 	echo "start edit\n";
 
 	echo "edit main page\n";
-	$summary = $C["summary_prefix"]."：存檔".$archive_count."提案 (".$C["summary_config_page"]."：已處理".TimediffFormat($blocked_retention_time)."、未處理".TimediffFormat($other_retention_time).")";
+	$summary = sprintf($cfg["main_page_summary"], $archive_count);
 	$post = array(
 		"action" => "edit",
 		"format" => "json",
-		"title" => $C["from_page"],
+		"title" => $cfg["main_page_name"],
 		"summary" => $summary,
 		"text" => $oldpagetext,
 		"token" => $edittoken,
@@ -146,7 +143,7 @@ for ($i=$C["fail_retry"]; $i > 0; $i--) {
 		"starttimestamp" => $starttimestamp,
 		"basetimestamp" => $basetimestamp
 	);
-	echo "edit ".$C["from_page"]." summary=".$summary."\n";
+	echo "edit ".$cfg["main_page_name"]." summary=".$summary."\n";
 	if (!$C["test"]) $res = cURL($C["wikiapi"], $post);
 	else {
 		$res = false;
@@ -166,7 +163,11 @@ for ($i=$C["fail_retry"]; $i > 0; $i--) {
 	}
 
 	echo "edit archive page\n";
-	$page = $C["to_page_prefix"].$year."年/".$half;
+	$page = sprintf(
+		$cfg["archive_page_name"],
+		$year,
+		($half ? $cfg["archive_page_name_first_half_year"] : $cfg["archive_page_name_second_half_year"])
+	);
 	$starttimestamp2 = time();
 	$res = cURL($C["wikiapi"]."?".http_build_query(array(
 		"action" => "query",
@@ -178,9 +179,11 @@ for ($i=$C["fail_retry"]; $i > 0; $i--) {
 	$res = json_decode($res, true);
 	$pages = current($res["query"]["pages"]);
 
-	$oldtext = "{{存档页|Wikipedia:需要管理員注意的用戶名}}
-{{Wikipedia:需要管理員注意的用戶名/Archive}}
-=== {$year}年".($half==1 ? "上半年" : "下半年")." ===";
+	$oldtext = sprintf(
+		$cfg["archive_page_preload"],
+		$year,
+		($half ? $cfg["first_half_year"] : $cfg["second_half_year"])
+	);
 
 	$basetimestamp2 = null;
 	if (!isset($pages["missing"])) {
@@ -195,7 +198,7 @@ for ($i=$C["fail_retry"]; $i > 0; $i--) {
 
 	$text = preg_replace("/\n{3,}/", "\n\n", $oldtext);
 
-	$summary = $C["summary_prefix"]."：存檔自[[".$C["from_page"]."]]共".$archive_count."個提案";
+	$summary = sprintf($cfg["archive_page_summary"], $archive_count);
 	$post = array(
 		"action" => "edit",
 		"format" => "json",
