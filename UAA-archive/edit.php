@@ -76,6 +76,7 @@ for ($i=$C["fail_retry"]; $i > 0; $i--) {
 	foreach ($text as $temp) {
 		$temp = trim($temp);
 		$blocked = false;
+		$starttime = time();
 		$lasttime = 0;
 		if (preg_match("/{{user-uaa\|(?:1=)?(.+?)}}/", $temp, $m)) {
 			$user = $m[1];
@@ -106,15 +107,25 @@ for ($i=$C["fail_retry"]; $i > 0; $i--) {
 		if (preg_match_all("/\d{4}年\d{1,2}月\d{1,2}日 \(.{3}\) \d{2}\:\d{2} \(UTC\)/", $temp, $m)) {
 			foreach ($m[0] as $timestr) {
 				$time = converttime($timestr);
+				if ($time < $starttime) $starttime = $time;
 				if ($time > $lasttime) $lasttime = $time;
 			}
 		} else {
 			$lasttime = time();
 			$temp .= "{{subst:Unsigned-before|~~~~~}}";
 		}
+		echo date("Y/m/d H:i", $starttime)."\t";
 		echo date("Y/m/d H:i", $lasttime)."\t";
 
-		if (time()-$lasttime > ($blocked ? $cfg["time_to_live_for_blocked"] : $cfg["minimum_time_to_live_for_not_blocked"])) {
+		if (
+			(
+				$blocked
+				&& time()-$lasttime > $cfg["time_to_live_for_blocked"])
+			|| (
+				!$blocked
+				&& time()-$lasttime > $cfg["time_to_live_for_not_blocked"]
+				&& time()-$starttime > $cfg["minimum_time_to_live_for_not_blocked"])
+		) {
 			echo "archive\n";
 			$newpagetext .= "\n".$temp;
 			$archive_count++;
