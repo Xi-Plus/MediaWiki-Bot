@@ -30,6 +30,7 @@ wikicode = mwparserfromhell.parse(text)
 
 totalcnt = 0
 istimeout = False
+changes = []
 for section in wikicode.get_sections()[2:]:
     title = str(section.get(0).title)
     print(title, end="\t")
@@ -85,15 +86,18 @@ for section in wikicode.get_sections()[2:]:
 
     if cnt == entrycnt:
         print("\t*** remove {} entry and section".format(cnt))
-        wikicode.remove(section)
+        changes.append([section, ""])
     elif cnt > 0:
         print("\t*** remove {} entry".format(cnt))
-        wikicode.replace(section, newtext)
+        changes.append([section, newtext])
 
     totalcnt += cnt
 
     if istimeout:
         break
+
+for change in changes:
+	wikicode.replace(change[0], change[1])
 
 text = str(wikicode)
 
