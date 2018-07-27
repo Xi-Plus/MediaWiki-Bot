@@ -52,6 +52,10 @@ $out = '{| class="wikitable sortable" style="background-color: #fff;"
 ';
 $outcsv = [];
 foreach ($res["query"]["abusefilters"] as $AF) {
+	$description = $AF["description"];
+	$description = preg_replace("/{{([^}]+)}}/", "{{((}}$1{{))}}", $description);
+	$description = preg_replace("/\[\[([^}]+)\]\]/", "{{!((}}$1{{))!}}", $description);
+
 	$action = $AF["actions"];
 	$action = str_replace("warn", "{{int:abusefilter-action-warn}}", $action);
 	$action = str_replace("tag", "{{int:abusefilter-action-tag}}", $action);
@@ -72,7 +76,7 @@ foreach ($res["query"]["abusefilters"] as $AF) {
 
 	$out .= '|- style="color: '.(isset($AF["enabled"])?"#000":(isset($AF["deleted"])?"#aaa":"#666")).';"
 | [[Special:AbuseFilter/'.$AF["id"].'|'.$AF["id"].']]
-| [[Special:AbuseFilter/'.$AF["id"].'|'.$AF["description"].']]
+| [[Special:AbuseFilter/'.$AF["id"].'|'.$description.']]
 |'.$action.'
 |'.(isset($AF["enabled"])?"{{int:abusefilter-enabled}}":(isset($AF["deleted"])?"{{int:abusefilter-deleted}}":"{{int:abusefilter-disabled}}")).'
 |'.(isset($AF["private"])?"{{int:abusefilter-hidden}}":"{{int:abusefilter-unhidden}}").'
