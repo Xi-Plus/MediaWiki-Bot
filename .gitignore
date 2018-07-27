@@ -3,8 +3,9 @@ tmp/
 config.php
 config.py
 input.txt
-out*.txt
+list*.csv
 out*.csv
+out*.txt
 user-config.py
 user-password.py
 
