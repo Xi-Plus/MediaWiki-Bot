@@ -56,7 +56,7 @@ for section in wikicode.get_sections()[1:]:
 		if target not in archivelist:
 			archivelist[target] = []
 		archivestr = str(section).strip()
-		archivestr = re.sub(r"{{bot-directive-archiver\|no-archive-begin}}.+?{{bot-directive-archiver\|no-archive-end}}\n?", "", archivestr)
+		archivestr = re.sub(r"{{bot-directive-archiver\|no-archive-begin}}[\s\S]+?{{bot-directive-archiver\|no-archive-end}}\n?", "", archivestr)
 		archivelist[target].append(archivestr)
 		count += 1
 		section.remove(section)
