@@ -58,14 +58,6 @@ for section in wikicode.get_sections()[1:]:
 			start = ":"
 			title = title[1:]
 
-		# page = pywikibot.Page(site, title)
-		# if not page.exists():
-		# 	print("  not exists")
-		# if page.isRedirectPage():
-		# 	title = page.getRedirectTarget().title()
-		# 	print("  follow redirect")
-		# else:
-		# 	title = page.title()
 		title = converttitle(title)
 
 		title = "[["+start+title+"]]"
@@ -88,13 +80,6 @@ for section in wikicode.get_sections()[1:]:
 				if title[0] == ":":
 					title = title[1:]
 
-				# page = pywikibot.Page(site, title)
-				# if page.isRedirectPage():
-				# 	title = page.getRedirectTarget().title()
-				# 	print("follow redirect")
-				# else:
-				# 	title = page.title()
-				# title = page.title()
 				title = converttitle(title)
 
 				newtitlelist.append(title)
@@ -114,13 +99,6 @@ for section in wikicode.get_sections()[1:]:
 			if title[0] == ":":
 				title = title[1:]
 
-			# page = pywikibot.Page(site, title)
-			# if page.isRedirectPage():
-			# 	title = page.getRedirectTarget().title()
-			# 	print("follow redirect")
-			# else:
-			# 	title = page.title()
-			# title = page.title()
 			title = converttitle(title)
 
 			newtitlelist.append(title)
@@ -143,6 +121,3 @@ print(summary)
 input("Save?")
 afdpage.text = text
 afdpage.save(summary=summary, minor=False)
-
-# with open('output.txt', 'w') as file:
-# 	file.write(text)
