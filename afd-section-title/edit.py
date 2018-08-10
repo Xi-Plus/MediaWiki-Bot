@@ -2,10 +2,12 @@
 import os
 os.environ['PYWIKIBOT2_DIR'] = os.path.dirname(os.path.realpath(__file__))
 import sys
+import json
 import re
 import pywikibot
 import mwparserfromhell
 from pywikibot.data.api import Request
+from config import *
 
 if len(sys.argv) >= 1:
 	pagename = sys.argv[1]
@@ -17,6 +19,15 @@ if not pagename.startswith("Wikipedia:頁面存廢討論/記錄/"):
 
 site = pywikibot.Site()
 site.login()
+
+config_page = pywikibot.Page(site, config_page_name)
+cfg = config_page.text
+cfg = json.loads(cfg)
+print(json.dumps(cfg, indent=4, ensure_ascii=False))
+
+if not cfg["enable"]:
+	exit("disabled\n")
+
 afdpage = pywikibot.Page(site, pagename)
 text = afdpage.text
 
@@ -126,9 +137,11 @@ if afdpage.text == text:
 	exit("  nothing changed")
 
 pywikibot.showDiff(afdpage.text, text)
+summary = cfg["summary"]
+print(summary)
 input("Save?")
 afdpage.text = text
-afdpage.save(summary="修復段落標題連結", minor=False)
+afdpage.save(summary=summary, minor=False)
 
 # with open('output.txt', 'w') as file:
 # 	file.write(text)
