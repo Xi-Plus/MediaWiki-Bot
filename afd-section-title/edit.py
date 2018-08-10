@@ -71,7 +71,8 @@ for section in wikicode.get_sections()[1:]:
 		title = "[["+start+title+"]]"
 
 		if str(section.get(0).title) != title:
-			section.insert(1, "\n{{formerly|"+str(section.get(0).title)+"}}")
+			if str(section.get(0).title).replace("_", " ") != title:
+				section.insert(1, "\n{{formerly|"+str(section.get(0).title)+"}}")
 			print("  set new title = "+title)
 			section.get(0).title = title
 		continue
