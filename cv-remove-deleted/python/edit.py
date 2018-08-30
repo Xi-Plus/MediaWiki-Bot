@@ -59,6 +59,8 @@ for section in wikicode.get_sections()[2:]:
             remove = False
             if page.exists():
                 for reversion in page.getVersionHistory():
+                    if reversion.timestamp.astimezone().timestamp() < entrytime:
+                        break
                     if re.search(r"替换为未侵权版本|清理\[\[Category:已完成侵權驗證的頁面]]", reversion.comment):
                         print(reversion.comment)
                         remove = True
@@ -97,7 +99,7 @@ for section in wikicode.get_sections()[2:]:
         break
 
 for change in changes:
-	wikicode.replace(change[0], change[1])
+    wikicode.replace(change[0], change[1])
 
 text = str(wikicode)
 
