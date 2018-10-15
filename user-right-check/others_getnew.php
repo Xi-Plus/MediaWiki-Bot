@@ -16,6 +16,16 @@ require(__DIR__."/function.php");
 
 echo "The time now is ".date("Y-m-d H:i:s")." (UTC)\n";
 
+$config_page = file_get_contents($C["config_page_notice"]);
+if ($config_page === false) {
+	exit("get config failed\n");
+}
+$cfg = json_decode($config_page, true);
+
+if (!$cfg["enable"]) {
+	exit("disabled\n");
+}
+
 login("bot");
 $edittoken = edittoken();
 
@@ -61,7 +71,7 @@ if (preg_match_all("/^\* *([^ \n]+) *$/m", $res, $m)) {
 		if (!isset($newuserlist[$value])) {
 			$newuserlist[$value] = userright($value, false);
 		}
-		$newuserlist[$value] []= $C["AWBright"];
+		$newuserlist[$value] []= $cfg["right_awb_name"];
 	}
 }
 

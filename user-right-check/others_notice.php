@@ -102,11 +102,7 @@ foreach ($row as $user) {
 				if ($key) {
 					$rightlist .= "、";
 				}
-				if ($value == $C["AWBright"]) {
-					$rightlist .= $cfg["right_awb_name"];
-				} else {
-					$rightlist .= '{{subst:int:group-'.$value.'}}';
-				}
+				$rightlist .= $cfg["right_text"][$value];
 			}
 			if ($isflow) {
 				$out = sprintf($cfg["notice_content_flow"], $rightlist);
