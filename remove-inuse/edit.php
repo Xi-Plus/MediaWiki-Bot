@@ -36,7 +36,7 @@ $res = cURL($C["wikiapi"]."?".http_build_query(array(
 	"format" => "json",
 	"list" => "categorymembers",
 	"cmtitle" => $cfg["category"],
-	"cmnamespace" => "0|118",
+	"cmnamespace" => $cfg["namespace"],
 	"cmlimit" => "max"
 )));
 if ($res === false) {
