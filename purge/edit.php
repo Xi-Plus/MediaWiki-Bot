@@ -92,6 +92,7 @@ login("user");
 $edittoken = edittoken();
 
 echo "wikiapi = ".$C["wikiapi"]."\n";
+echo "sleep = ".$C["sleep"]."\n";
 
 if (!isset($options["p"]) && !isset($options["c"]) && !isset($options["t"])) {
 	echo "no options given, input pages:\n";
