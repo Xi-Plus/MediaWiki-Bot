@@ -12,6 +12,10 @@ require(__DIR__."/../function/curl.php");
 require(__DIR__."/../function/login.php");
 require(__DIR__."/../function/edittoken.php");
 
+if ($C["test"]) {
+	echo "test mode on\n";
+}
+
 echo "===== project =====\n";
 $project = null;
 if (count(array_keys($C["project"])) == 1) {
