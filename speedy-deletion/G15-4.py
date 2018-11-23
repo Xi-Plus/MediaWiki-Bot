@@ -39,8 +39,11 @@ if mainpage.exists():
 if not talkpage.exists():
     exit("talkpage not exist.\n");
 
-if talkpage.namespace().id in [3]:
+if talkpage.namespace().id in [3, 9]:
     exit("ignore namespace.\n")
+
+if talkpage.depth > 0:
+    exit("ignore subpage.\n")
 
 for template in talkpage.templates():
     if template.title() in ["Template:Talk archive"]:
