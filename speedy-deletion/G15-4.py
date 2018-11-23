@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
 import os
 import sys
-import pywikibot
 import json
 from config import *
 
 os.environ['PYWIKIBOT2_DIR'] = os.path.dirname(os.path.realpath(__file__))
 os.environ['TZ'] = 'UTC'
+import pywikibot
+
 
 if len(sys.argv) < 2:
     exit("no pagename provided.\n")
