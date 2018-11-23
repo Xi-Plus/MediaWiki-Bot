@@ -30,12 +30,12 @@ mainpage = pywikibot.Page(site, pagename)
 if mainpage.exists():
     exit("mainpage exist.\n");
 
-if mainpage.namespace().id in [3]:
+if mainpage.namespace().id in [2, 3]:
     exit("ignore namespace.\n")
 
 for backlink in mainpage.backlinks(filter_redirects=True):
     print(backlink.title())
-    if backlink.namespace().id in [3]:
+    if backlink.namespace().id in [2, 3]:
         print("ignore namespace.\n")
         continue
 
