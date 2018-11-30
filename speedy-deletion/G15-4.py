@@ -36,6 +36,14 @@ else:
 if mainpage.exists():
     exit("mainpage exist.\n");
 
+if mainpage.namespace().id == 6:
+    image = pywikibot.FilePage(site, mainpage.title())
+    try:
+        if image.fileIsShared():
+            exit("mainpage exist (shared file).\n")
+    except Exception as e:
+        pass
+
 if not talkpage.exists():
     exit("talkpage not exist.\n");
 
