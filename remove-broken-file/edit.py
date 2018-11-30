@@ -30,7 +30,7 @@ for page in site.categorymembers(cat):
             try:
                 if image.fileIsShared():
                     continue
-            except:
+            except Exception as e:
                 pass
             
             imagename = image.title(with_ns=False)
