@@ -36,6 +36,7 @@ for page in site.categorymembers(cat):
         continue
     text = page.text
     summary_comment = []
+    summary_rename = []
     summary_remove = []
     for image in page.imagelinks():
         if not image.exists():
@@ -57,6 +58,7 @@ for page in site.categorymembers(cat):
                     break
 
             deleted = False
+            moved = False
             
             if existother is None:
                 print("File:{} not exist".format(imagename))
@@ -65,7 +67,7 @@ for page in site.categorymembers(cat):
                     'action': 'query',
                     'letitle': image.title(),
                     "list": "logevents",
-                    "letype": "delete",
+                    "leaction": "delete/delete",
                     "lelimit": "1"
                     }).submit()
                 if len(data['query']['logevents']) > 0:
@@ -79,18 +81,32 @@ for page in site.categorymembers(cat):
                         'action': 'query',
                         'letitle': image.title(),
                         "list": "logevents",
-                        "letype": "delete",
+                        "leaction": "delete/delete",
                         "lelimit": "1"
                         }).submit()
                     if len(data['query']['logevents']) > 0:
                         deleted = True
                         deletedoncommons = True
                         deletelog = data['query']['logevents'][0]
-                        print(deletelog)
+                if not deleted:
+                    data = pywikibot.data.api.Request(site=site, parameters={
+                        'action': 'query',
+                        'letitle': image.title(),
+                        "list": "logevents",
+                        "letype": "move",
+                        "lelimit": "1"
+                        }).submit()
+                    if len(data['query']['logevents']) > 0 and "suppressredirect" in data['query']['logevents'][0]['params']:
+                        moved = True
+                        movelog = data['query']['logevents'][0]
+                        movelog["params"]["target_title_without_ns"] = pywikibot.Page(site, movelog["params"]["target_title"]).titleWithoutNamespace()
+                        print(movelog)
                 
                 regex = cfg["regex"]["not_exist_other"]["infobox"]["pattern"].format(imageregex)
                 if deleted:
                     replace = cfg["regex"]["not_exist_other"]["infobox"]["replace"]["deleted"]
+                elif moved:
+                    replace = cfg["regex"]["not_exist_other"]["infobox"]["replace"]["moved"].format(movelog["params"]["target_title_without_ns"])
                 else:
                     replace = cfg["regex"]["not_exist_other"]["infobox"]["replace"]["not_deleted"]
 
@@ -99,6 +115,8 @@ for page in site.categorymembers(cat):
                 regex = cfg["regex"]["not_exist_other"]["normal"]["pattern"].format(imageregex)
                 if deleted:
                     replace = cfg["regex"]["not_exist_other"]["normal"]["replace"]["deleted"]
+                elif moved:
+                    replace = cfg["regex"]["not_exist_other"]["normal"]["replace"]["moved"].format(movelog["params"]["target_title_without_ns"])
                 else:
                     replace = cfg["regex"]["not_exist_other"]["normal"]["replace"]["not_deleted"]
 
@@ -129,6 +147,8 @@ for page in site.categorymembers(cat):
                     summary_remove.append(cfg["summary"]["deleted"]["commons"].format(imagename, deletelog["user"], deletelog["logid"], comment))
                 else:
                     summary_remove.append(cfg["summary"]["deleted"]["local"].format(imagename, deletelog["user"], deletelog["logid"], deletelog["comment"]))
+            elif moved:
+                summary_rename.append(cfg["summary"]["moved"].format(imagename, movelog["params"]["target_title_without_ns"], movelog["user"], movelog["logid"], movelog["comment"]))
             else:
                 if existother:
                     summary_comment.append(cfg["summary"]["not_deleted"]["exist_other"].format(imagename, existother))
@@ -145,6 +165,8 @@ for page in site.categorymembers(cat):
     summary = []
     if len(summary_comment):
         summary.append(cfg["summary"]["prepend"]["comment"] + "、".join(summary_comment))
+    if len(summary_rename):
+        summary.append(cfg["summary"]["prepend"]["rename"] + "、".join(summary_rename))
     if len(summary_remove):
         summary.append(cfg["summary"]["prepend"]["remove"] + "、".join(summary_remove))
     summary = "；".join(summary)
