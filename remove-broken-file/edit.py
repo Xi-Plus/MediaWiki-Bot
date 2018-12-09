@@ -5,6 +5,7 @@ import json
 import re
 from config import *
 
+
 os.environ['PYWIKIBOT2_DIR'] = os.path.dirname(os.path.realpath(__file__))
 os.environ['TZ'] = 'UTC'
 
@@ -20,7 +21,7 @@ print(json.dumps(cfg, indent=4, ensure_ascii=False))
 if not cfg["enable"]:
     exit("disabled\n")
 
-cat = pywikibot.Page(site, "Category:缺少文件的条目")
+cat = pywikibot.Page(site, cfg["category"])
 
 skippages = ""
 with open("skipedpage.txt", "r") as f:
@@ -48,12 +49,9 @@ for page in site.categorymembers(cat):
 
             imageregex = "[" + imagename[0].upper() + imagename[0].lower() + "]" + re.escape(imagename[1:])
             imageregex = imageregex.replace("\\ ", "[ _]")
-            
-            checkotherwiki = {
-                "en": "英文維基百科"
-            }
+
             existother = None
-            for wiki in checkotherwiki:
+            for wiki in cfg["check_other_wiki"]:
                 if pywikibot.Page(site, "{}:File:{}".format(wiki, imagename)).exists():
                     existother = wiki
                     break
@@ -73,7 +71,7 @@ for page in site.categorymembers(cat):
                 if len(data['query']['logevents']) > 0:
                     deleted = True
                     deletelog = data['query']['logevents'][0]
-                    if "CSD F7" in deletelog['comment']:
+                    if re.search(cfg["csd_f7_comment"], deletelog['comment']):
                         deleted = False
                 deletedoncommons = False
                 if not deleted:
@@ -90,50 +88,52 @@ for page in site.categorymembers(cat):
                         deletelog = data['query']['logevents'][0]
                         print(deletelog)
                 
-                regex = r"(^\s*\|\s*(?:image|logo|map_image)\s*=\s*)((?:(?:File|Image):)?{0})\s*$".format(imageregex)
+                regex = cfg["regex"]["not_exist_other"]["infobox"]["pattern"].format(imageregex)
                 if deleted:
-                    replace = r"\1"
+                    replace = cfg["regex"]["not_exist_other"]["infobox"]["replace"]["deleted"]
                 else:
-                    replace = r"\1<!-- 檔案不存在 \2  -->"
+                    replace = cfg["regex"]["not_exist_other"]["infobox"]["replace"]["not_deleted"]
 
                 text = re.sub(regex, replace, text, flags=re.M)
 
-                regex = r"(\[\[(?:File|Image):{0}\s*(?:\|(?:\[\[[^[\]]*\]\]|[^[\]])*)?\]\])[ \t]*".format(imageregex)
+                regex = cfg["regex"]["not_exist_other"]["normal"]["pattern"].format(imageregex)
                 if deleted:
-                    replace = ""
+                    replace = cfg["regex"]["not_exist_other"]["normal"]["replace"]["deleted"]
                 else:
-                    replace = r"<!-- 檔案不存在 \1 -->"
+                    replace = cfg["regex"]["not_exist_other"]["normal"]["replace"]["not_deleted"]
 
                 text = re.sub(regex, replace, text)
 
             else:
                 print("File:{} exist on {}".format(imagename, existother))
                 
-                regex = r"^(\s*\|\s*(?:image|logo|map_image)\s*=\s*)((?:(?:File|Image):)?{0}\s*)$".format(imageregex)
+                regex = cfg["regex"]["exist_other"]["infobox"]["pattern"].format(imageregex)
                 if deleted:
-                    replace = r"\1"
+                    replace = cfg["regex"]["exist_other"]["infobox"]["replace"]["deleted"]
                 else:
-                    replace = r"\1<!-- 檔案不存在 \2 ，可從{0}取得 -->".format(checkotherwiki[existother])
+                    replace = cfg["regex"]["exist_other"]["infobox"]["replace"]["not_deleted"].format(cfg["check_other_wiki"][existother])
+
                 text = re.sub(regex, replace, text, flags=re.M)
 
-                regex = r"(\[\[(?:File|Image):{0}\s*(?:\|(?:\[\[[^[\]]*\]\]|[^[\]])*)?\]\])[ \t]*".format(imageregex)
+                regex = cfg["regex"]["exist_other"]["normal"]["pattern"].format(imageregex)
                 if deleted:
-                    replace = ""
+                    replace = cfg["regex"]["exist_other"]["normal"]["replace"]["deleted"]
                 else:
-                    replace = r"<!-- 檔案不存在 \1 ，可從{0}取得 -->".format(checkotherwiki[existother])
+                    replace = cfg["regex"]["exist_other"]["normal"]["replace"]["not_deleted"].format(cfg["check_other_wiki"][existother])
+
                 text = re.sub(regex, replace, text)
 
             if deleted:
                 if deletedoncommons:
                     comment = re.sub(r"\[\[([^\[\]]+?)]]", r"[[:c:\1]]", deletelog["comment"])
-                    summary_remove.append("{0}，已被[[:c:Special:Contributions/{1}|{1}]][[:c:Special:Redirect/logid/{2}|刪除]]：{3}".format(imagename, deletelog["user"], deletelog["logid"], comment))
+                    summary_remove.append(cfg["summary"]["deleted"]["commons"].format(imagename, deletelog["user"], deletelog["logid"], comment))
                 else:
-                    summary_remove.append("{0}，已被[[Special:Contributions/{1}|{1}]][[Special:Redirect/logid/{2}|刪除]]：{3}".format(imagename, deletelog["user"], deletelog["logid"], deletelog["comment"]))
+                    summary_remove.append(cfg["summary"]["deleted"]["local"].format(imagename, deletelog["user"], deletelog["logid"], deletelog["comment"]))
             else:
                 if existother:
-                    summary_comment.append("{0}（[[:{1}:File:{0}|從{1}取得]]）".format(imagename, existother))
+                    summary_comment.append(cfg["summary"]["not_deleted"]["exist_other"].format(imagename, existother))
                 else:
-                    summary_comment.append(imagename)
+                    summary_comment.append(cfg["summary"]["not_deleted"]["not_exist_other"].format(imagename))
 
     if page.text == text:
         print("nothing changed")
@@ -144,9 +144,9 @@ for page in site.categorymembers(cat):
 
     summary = []
     if len(summary_comment):
-        summary.append("注釋不存在檔案：" + "、".join(summary_comment))
+        summary.append(cfg["summary"]["prepend"]["comment"] + "、".join(summary_comment))
     if len(summary_remove):
-        summary.append("移除檔案：" + "、".join(summary_remove))
+        summary.append(cfg["summary"]["prepend"]["remove"] + "、".join(summary_remove))
     summary = "；".join(summary)
     print("summary = {}".format(summary))
 
