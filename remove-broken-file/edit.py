@@ -116,7 +116,7 @@ for page in site.categorymembers(cat):
                     replace = r"\1<!-- 檔案不存在 \2 ，可從{0}取得 -->".format(checkotherwiki[existother])
                 text = re.sub(regex, replace, text, flags=re.M)
 
-                regex = r"(\[\[File:{0}\s*(?:\|(?:\[\[[^[\]]*\]\]|[^[\]])*)?\]\])[ \t]*".format(imageregex)
+                regex = r"(\[\[(?:File|Image):{0}\s*(?:\|(?:\[\[[^[\]]*\]\]|[^[\]])*)?\]\])[ \t]*".format(imageregex)
                 if deleted:
                     replace = ""
                 else:
@@ -125,12 +125,13 @@ for page in site.categorymembers(cat):
 
             if deleted:
                 if deletedoncommons:
-                    summary_remove.append("{0}，已被[[:commons:User:{1}|{1}]][[commons:Special:Redirect/logid/{2}|刪除]]".format(imagename, deletelog["user"], deletelog["logid"]))
+                    comment = re.sub(r"\[\[([^\[\]]+?)]]", r"[[:c:\1]]", deletelog["comment"])
+                    summary_remove.append("{0}，已被[[:c:Special:Contributions/{1}|{1}]][[:c:Special:Redirect/logid/{2}|刪除]]：{3}".format(imagename, deletelog["user"], deletelog["logid"], comment))
                 else:
-                    summary_remove.append("{0}，已被[[:User:{1}|{1}]][[Special:Redirect/logid/{2}|刪除]]：{3}".format(imagename, deletelog["user"], deletelog["logid"], deletelog["comment"]))
+                    summary_remove.append("{0}，已被[[Special:Contributions/{1}|{1}]][[Special:Redirect/logid/{2}|刪除]]：{3}".format(imagename, deletelog["user"], deletelog["logid"], deletelog["comment"]))
             else:
                 if existother:
-                    summary_comment.append("{0}（[[{1}:File:{0}|從{1}取得]]）".format(imagename, existother))
+                    summary_comment.append("{0}（[[:{1}:File:{0}|從{1}取得]]）".format(imagename, existother))
                 else:
                     summary_comment.append(imagename)
 
@@ -153,3 +154,6 @@ for page in site.categorymembers(cat):
     if save in ["Yes", "yes", "Y", "y"]:
         page.text = text
         page.save(summary=summary, minor=False)
+    else:
+        print("skip")
+        skipfile.write(pagetitle + "\n")
