@@ -47,7 +47,7 @@ foreach ($pagelist as $page) {
 		$text = $pages["revisions"][0]["*"];
 		$basetimestamp = $pages["revisions"][0]["timestamp"];
 
-		$text = preg_replace("/{{Draft Copyvio}} *\n*/i", "", $text);
+		$text = preg_replace("/{{Draft Copyvio(\|[^{}]+?)?}} *\n*/i", "", $text);
 		$text = preg_replace("/<!--請勿刪除此行，並由下一行開始編輯--> *\n*/i", "", $text);
 
 		$summary = $C["summary_prefix"]."，清理[[Category:已完成侵權驗證的頁面]]";
