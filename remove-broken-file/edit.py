@@ -125,9 +125,9 @@ for page in site.categorymembers(cat):
 
             if deleted:
                 if deletedoncommons:
-                    summary_remove.append("{0}，已被[[commons:User:{1}|{1}]][[commons:Special:Redirect/logid/{2}|刪除]]".format(imagename, deletelog["user"], deletelog["logid"]))
+                    summary_remove.append("{0}，已被[[:commons:User:{1}|{1}]][[commons:Special:Redirect/logid/{2}|刪除]]".format(imagename, deletelog["user"], deletelog["logid"]))
                 else:
-                    summary_remove.append("{0}，已被[[User:{1}|{1}]][[Special:Redirect/logid/{2}|刪除]]：{3}".format(imagename, deletelog["user"], deletelog["logid"], deletelog["comment"]))
+                    summary_remove.append("{0}，已被[[:User:{1}|{1}]][[Special:Redirect/logid/{2}|刪除]]：{3}".format(imagename, deletelog["user"], deletelog["logid"], deletelog["comment"]))
             else:
                 if existother:
                     summary_comment.append("{0}（[[{1}:File:{0}|從{1}取得]]）".format(imagename, existother))
