@@ -28,9 +28,10 @@ with open("skipedpage.txt", "r") as f:
     skippages = f.read()
 skipfile = open("skipedpage.txt", "a")
 
+cnt = 1
 for page in site.categorymembers(cat):
     pagetitle = page.title()
-    print(pagetitle)
+    print(cnt, pagetitle)
     if pagetitle in skippages:
         print("skip")
         continue
@@ -169,13 +170,14 @@ for page in site.categorymembers(cat):
         summary.append(cfg["summary"]["prepend"]["rename"] + "、".join(summary_rename))
     if len(summary_remove):
         summary.append(cfg["summary"]["prepend"]["remove"] + "、".join(summary_remove))
-    summary = "；".join(summary)
+    summary = cfg["summary"]["prepend"]["all"] + "；".join(summary)
     print("summary = {}".format(summary))
 
     save = input("save?")
     if save in ["Yes", "yes", "Y", "y"]:
         page.text = text
-        page.save(summary=summary, minor=False)
+        page.save(summary=summary, minor=False, botflag=False)
+        cnt += 1
     else:
         print("skip")
         skipfile.write(pagetitle + "\n")
