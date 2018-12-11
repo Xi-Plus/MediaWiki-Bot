@@ -116,10 +116,6 @@ for page in site.categorymembers(cat):
             # moved start
             movelog = followMove(image_fullname)
             if len(movelog) > 0:
-                print("Info: File moved")
-                image_fullname = movelog[-1]["params"]["target_title"]
-                old_image_fullname = image_fullname
-
                 if checkImageExists(imagename):
                     print("File:{} moved".format(imagename))
 
@@ -129,12 +125,16 @@ for page in site.categorymembers(cat):
 
                         text = re.sub(regex, replace, text, flags=re.M)
 
-                    summary_temp = old_image_fullname
+                    summary_temp = image_fullname
                     for log in movelog:
                         summary_temp = cfg["summary"]["moved"].format(summary_temp, movelog["params"]["target_title_without_ns"], movelog["user"], movelog["logid"], movelog["comment"])
                     summary_moved.append(summary_temp)
+                    
+                    continue
+                else:
+                    image_fullname = movelog[-1]["params"]["target_title"]
+                    print("Info: File moved to {}".format(image_fullname))
 
-                continue
             # moved end
 
             # deleted start
@@ -233,6 +233,7 @@ for page in site.categorymembers(cat):
 
     if page.text == text:
         print("nothing changed")
+        input()
         skipfile.write(pagetitle + "\n")
         continue
 
