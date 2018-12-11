@@ -104,17 +104,11 @@ for page in site.categorymembers(cat):
             if existother is not None:
                 print("{} exist on {}".format(image_fullname, existother))
 
-                regex = cfg["regex"]["infobox"]["pattern"].format(imageregex)
-                replace = cfg["regex"]["infobox"]["replace"]["comment_other"].format(cfg["check_other_wiki"][existother])
+                for regex_type in cfg["regex"]:
+                    regex = cfg["regex"][regex_type]["pattern"].format(imageregex)
+                    replace = cfg["regex"][regex_type]["replace"]["comment_other"].format(cfg["check_other_wiki"][existother])
 
-                text = re.sub(regex, replace, text, flags=re.M)
-
-                regex = cfg["regex"]["normal"]["pattern"].format(imageregex)
-                replace = cfg["regex"]["normal"]["replace"]["comment_other"].format(cfg["check_other_wiki"][existother])
-
-                text = re.sub(regex, replace, text)
-
-                summary_comment.append(cfg["summary"]["comment_other"].format(imagename, existother))
+                    text = re.sub(regex, replace, text, flags=re.M)
 
                 continue
             # coment_other end
@@ -129,15 +123,11 @@ for page in site.categorymembers(cat):
                 if checkImageExists(imagename):
                     print("File:{} moved".format(imagename))
 
-                    regex = cfg["regex"]["infobox"]["pattern"].format(imageregex)
-                    replace = cfg["regex"]["infobox"]["replace"]["moved"].format(movelog[-1]["params"]["target_title_without_ns"])
+                    for regex_type in cfg["regex"]:
+                        regex = cfg["regex"][regex_type]["pattern"].format(imageregex)
+                        replace = cfg["regex"][regex_type]["replace"]["moved"].format(movelog[-1]["params"]["target_title_without_ns"])
 
-                    text = re.sub(regex, replace, text, flags=re.M)
-
-                    regex = cfg["regex"]["normal"]["pattern"].format(imageregex)
-                    replace = cfg["regex"]["normal"]["replace"]["moved"].format(movelog[-1]["params"]["target_title_without_ns"])
-
-                    text = re.sub(regex, replace, text)
+                        text = re.sub(regex, replace, text, flags=re.M)
 
                     summary_temp = old_image_fullname
                     for log in movelog:
@@ -176,7 +166,6 @@ for page in site.categorymembers(cat):
                     deleted = True
                     deleted_commons = True
                     deletelog = data["query"]["logevents"][0]
-                    print("deleted on commons")
 
             if deleted:
                 if deleted_commons:
@@ -184,15 +173,11 @@ for page in site.categorymembers(cat):
                 else:
                     print("{} deleted".format(image_fullname))
 
-                regex = cfg["regex"]["infobox"]["pattern"].format(imageregex)
-                replace = cfg["regex"]["infobox"]["replace"]["deleted"]
+                for regex_type in cfg["regex"]:
+                    regex = cfg["regex"][regex_type]["pattern"].format(imageregex)
+                    replace = cfg["regex"][regex_type]["replace"]["deleted"]
 
-                text = re.sub(regex, replace, text, flags=re.M)
-
-                regex = cfg["regex"]["normal"]["pattern"].format(imageregex)
-                replace = cfg["regex"]["normal"]["replace"]["deleted"]
-
-                text = re.sub(regex, replace, text)
+                    text = re.sub(regex, replace, text, flags=re.M)
 
                 if deleted_commons:
                     comment = re.sub(r"\[\[([^\[\]]+?)]]", r"[[:c:\1]]", deletelog["comment"])
@@ -230,15 +215,11 @@ for page in site.categorymembers(cat):
             if not uploaded:
                 print("{} never uploaded".format(image_fullname))
 
-                regex = cfg["regex"]["infobox"]["pattern"].format(imageregex)
-                replace = cfg["regex"]["infobox"]["replace"]["comment"]
+                for regex_type in cfg["regex"]:
+                    regex = cfg["regex"][regex_type]["pattern"].format(imageregex)
+                    replace = cfg["regex"][regex_type]["replace"]["comment"]
 
-                text = re.sub(regex, replace, text, flags=re.M)
-
-                regex = cfg["regex"]["normal"]["pattern"].format(imageregex)
-                replace = cfg["regex"]["normal"]["replace"]["comment"]
-
-                text = re.sub(regex, replace, text)
+                    text = re.sub(regex, replace, text, flags=re.M)
 
                 summary_comment.append(cfg["summary"]["comment"].format(imagename))
 
