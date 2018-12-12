@@ -170,6 +170,11 @@ for page in site.categorymembers(cat):
                     deleted_commons = True
                     deletelog = data["query"]["logevents"][0]
 
+            if deleted_comment or deleted:
+                summary_prefix = imagename
+                for log in movelog:
+                    summary_prefix = cfg["summary"]["moved_deleted"].format(summary_prefix, log["params"]["target_title_without_ns"], log["logid"])
+
             if deleted_comment:
                 print("{} deleted by F6".format(image_fullname))
 
@@ -179,7 +184,7 @@ for page in site.categorymembers(cat):
 
                     text = re.sub(regex, replace, text, flags=re.M)
 
-                summary_comment.append(cfg["summary"]["deleted"]["local"].format(imagename, deletelog["user"], deletelog["logid"], deletelog["comment"]))
+                summary_comment.append(cfg["summary"]["deleted"]["local"].format(summary_prefix, deletelog["user"], deletelog["logid"], deletelog["comment"]))
 
                 drv_page = pywikibot.Page(site, cfg["drv_page"])
                 drv_page_text = drv_page.text
@@ -211,7 +216,7 @@ for page in site.categorymembers(cat):
                     comment = re.sub(r"\[\[([^\[\]]+?)]]", r"[[:c:\1]]", deletelog["comment"])
                     summary_deleted.append(cfg["summary"]["deleted"]["commons"].format(imagename, deletelog["user"], deletelog["logid"], comment))
                 else:
-                    summary_deleted.append(cfg["summary"]["deleted"]["local"].format(imagename, deletelog["user"], deletelog["logid"], deletelog["comment"]))
+                    summary_deleted.append(cfg["summary"]["deleted"]["local"].format(summary_prefix, deletelog["user"], deletelog["logid"], deletelog["comment"]))
 
                 continue
 
