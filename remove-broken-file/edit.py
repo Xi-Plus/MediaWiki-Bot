@@ -190,7 +190,7 @@ for page in site.categorymembers(cat):
 
                 save = input("save?")
                 if save in ["Yes", "yes", "Y", "y"]:
-                    drv_page.text = text
+                    drv_page.text = drv_page_text
                     drv_page.save(summary=summary, minor=False, botflag=False)
 
                 continue
