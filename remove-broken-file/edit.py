@@ -140,6 +140,7 @@ for page in site.categorymembers(cat):
             # deleted start
             deleted = False
             deleted_commons = False
+            deleted_comment = False
 
             data = pywikibot.data.api.Request(site=site, parameters={
                 "action": "query",
@@ -154,6 +155,8 @@ for page in site.categorymembers(cat):
                     deleted = False
                 else:
                     deleted = True
+                    if re.search(cfg["drv_csd_comment"], deletelog["comment"]):
+                        deleted_comment = True
             if not deleted:
                 data = pywikibot.data.api.Request(site=sitecommons, parameters={
                     "action": "query",
@@ -166,6 +169,31 @@ for page in site.categorymembers(cat):
                     deleted = True
                     deleted_commons = True
                     deletelog = data["query"]["logevents"][0]
+
+            if deleted_comment:
+                print("{} deleted by F6".format(image_fullname))
+
+                for regex_type in cfg["regex"]:
+                    regex = cfg["regex"][regex_type]["pattern"].format(imageregex)
+                    replace = cfg["regex"][regex_type]["replace"]["deleted_comment"]
+
+                    text = re.sub(regex, replace, text, flags=re.M)
+
+                summary_comment.append(cfg["summary"]["deleted"]["local"].format(imagename, deletelog["user"], deletelog["logid"], deletelog["comment"]))
+
+                drv_page = pywikibot.Page(site, cfg["drv_page"])
+                drv_page_text = drv_page.text
+                drv_page_text += cfg["drv_append_text"].format(image_fullname, pagetitle, deletelog["user"], deletelog["comment"], deletelog["logid"])
+                pywikibot.showDiff(drv_page.text, drv_page_text)
+                summary = cfg["drv_summary"]
+                print("summary = {}".format(summary))
+
+                save = input("save?")
+                if save in ["Yes", "yes", "Y", "y"]:
+                    drv_page.text = text
+                    drv_page.save(summary=summary, minor=False, botflag=False)
+
+                continue
 
             if deleted:
                 if deleted_commons:
