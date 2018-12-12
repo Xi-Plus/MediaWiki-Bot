@@ -110,6 +110,8 @@ for page in site.categorymembers(cat):
 
                     text = re.sub(regex, replace, text, flags=re.M)
 
+                summary_comment.append(cfg["summary"]["comment_other"].format(imagename, existother))
+
                 continue
             # coment_other end
 
