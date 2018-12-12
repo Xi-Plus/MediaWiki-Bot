@@ -127,7 +127,7 @@ for page in site.categorymembers(cat):
 
                     summary_temp = image_fullname
                     for log in movelog:
-                        summary_temp = cfg["summary"]["moved"].format(summary_temp, movelog["params"]["target_title_without_ns"], movelog["user"], movelog["logid"], movelog["comment"])
+                        summary_temp = cfg["summary"]["moved"].format(summary_temp, log["params"]["target_title_without_ns"], log["user"], log["logid"], log["comment"])
                     summary_moved.append(summary_temp)
                     
                     continue
