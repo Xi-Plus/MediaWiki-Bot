@@ -64,7 +64,7 @@ function purge($page) {
 		var_dump($res["error"]);
 	}
 	if ($C["sleep"] !== 0) {
-		usleep($C["sleep"] * 1000);
+		usleep($C["sleep"] * 1000 * 1000);
 	}
 }
 
