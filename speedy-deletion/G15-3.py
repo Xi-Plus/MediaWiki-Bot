@@ -49,7 +49,10 @@ for backlink in mainpage.backlinks(filter_redirects=True):
     if marked:
         continue
 
-    text = cfg["prepend_text"] + backlink.text
+    if len(list(backlink.embeddedin(total=1))) > 0:
+        text = cfg["prepend_text_with_noinclude"] + backlink.text
+    else:
+        text = cfg["prepend_text"] + backlink.text
     pywikibot.showDiff(backlink.text, text)
     backlink.text = text
     summary = cfg["summary"]

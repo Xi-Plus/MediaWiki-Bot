@@ -53,7 +53,10 @@ for page in processPages:
     if marked:
         continue
 
-    text = cfg["prepend_text"] + page.text
+    if len(list(page.embeddedin(total=1))) > 0:
+        text = cfg["prepend_text_with_noinclude"] + page.text
+    else:
+        text = cfg["prepend_text"] + page.text
     pywikibot.showDiff(page.text, text)
     page.text = text
     summary = cfg["summary"]

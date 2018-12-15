@@ -59,7 +59,10 @@ for template in talkpage.templates():
     if template.title() in ["Template:Delete"]:
         exit("marked deletion.\n")
 
-text = cfg["prepend_text"] + talkpage.text
+if len(list(talkpage.embeddedin(total=1))) > 0:
+    text = cfg["prepend_text_with_noinclude"] + talkpage.text
+else:
+    text = cfg["prepend_text"] + talkpage.text
 pywikibot.showDiff(talkpage.text, text)
 talkpage.text = text
 summary = cfg["summary"]
