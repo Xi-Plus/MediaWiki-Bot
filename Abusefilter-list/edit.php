@@ -52,6 +52,10 @@ $out = '{| class="wikitable sortable" style="background-color: #fff;"
 ';
 $outcsv = [];
 foreach ($res["query"]["abusefilters"] as $AF) {
+	if (isset($AF["deleted"]) && $C["hidedeleted"]) {
+		continue;
+	}
+
 	$description = $AF["description"];
 	$description = preg_replace("/{{([^}]+)}}/", "{{((}}$1{{))}}", $description);
 	$description = preg_replace("/\[\[([^}]+)\]\]/", "{{!((}}$1{{))!}}", $description);

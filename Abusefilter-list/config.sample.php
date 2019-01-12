@@ -13,6 +13,8 @@ $C["text2"] = "<!--af table end-->";
 $C["text3"] = "<!--sign start-->";
 $C["text4"] = "<!--sign end-->";
 
+$C["hidedeleted"] = false;
+
 $C["User-Agent"] = "";
 
 $C["cookiefile"] = __DIR__."/../tmp/abusefilter-list-cookie.txt";
