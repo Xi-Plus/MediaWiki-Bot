@@ -57,5 +57,4 @@ for backlink in mainpage.backlinks(filter_redirects=True):
     backlink.text = text
     summary = cfg["summary"]
     print(summary)
-    input("Save?")
     backlink.save(summary=summary, minor=False)

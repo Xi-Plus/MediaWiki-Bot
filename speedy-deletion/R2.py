@@ -29,10 +29,12 @@ mainpage = pywikibot.Page(site, pagename)
 
 processPages = []
 if mainpage.isRedirectPage():
+    print("page is redirect\n")
     if (mainpage.namespace().id in [0, 118]
             and mainpage.getRedirectTarget().namespace().id != mainpage.namespace().id):
         processPages.append(mainpage)
 else:
+    print("page is not redirect\n")
     for backlink in mainpage.backlinks(filter_redirects=True):
         if (backlink.namespace().id in [0, 118]
                 and backlink.namespace().id != mainpage.namespace().id):
@@ -61,5 +63,4 @@ for page in processPages:
     page.text = text
     summary = cfg["summary"]
     print(summary)
-    input("Save?")
     page.save(summary=summary, minor=False)

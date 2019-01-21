@@ -67,5 +67,4 @@ pywikibot.showDiff(talkpage.text, text)
 talkpage.text = text
 summary = cfg["summary"]
 print(summary)
-input("Save?")
 talkpage.save(summary=summary, minor=False)
