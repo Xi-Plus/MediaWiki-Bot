@@ -16,7 +16,7 @@ require(__DIR__."/function.php");
 
 echo "The time now is ".date("Y-m-d H:i:s")." (UTC)\n";
 
-$config_page = file_get_contents($C["config_page_notice"]);
+$config_page = file_get_contents($C["config_page_getnew"]);
 if ($config_page === false) {
 	exit("get config failed\n");
 }
@@ -59,7 +59,7 @@ foreach ($allusers as $user) {
 }
 
 echo "fetch AWB list\n";
-$res = file_get_contents($C["AWBpage"]);
+$res = file_get_contents($cfg["AWBpage"]);
 if ($res === false) {
 	exit("fetch page fail\n");
 }

@@ -15,13 +15,23 @@ require(__DIR__."/function.php");
 
 echo "The time now is ".date("Y-m-d H:i:s")." (UTC)\n";
 
+$config_page = file_get_contents($C["config_page_report"]);
+if ($config_page === false) {
+	exit("get config failed\n");
+}
+$cfg = json_decode($config_page, true);
+
+if (!$cfg["enable"]) {
+	exit("disabled\n");
+}
+
 login("bot");
 $edittoken = edittoken();
 
-$timelimit = date("Y-m-d H:i:s", strtotime($C["other_report_timelimit"]));
-echo "timelimit < ".$timelimit." (".$C["other_report_timelimit"].")\n";
-$notice_timelimit = date("Y-m-d H:i:s", strtotime($C["other_report_notice_timelimit"]));
-echo "notice_timelimit < ".$notice_timelimit." (".$C["other_report_notice_timelimit"].")\n";
+$timelimit = date("Y-m-d H:i:s", strtotime($cfg["other_report_timelimit"]));
+echo "timelimit < ".$timelimit." (".$cfg["other_report_timelimit"].")\n";
+$notice_timelimit = date("Y-m-d H:i:s", strtotime($cfg["other_report_notice_timelimit"]));
+echo "notice_timelimit < ".$notice_timelimit." (".$cfg["other_report_notice_timelimit"].")\n";
 
 $sth = $G["db"]->prepare("SELECT * FROM `{$C['DBTBprefix']}userlist` WHERE `lasttime` < :lasttime AND `noticetime` != '{$C['TIME_MIN']}' AND `noticetime` < :noticetime ORDER BY `lasttime` ASC, `lastlog` ASC");
 $sth->bindValue(":lasttime", $timelimit);
@@ -34,7 +44,7 @@ foreach ($row as $key => $user) {
 	if (in_array("bot", $row[$key]["rights"])) {
 		$row[$key]["rights"] = array_diff($row[$key]["rights"], ["AWB"]);
 	}
-	$row[$key]["rights"] = array_diff($row[$key]["rights"], $C["right-whitelist"]);
+	$row[$key]["rights"] = array_diff($row[$key]["rights"], $cfg["right_not_to_process"]);
 	$row[$key]["rights"] = array_values($row[$key]["rights"]);
 	if (count($row[$key]["rights"]) == 0) {
 		unset($row[$key]);
@@ -55,7 +65,7 @@ for ($i=$C["fail_retry"]; $i > 0; $i--) {
 		"prop" => "revisions",
 		"format" => "json",
 		"rvprop" => "content|timestamp",
-		"titles" => $C["other_report_page"]
+		"titles" => $cfg["other_report_page"]
 	)));
 	if ($res === false) {
 		exit("fetch page fail\n");
@@ -66,7 +76,7 @@ for ($i=$C["fail_retry"]; $i > 0; $i--) {
 	$basetimestamp = $pages["revisions"][0]["timestamp"];
 	echo "get main page\n";
 
-	$start = strpos($text, $C["other_report_text"]);
+	$start = strpos($text, $cfg["other_report_text"]);
 	if ($start === false) {
 		exit("split fail\n");
 	}
@@ -85,8 +95,8 @@ for ($i=$C["fail_retry"]; $i > 0; $i--) {
 			if ($key) {
 				$out .= "、";
 			}
-			if ($value == $C["AWBright"]) {
-				$out .= $C["AWBname"];
+			if ($value == $cfg["right_awb_name"]) {
+				$out .= $cfg["right_text"]["AWB"];
 			} else {
 				$out .= '{{subst:int:group-'.$value.'}}';
 			}
@@ -118,7 +128,7 @@ for ($i=$C["fail_retry"]; $i > 0; $i--) {
 		$sth->bindValue(":name", $user["name"]);
 		$res = $sth->execute();
 
-		if ($count >= $C["other_report_limit"]) {
+		if ($count >= $cfg["other_report_limit"]) {
 			break;
 		}
 	}
@@ -134,11 +144,11 @@ for ($i=$C["fail_retry"]; $i > 0; $i--) {
 
 	$newtext = substr($text, 0, $start).$out.substr($text, $start);
 
-	$summary = $C["other_report_summary_prefix"]."，共".$count."位用戶";
+	$summary = $cfg["other_report_summary_prefix"]."，共".$count."位用戶";
 	$post = array(
 		"action" => "edit",
 		"format" => "json",
-		"title" => $C["other_report_page"],
+		"title" => $cfg["other_report_page"],
 		"summary" => $summary,
 		"text" => $newtext,
 		"token" => $edittoken,
@@ -146,7 +156,7 @@ for ($i=$C["fail_retry"]; $i > 0; $i--) {
 		"basetimestamp" => $basetimestamp
 	);
 
-	echo "edit ".$C["other_report_page"]." summary=".$summary."\n";
+	echo "edit ".$cfg["other_report_page"]." summary=".$summary."\n";
 	if (!$C["test"]) {
 		$res = cURL($C["wikiapi"], $post);
 	} else {
