@@ -49,7 +49,7 @@ for ($i=0; $i < $C["fail_retry"]; $i++) {
 		continue;
 	}
 
-	preg_match_all("/^(\* |: inactive\||: nouser\|)(.+)$/m", $text, $m);
+	preg_match_all("/^(\* |: .+?\|)(.+)$/m", $text, $m);
 	$out = '{| class="wikitable sortable"
 !使用者
 !簽名
