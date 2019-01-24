@@ -11,6 +11,7 @@ $starttime = microtime(true);
 require(__DIR__."/../function/curl.php");
 require(__DIR__."/../function/login.php");
 require(__DIR__."/../function/edittoken.php");
+require(__DIR__."/../function/getPage.php");
 
 function converttime($chitime){
 	if (preg_match("/(\d{4})年(\d{1,2})月(\d{1,2})日 \(.{3}\) (\d{2})\:(\d{2}) \(UTC\)/", $chitime, $m)) {
@@ -28,37 +29,31 @@ function TimediffFormat($time) {
 
 echo "The time now is ".date("Y-m-d H:i:s")." (UTC)\n";
 
+$config_page = getPageContent($C["wikiapi"], 'User:A2093064-bot/task/7/config.json');
+if ($config_page === false) {
+	exit("get config failed\n");
+}
+$cfg = json_decode($config_page['*'], true);
+if (!$cfg["enable"]) {
+	exit("disabled\n");
+}
+
 login("bot");
 $edittoken = edittoken();
 
-$retention_time = file_get_contents($C["retention_time"]);
-if ($retention_time === false) {
-	$retention_time = $C["retention_time_default"];
-	echo "Warning: fetch retention_time fail, use default value\n";
-}
+$retention_time = $cfg["retention_time"];
 echo "archive before ".$retention_time." ago (".date("Y-m-d H:i:s", time()-$retention_time).")\n";
 
 for ($i=$C["fail_retry"]; $i > 0; $i--) {
 	$starttimestamp = time();
-	$res = cURL($C["wikiapi"]."?".http_build_query(array(
-		"action" => "query",
-		"prop" => "revisions",
-		"format" => "json",
-		"rvprop" => "content|timestamp",
-		"titles" => $C["from_page"]
-	)));
-	if ($res === false) {
-		exit("fetch page fail\n");
-	}
-	$res = json_decode($res, true);
-	$pages = current($res["query"]["pages"]);
-	$text = $pages["revisions"][0]["*"];
-	$basetimestamp = $pages["revisions"][0]["timestamp"];
+	$res = getPageContent($C["wikiapi"], $cfg["from_page"]);
+	$text = $res["*"];
+	$basetimestamp = $res["timestamp"];
 	echo "get main page\n";
 
-	$start = strpos($text, $C["text1"]);
-	$oldpagetext = substr($text, 0, $start+strlen($C["text1"]));
-	$text = substr($text, $start+strlen($C["text1"]));
+	$start = strpos($text, $cfg["text1"]);
+	$oldpagetext = substr($text, 0, $start+strlen($cfg["text1"]));
+	$text = substr($text, $start+strlen($cfg["text1"]));
 
 	$hash = md5(uniqid(rand(), true));
 	$text = preg_replace("/^( *==.+?== *)$/m", $hash."$1", $text);
@@ -135,11 +130,11 @@ for ($i=$C["fail_retry"]; $i > 0; $i--) {
 	echo "start edit\n";
 
 	echo "edit main page\n";
-	$summary = $C["summary_prefix"]."：存檔".$archive_count["all"]."請求至".count($newpagetext)."頁面 (".$C["summary_config_page"]."：".TimediffFormat($retention_time).")";
+	$summary = sprintf($cfg['from_page_summary'], $archive_count["all"], count($newpagetext));
 	$post = array(
 		"action" => "edit",
 		"format" => "json",
-		"title" => $C["from_page"],
+		"title" => $cfg["from_page"],
 		"summary" => $summary,
 		"text" => $oldpagetext,
 		"token" => $edittoken,
@@ -147,7 +142,7 @@ for ($i=$C["fail_retry"]; $i > 0; $i--) {
 		"starttimestamp" => $starttimestamp,
 		"basetimestamp" => $basetimestamp
 	);
-	echo "edit ".$C["from_page"]." summary=".$summary."\n";
+	echo "edit ".$cfg["from_page"]." summary=".$summary."\n";
 	if (!$C["test"]) $res = cURL($C["wikiapi"], $post);
 	else $res = false;
 	$res = json_decode($res, true);
@@ -165,20 +160,12 @@ for ($i=$C["fail_retry"]; $i > 0; $i--) {
 
 echo "edit archive page\n";
 foreach ($newpagetext as $year => $newtext) {
-	$page = $C["to_page_prefix"].$year."年";
+	$page = sprintf($cfg['to_page'], $year);
 	for ($i=$C["fail_retry"]; $i > 0; $i--) { 
 		$starttimestamp2 = time();
-		$res = cURL($C["wikiapi"]."?".http_build_query(array(
-			"action" => "query",
-			"prop" => "revisions",
-			"format" => "json",
-			"rvprop" => "content|timestamp",
-			"titles" => $page
-		)));
-		$res = json_decode($res, true);
-		$pages = current($res["query"]["pages"]);
+		$pages = getPage($C["wikiapi"], $page);
 
-		$oldtext = "{{存档页|Wikipedia:合并请求}}\n";
+		$oldtext = $cfg['to_page_preload'];
 
 		$basetimestamp2 = null;
 		if (!isset($pages["missing"])) {
@@ -222,7 +209,7 @@ foreach ($newpagetext as $year => $newtext) {
 		$text = implode("\n", $oldtextarr);
 		$text = preg_replace("/\n{3,}/", "\n\n", $text);
 
-		$summary = $C["summary_prefix"]."：存檔自[[".$C["from_page"]."]]共".$archive_count[$year]."個請求";
+		$summary = sprintf($cfg['to_page_summary'], $cfg["from_page"], $archive_count[$year]);
 		$post = array(
 			"action" => "edit",
 			"format" => "json",
