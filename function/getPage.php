@@ -1,7 +1,7 @@
 <?php
 require_once(__DIR__.'/curl.php');
 
-function getPageContent($api, $title) {
+function getPage($api, $title) {
 	$res = cURL($api."?".http_build_query(array(
 		"action" => "query",
 		"prop" => "revisions",
@@ -14,5 +14,13 @@ function getPageContent($api, $title) {
 	}
 	$res = json_decode($res, true);
 	$pages = current($res["query"]["pages"]);
-	return $pages["revisions"][0];
+	return $pages;
+}
+
+function getPageContent($api, $title) {
+	$res = getPage($api, $title);
+	if (!isset($res["revisions"][0])) {
+		return false;
+	}
+	return $res["revisions"][0];
 }
