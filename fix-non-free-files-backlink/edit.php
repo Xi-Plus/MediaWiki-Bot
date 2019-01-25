@@ -82,7 +82,7 @@ foreach ($C["category"] as $category) {
 				break;
 			}
 
-			$newtext = preg_replace("/(\| *Article *=).+$/mi", '${1} '.$article, $text);
+			$newtext = preg_replace("/(\| *Article *= *)[^\|]+/mi", '${1}'.$article, $text);
 			if (preg_replace("/\s/", "", $text) === preg_replace("/\s/", "", $newtext)) {
 				echo "no changed\n";
 				$newtext = $text;
