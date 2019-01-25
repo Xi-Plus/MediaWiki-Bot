@@ -29,7 +29,28 @@ def converttitle(title):
 		"converttitles": 1
 		})
 	data = r.submit()
-	return list(data['query']['pages'].values())[0]['title']
+	title = list(data['query']['pages'].values())[0]['title']
+	mode = []
+	if 'redirects' in data['query']: # 重定向
+		mode.append('redirects')
+	if 'converted' in data['query']: # 繁簡轉換
+		mode.append('converted')
+	if 'normalized' in data['query']: # 命名空間
+		mode.append('normalized')
+	return {'title': title, 'mode': mode}
+
+def appendComment(text, mode):
+	text = text.strip()
+	comment = []
+	if 'redirects' in mode and isinstance(cfg['comment_redirects'], str):
+		comment.append(cfg['comment_redirects'])
+	if 'converted' in mode and isinstance(cfg['comment_converted'], str):
+		comment.append(cfg['comment_converted'])
+	if 'normalized' in mode and isinstance(cfg['comment_normalized'], str):
+		comment.append(cfg['comment_normalized'])
+	if len(comment) > 0:
+		text += '\n' + cfg['comment'].format(''.join(comment))
+	return text
 
 def fix(pagename):
 	if not pagename.startswith("Wikipedia:頁面存廢討論/記錄/"):
@@ -58,7 +79,8 @@ def fix(pagename):
 				start = ":"
 				title = title[1:]
 
-			title = converttitle(title)
+			convert = converttitle(title)
+			title = convert['title']
 
 			title = "[["+start+title+"]]"
 
@@ -67,12 +89,15 @@ def fix(pagename):
 					section.insert(1, "\n{{formerly|"+str(section.get(0).title)+"}}")
 				print("  set new title = "+title)
 				section.get(0).title = title
+				newtext = appendComment(str(section), mode)
+				section.replace(section, newtext)
 			continue
 		
 		m = re.search(r"^(\[\[[^\]]+\]\][、，])+\[\[[^\]]+\]\]$", title, re.IGNORECASE)
 		if m != None:
 			titlelist = m.group(0).replace("]]，[[", "]]、[[").split("、")
 			newtitlelist = []
+			mode = []
 			for title in titlelist:
 				if title.startswith("[[") and title.endswith("]]"):
 					title = title[2:-2]
@@ -80,7 +105,9 @@ def fix(pagename):
 					if title[0] == ":":
 						title = title[1:]
 
-					title = converttitle(title)
+					convert = converttitle(title)
+					title = convert['title']
+					mode += convert['mode']
 
 					newtitlelist.append(title)
 				else :
@@ -90,23 +117,30 @@ def fix(pagename):
 			if str(section.get(0).title) != title:
 				print("  set new title = "+title)
 				section.get(0).title = title
+				newtext = appendComment(str(section), mode)
+				section.replace(section, newtext)
 			continue
 
 		m = re.search(r"^{{al\|([^\]]+\|)+[^\]]+}}$", title, re.IGNORECASE)
 		if m != None:
 			titlelist = m.group(0)[5:-2].split("|")
 			newtitlelist = []
+			mode = []
 			for title in titlelist:
 				if title[0] == ":":
 					title = title[1:]
 
-				title = converttitle(title)
+				convert = converttitle(title)
+				title = convert['title']
+				mode += convert['mode']
 
 				newtitlelist.append(title)
 			title = "{{al|"+"|".join(newtitlelist)+"}}"
 			if str(section.get(0).title) != title:
 				print("  set new title = "+title)
 				section.get(0).title = title
+				newtext = appendComment(str(section), mode)
+				section.replace(section, newtext)
 			continue
 
 		print("  unknown format, skip")
