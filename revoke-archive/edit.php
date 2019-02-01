@@ -28,20 +28,26 @@ function TimediffFormat($time) {
 
 echo "The time now is ".date("Y-m-d H:i:s")." (UTC)\n";
 
+$config_page = file_get_contents($C["config_page"]);
+if ($config_page === false) {
+	exit("get config failed\n");
+}
+$cfg = json_decode($config_page, true);
+
+if (!$cfg["enable"]) {
+	exit("disabled\n");
+}
+
 login("bot");
 $edittoken = edittoken();
 
-$retention_time = array();
+$retention_time = [];
 for ($i=1; $i <= 4; $i++) { 
-	$retention_time[$i] = @file_get_contents($C["retention_time_{$i}"]);
-	if ($retention_time[$i] === false) {
-		$retention_time[$i] = $C["retention_time_{$i}_default"];
-		echo "Warning: fetch retention_time_{$i} fail, use default value\n";
-	}
+	$retention_time[$i] = $cfg["retention_time_{$i}"];
 	echo "{$i}. archive before ".$retention_time[$i]." ago (".date("Y-m-d H:i:s", time()-$retention_time[$i]).")\n";
 }
 
-$revoketime = strtotime("-6 months");
+$revoketime = strtotime($cfg["revoketime"]);
 
 for ($i=$C["fail_retry"]; $i > 0; $i--) {
 	$starttimestamp = time();
@@ -50,7 +56,7 @@ for ($i=$C["fail_retry"]; $i > 0; $i--) {
 		"prop" => "revisions",
 		"format" => "json",
 		"rvprop" => "content|timestamp",
-		"titles" => $C["from_page"]
+		"titles" => $cfg["from_page"]
 	)));
 	if ($res === false) {
 		exit("fetch page fail\n");
@@ -63,10 +69,10 @@ for ($i=$C["fail_retry"]; $i > 0; $i--) {
 
 	$hash = md5(uniqid(rand(), true));
 
-	$text = preg_replace("/^( *== *{$C['text1']} *== *)$/m", $hash."$1", $text);
-	$text = preg_replace("/^( *== *{$C['text2']} *== *)$/m", $hash."$1", $text);
-	$text = preg_replace("/^( *== *{$C['text3']} *== *)$/m", $hash."$1", $text);
-	$text = preg_replace("/^( *== *{$C['text4']} *== *)$/m", $hash."$1", $text);
+	$text = preg_replace("/^( *== *{$cfg['text1']} *== *)$/m", $hash."$1", $text);
+	$text = preg_replace("/^( *== *{$cfg['text2']} *== *)$/m", $hash."$1", $text);
+	$text = preg_replace("/^( *== *{$cfg['text3']} *== *)$/m", $hash."$1", $text);
+	$text = preg_replace("/^( *== *{$cfg['text4']} *== *)$/m", $hash."$1", $text);
 
 	$text = explode($hash, $text);
 	if (count($text) != 5) {
@@ -89,7 +95,7 @@ for ($i=$C["fail_retry"]; $i > 0; $i--) {
 				echo $m[1]."\t";
 				preg_match("/{{status2\|(.+?)(\||}})/", $temp, $m);
 				echo "status ".$m[1]."\t";
-				if (in_array($m[1], $C["status2done"])) {
+				if (in_array($m[1], $cfg["status2done"])) {
 					preg_match_all("/\d{4}年\d{1,2}月\d{1,2}日 \(.{3}\) \d{2}\:\d{2} \(UTC\)/", $temp, $m);
 					$firsttime = time();
 					$lasttime = 0;
@@ -134,11 +140,11 @@ for ($i=$C["fail_retry"]; $i > 0; $i--) {
 	echo "start edit\n";
 
 	echo "edit main page\n";
-	$summary = $C["summary_prefix"]."：存檔".$archive_count["all"]."請求至".count($newpagetext)."頁面 (".$C["summary_config_page"]."：各段落分別".TimediffFormat($retention_time[1]).",".TimediffFormat($retention_time[2]).",".TimediffFormat($retention_time[3]).",".TimediffFormat($retention_time[4])."無回應)";
+	$summary = sprintf($cfg["from_page_summary"], $archive_count["all"], count($newpagetext));
 	$post = array(
 		"action" => "edit",
 		"format" => "json",
-		"title" => $C["from_page"],
+		"title" => $cfg["from_page"],
 		"summary" => $summary,
 		"text" => $oldpagetext,
 		"token" => $edittoken,
@@ -147,11 +153,11 @@ for ($i=$C["fail_retry"]; $i > 0; $i--) {
 		"starttimestamp" => $starttimestamp,
 		"basetimestamp" => $basetimestamp
 	);
-	echo "edit ".$C["from_page"]." summary=".$summary."\n";
+	echo "edit ".$cfg["from_page"]." summary=".$summary."\n";
 	if (!$C["test"]) $res = cURL($C["wikiapi"], $post);
 	else {
 		$res = false;
-		file_put_contents(str_replace("/", "-", $C["from_page"]).".txt", $oldpagetext);
+		file_put_contents(str_replace("/", "-", $cfg["from_page"]).".txt", $oldpagetext);
 	}
 	$res = json_decode($res, true);
 	if (isset($res["error"])) {
@@ -168,7 +174,7 @@ for ($i=$C["fail_retry"]; $i > 0; $i--) {
 
 echo "edit archive page\n";
 foreach ($newpagetext as $year => $newtext) {
-	$page = $C["to_page_prefix"].$year."年";
+	$page = sprintf($cfg["to_page"], $year);
 	for ($i=$C["fail_retry"]; $i > 0; $i--) { 
 		$starttimestamp2 = time();
 		$res = cURL($C["wikiapi"]."?".http_build_query(array(
@@ -182,10 +188,10 @@ foreach ($newpagetext as $year => $newtext) {
 		$pages = current($res["query"]["pages"]);
 
 		$text = "{{存档页|Wikipedia:申请解除权限}}\n".
-			"=={$C['text1']}==\n".
-			"=={$C['text2']}==\n".
-			"=={$C['text3']}==\n".
-			"=={$C['text4']}\n";
+			"=={$cfg['text1']}==\n".
+			"=={$cfg['text2']}==\n".
+			"=={$cfg['text3']}==\n".
+			"=={$cfg['text4']}\n";
 
 		$basetimestamp2 = null;
 		if (!isset($pages["missing"])) {
@@ -194,18 +200,18 @@ foreach ($newpagetext as $year => $newtext) {
 			echo $page." exist\n";
 		} else {
 			echo $page." not exist\n";
-			$text = "{{存档页|".$C["from_page"]."}}\n".
-				"==".$C["text1"]."==\n".
-				"==".$C["text2"]."==\n".
-				"==".$C["text3"]."==\n".
-				"==".$C["text4"]."==\n";
+			$text = "{{存档页|".$cfg["from_page"]."}}\n".
+				"==".$cfg["text1"]."==\n".
+				"==".$cfg["text2"]."==\n".
+				"==".$cfg["text3"]."==\n".
+				"==".$cfg["text4"]."==\n";
 		}
 
 		$hash = md5(uniqid(rand(), true));
-		$text = preg_replace("/^( *== *{$C['text1']} *== *)$/m", $hash."$1", $text);
-		$text = preg_replace("/^( *== *{$C['text2']} *== *)$/m", $hash."$1", $text);
-		$text = preg_replace("/^( *== *{$C['text3']} *== *)$/m", $hash."$1", $text);
-		$text = preg_replace("/^( *== *{$C['text4']} *== *)$/m", $hash."$1", $text);
+		$text = preg_replace("/^( *== *{$cfg['text1']} *== *)$/m", $hash."$1", $text);
+		$text = preg_replace("/^( *== *{$cfg['text2']} *== *)$/m", $hash."$1", $text);
+		$text = preg_replace("/^( *== *{$cfg['text3']} *== *)$/m", $hash."$1", $text);
+		$text = preg_replace("/^( *== *{$cfg['text4']} *== *)$/m", $hash."$1", $text);
 
 		$text = explode($hash, $text);
 		if (count($text) != 5) {
@@ -220,7 +226,7 @@ foreach ($newpagetext as $year => $newtext) {
 		$text = implode("\n", $text);
 		$text = preg_replace("/\n{3,}/", "\n\n", $text);
 
-		$summary = $C["summary_prefix"]."：存檔自[[".$C["from_page"]."]]共".$archive_count[$year]."個請求";
+		$summary = sprintf($cfg["to_page_summary"], $cfg["from_page"], $archive_count[$year]);
 		$post = array(
 			"action" => "edit",
 			"format" => "json",
