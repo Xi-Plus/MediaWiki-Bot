@@ -49,7 +49,7 @@ def appendComment(text, mode):
 	if 'normalized' in mode and isinstance(cfg['comment_normalized'], str):
 		comment.append(cfg['comment_normalized'])
 	if len(comment) > 0:
-		text += '\n' + cfg['comment'].format(''.join(comment))
+		text += '\n' + cfg['comment'].format(''.join(comment)) + '\n\n'
 	return text
 
 def fix(pagename):
