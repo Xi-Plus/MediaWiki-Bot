@@ -79,8 +79,11 @@ def fix(pagename):
 				start = ":"
 				title = title[1:]
 
+			mode = []
+
 			convert = converttitle(title)
 			title = convert['title']
+			mode += convert['mode']
 
 			title = "[["+start+title+"]]"
 
