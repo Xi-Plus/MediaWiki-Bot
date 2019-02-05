@@ -2,12 +2,12 @@
 
 $C["source"] = [
 	"gadgetlocal" => "/home/user/sample/",
-	"gadgetgithub" => "https://raw.githubusercontent.com/user/repo/master/"
+	"gadgetgithub" => "https://raw.githubusercontent.com/user/repo/master/",
 ];
 
 $C["target"] = [
 	"sample" => "User:Example/sample/",
-	"gadget" => "User:Example/gadget/"
+	"gadget" => "User:Example/gadget/",
 ];
 
 $C["web"] = [
@@ -18,7 +18,7 @@ $C["web"] = [
 		"bot" => false,
 		"minor" => true,
 		"nocreate" => true,
-		"cookiefile" =>__DIR__."/../tmp/push-cookie.txt"
+		"cookiefile" => __DIR__ . "/../tmp/push-cookie.txt",
 	],
 	"zhwp" => [
 		"wikiapi" => "https://zh.wikipedia.org/w/api.php",
@@ -27,8 +27,8 @@ $C["web"] = [
 		"bot" => false,
 		"minor" => true,
 		"nocreate" => true,
-		"cookiefile" => __DIR__."/../tmp/push-wp-cookie.txt"
-	]
+		"cookiefile" => __DIR__ . "/../tmp/push-wp-cookie.txt",
+	],
 ];
 
 $C["project"] = [
@@ -39,17 +39,17 @@ $C["project"] = [
 		],
 		"target" => [
 			"sample",
-			"gadget"
+			"gadget",
 		],
 		"web" => [
 			"beta",
-			"zhwp"
+			"zhwp",
 		],
 		"summary" => "deploy new feature",
 		"files" => [
-			'sample.js' => 'sample.js'
-		]
-	]
+			'sample.js' => 'sample.js',
+		],
+	],
 ];
 
 $C["User-Agent"] = "";

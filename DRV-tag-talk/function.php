@@ -3,19 +3,19 @@
 # get wikitext of page by revid
 function getrevcontent($revid) {
 	global $C;
-	$cachepath = $C["revcachedir"].$revid.".txt";
+	$cachepath = $C["revcachedir"] . $revid . ".txt";
 	if (file_exists($cachepath)) {
 		$text = file_get_contents($cachepath);
 		if ($text !== false) {
 			return $text;
 		}
 	}
-	$res = cURL($C["wikiapi"]."?".http_build_query(array(
+	$res = cURL($C["wikiapi"] . "?" . http_build_query(array(
 		"action" => "query",
 		"prop" => "revisions",
 		"format" => "json",
 		"rvprop" => "content",
-		"revids" => $revid
+		"revids" => $revid,
 	)));
 	if ($res === false) {
 		exit("fetch page fail\n");
@@ -30,11 +30,11 @@ function getrevcontent($revid) {
 # solve redirect
 function solveredirect($title) {
 	global $C;
-	$res = cURL($C["wikiapi"]."?".http_build_query(array(
+	$res = cURL($C["wikiapi"] . "?" . http_build_query(array(
 		"action" => "query",
 		"format" => "json",
 		"titles" => $title,
-		"redirects" => 1
+		"redirects" => 1,
 	)));
 	if ($res === false) {
 		exit("fetch page fail\n");
@@ -49,7 +49,7 @@ function getpagecontent($title) {
 	global $C;
 
 	if ($C["talkpagecache"]) {
-		$cachepath = $C["revcachedir"].$title.".txt";
+		$cachepath = $C["revcachedir"] . $title . ".txt";
 		if (file_exists($cachepath)) {
 			$text = file_get_contents($cachepath);
 			if ($text !== false) {
@@ -58,14 +58,14 @@ function getpagecontent($title) {
 		}
 	}
 
-	$res = cURL($C["wikiapi"]."?".http_build_query(array(
+	$res = cURL($C["wikiapi"] . "?" . http_build_query(array(
 		"action" => "query",
 		"format" => "json",
 		"prop" => "revisions",
 		"titles" => $title,
 		"redirects" => true,
 		"rvprop" => "content",
-		"rvlimit" => 1
+		"rvlimit" => 1,
 	)));
 	if ($res === false) {
 		exit("fetch page fail\n");
@@ -88,7 +88,7 @@ function getpagecontent($title) {
 function getstatus($text) {
 	global $C;
 	$hash = md5(uniqid(rand(), true));
-	$text = preg_replace("/^(==.+?==\s*)$/m", $hash."$1", $text);
+	$text = preg_replace("/^(==.+?==\s*)$/m", $hash . "$1", $text);
 	$text = explode($hash, $text);
 	unset($text[0]);
 	$result = [];
@@ -99,7 +99,7 @@ function getstatus($text) {
 			$title = $m[1];
 		} else {
 			if ($C["errormessage"]) {
-				echo "bad title: ".explode("\n", trim($temp))[0]."\n";
+				echo "bad title: " . explode("\n", trim($temp))[0] . "\n";
 			}
 			continue;
 		}
@@ -121,7 +121,7 @@ function getstatus($text) {
 		} else {
 			if ($C["errormessage"]) {
 				echo "cannot match status:\n";
-				echo trim($temp)."\n";
+				echo trim($temp) . "\n";
 			}
 			$status = "未知";
 			$ok = false;
@@ -134,7 +134,7 @@ function getstatus($text) {
 				"title" => $title,
 				"result" => $ok,
 				"status" => $status,
-				"time" => $time
+				"time" => $time,
 			];
 		}
 	}
@@ -142,9 +142,9 @@ function getstatus($text) {
 }
 
 # convert time string to timestamp
-function converttime($chitime){
+function converttime($chitime) {
 	if (preg_match("/(\d{4})年(\d{1,2})月(\d{1,2})日 \(.{3}\) (\d{2})\:(\d{2}) \(UTC\)/", $chitime, $m)) {
-		return strtotime($m[1]."/".$m[2]."/".$m[3]." ".$m[4].":".$m[5]);
+		return strtotime($m[1] . "/" . $m[2] . "/" . $m[3] . " " . $m[4] . ":" . $m[5]);
 	} else {
 		exit("converttime fail\n");
 	}
@@ -156,12 +156,15 @@ function getfirsttime($text) {
 		$firsttime = time();
 		foreach ($m[0] as $timestr) {
 			$time = converttime($timestr);
-			if ($time < $firsttime) $firsttime = $time;
+			if ($time < $firsttime) {
+				$firsttime = $time;
+			}
+
 		}
 		return $firsttime;
 	}
 	echo "cannot get firsttime:\n";
-	echo trim($text)."\n";
+	echo trim($text) . "\n";
 	return false;
 }
 
@@ -171,11 +174,11 @@ function getpageinfo($pagename) {
 	if (!isset($C["ns"])) {
 		$C["ns"] = [];
 
-		$res = cURL($C["wikiapi"]."?".http_build_query(array(
+		$res = cURL($C["wikiapi"] . "?" . http_build_query(array(
 			"action" => "query",
 			"format" => "json",
 			"meta" => "siteinfo",
-			"siprop" => "namespaces"
+			"siprop" => "namespaces",
 		)));
 		if ($res === false) {
 			exit("fetch page fail\n");
@@ -187,12 +190,12 @@ function getpageinfo($pagename) {
 		}
 	}
 
-	$res = cURL($C["wikiapi"]."?".http_build_query(array(
+	$res = cURL($C["wikiapi"] . "?" . http_build_query(array(
 		"action" => "query",
 		"format" => "json",
 		"prop" => "info",
 		"titles" => $pagename,
-		"converttitles" => true
+		"converttitles" => true,
 	)));
 	if ($res === false) {
 		exit("fetch page fail\n");
@@ -201,44 +204,44 @@ function getpageinfo($pagename) {
 	$page = current($res["query"]["pages"]);
 
 	if (isset($page["missing"])) {
-		echo $pagename." missing\n";
+		echo $pagename . " missing\n";
 		return false;
 	}
 
 	if (in_array($page["ns"], $C["nsignore"])) {
-		echo $pagename."in ignore ns (".$page["ns"].")\n";
+		echo $pagename . "in ignore ns (" . $page["ns"] . ")\n";
 		return false;
 	}
 	if ($page["ns"] % 2 == 1) {
 		return [
 			"title" => $page["title"],
-			"talk" => $page["title"]
+			"talk" => $page["title"],
 		];
 	} else if ($page["ns"] == 0) {
 		return [
 			"title" => $page["title"],
-			"talk" => solveredirect("Talk:".$page["title"])
+			"talk" => solveredirect("Talk:" . $page["title"]),
 		];
 	} else {
-		$talk = preg_replace("/^".$C["ns"][$page["ns"]].":/", $C["ns"][$page["ns"]+1].":", $page["title"]);
+		$talk = preg_replace("/^" . $C["ns"][$page["ns"]] . ":/", $C["ns"][$page["ns"] + 1] . ":", $page["title"]);
 		return [
 			"title" => $page["title"],
-			"talk" => solveredirect($talk)
+			"talk" => solveredirect($talk),
 		];
 	}
 }
 
 function checktalkpagetagged($text, $date) {
-	$regdate1 = date("Y", $date)."\/?0?".date("n", $date)."\/?0?".date("j", $date);
-	$regdate2 = date("Y", $date)."-0?".date("n", $date)."-0?".date("j", $date);
-	$regdate3 = date("Y", $date)."年0?".date("n", $date)."月0?".date("j", $date)."日";
+	$regdate1 = date("Y", $date) . "\/?0?" . date("n", $date) . "\/?0?" . date("j", $date);
+	$regdate2 = date("Y", $date) . "-0?" . date("n", $date) . "-0?" . date("j", $date);
+	$regdate3 = date("Y", $date) . "年0?" . date("n", $date) . "月0?" . date("j", $date) . "日";
 
 	if (preg_match("/{{\s*Drv-kept\s*\|\s*({$regdate1}|{$regdate2})/i", $text)) {
 		return true;
 	}
 
 	$hash = md5(uniqid(rand(), true));
-	$text = preg_replace("/^(==.+?==\s*)$/m", $hash."$1", $text);
+	$text = preg_replace("/^(==.+?==\s*)$/m", $hash . "$1", $text);
 	$text = explode($hash, $text)[0];
 
 	if (preg_match("/({$regdate1}|{$regdate2}|{$regdate3}).*(存廢覆核|存废复核)/i", $text)) {
@@ -260,12 +263,12 @@ function tagtalkpage($title, $date, $diff, $result) {
 		$result = "完成";
 	}
 	$add = "{{Drv-kept|$date|$diff|$result}}";
-	echo $add."\n";
-	$res = cURL($C["wikiapi"]."?".http_build_query(array(
+	echo $add . "\n";
+	$res = cURL($C["wikiapi"] . "?" . http_build_query(array(
 		"action" => "query",
 		"format" => "json",
 		"prop" => "info",
-		"titles" => $title
+		"titles" => $title,
 	)));
 	if ($res === false) {
 		exit("fetch page fail\n");
@@ -278,12 +281,12 @@ function tagtalkpage($title, $date, $diff, $result) {
 	}
 
 	$starttimestamp = time();
-	$res = cURL($C["wikiapi"]."?".http_build_query(array(
+	$res = cURL($C["wikiapi"] . "?" . http_build_query(array(
 		"action" => "query",
 		"prop" => "revisions",
 		"format" => "json",
 		"rvprop" => "content|timestamp",
-		"titles" => $title
+		"titles" => $title,
 	)));
 	if ($res === false) {
 		exit("fetch page fail\n");
@@ -293,15 +296,15 @@ function tagtalkpage($title, $date, $diff, $result) {
 	if (isset($page["missing"])) {
 		$text = "";
 		$basetimestamp = 0;
-		echo $title." missing\n";
+		echo $title . " missing\n";
 	} else {
 		$text = $page["revisions"][0]["*"];
 		$basetimestamp = $page["revisions"][0]["timestamp"];
 	}
 
-	$text = $add."\n".trim($text);
+	$text = $add . "\n" . trim($text);
 
-	$summary = $C["summary_prefix"]."[[Special:diff/".$diff."|".$result."]]";
+	$summary = $C["summary_prefix"] . "[[Special:diff/" . $diff . "|" . $result . "]]";
 	$post = array(
 		"action" => "edit",
 		"format" => "json",
@@ -310,9 +313,9 @@ function tagtalkpage($title, $date, $diff, $result) {
 		"text" => $text,
 		"token" => $C["edittoken"],
 		"starttimestamp" => $starttimestamp,
-		"basetimestamp" => $basetimestamp
+		"basetimestamp" => $basetimestamp,
 	);
-	echo "edit ".$title." summary=".$summary."\n";
+	echo "edit " . $title . " summary=" . $summary . "\n";
 
 	$check = "";
 	while ($C["checkedit"] && $check !== "y") {
@@ -328,7 +331,7 @@ function tagtalkpage($title, $date, $diff, $result) {
 		$res = cURL($C["wikiapi"], $post);
 	} else {
 		$res = false;
-		file_put_contents(__DIR__."/".str_replace(":", "_", $title).".txt", $text);
+		file_put_contents(__DIR__ . "/" . str_replace(":", "_", $title) . ".txt", $text);
 	}
 	$res = json_decode($res, true);
 	if (isset($res["error"])) {
@@ -337,7 +340,7 @@ function tagtalkpage($title, $date, $diff, $result) {
 		return false;
 	} else {
 		if ($C["talkpagecache"]) {
-			$cachepath = $C["revcachedir"].$title.".txt";
+			$cachepath = $C["revcachedir"] . $title . ".txt";
 			if (file_exists($cachepath)) {
 				unlink($cachepath);
 			}

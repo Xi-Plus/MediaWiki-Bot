@@ -19,4 +19,4 @@ $C["summary_config_page"] = "[[User:A2093064-bot/task/2/config|門檻]]";
 
 $C["User-Agent"] = "User:A2093064-bot usertalk-archive";
 
-$C["cookiefile"] = __DIR__."/../tmp/usertalk-archive-cookie.txt";
+$C["cookiefile"] = __DIR__ . "/../tmp/usertalk-archive-cookie.txt";

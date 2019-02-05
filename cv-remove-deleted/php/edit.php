@@ -1,5 +1,5 @@
 <?php
-require(__DIR__."/../config/config.php");
+require __DIR__ . "/../config/config.php";
 if (!in_array(PHP_SAPI, $C["allowsapi"])) {
 	exit("No permission");
 }
@@ -7,23 +7,23 @@ if (!in_array(PHP_SAPI, $C["allowsapi"])) {
 set_time_limit(600);
 date_default_timezone_set('UTC');
 $starttime = microtime(true);
-@include(__DIR__."/config.php");
-require(__DIR__."/../function/curl.php");
-require(__DIR__."/../function/login.php");
-require(__DIR__."/../function/edittoken.php");
+@include __DIR__ . "/config.php";
+require __DIR__ . "/../function/curl.php";
+require __DIR__ . "/../function/login.php";
+require __DIR__ . "/../function/edittoken.php";
 
-echo "The time now is ".date("Y-m-d H:i:s")." (UTC)\n";
+echo "The time now is " . date("Y-m-d H:i:s") . " (UTC)\n";
 
 login();
 $edittoken = edittoken();
 
 $starttimestamp = time();
-$res = cURL($C["wikiapi"]."?".http_build_query(array(
+$res = cURL($C["wikiapi"] . "?" . http_build_query(array(
 	"action" => "query",
 	"prop" => "revisions",
 	"format" => "json",
 	"rvprop" => "content|timestamp",
-	"titles" => $C["page"]
+	"titles" => $C["page"],
 )));
 if ($res === false) {
 	exit("fetch page fail\n");
@@ -34,13 +34,13 @@ $text = $pages["revisions"][0]["*"];
 $basetimestamp = $pages["revisions"][0]["timestamp"];
 
 $start = strpos($text, $C["text1"]);
-$oldpagetext = substr($text, 0, $start+strlen($C["text1"]));
-$text = substr($text, $start+strlen($C["text1"]));
+$oldpagetext = substr($text, 0, $start + strlen($C["text1"]));
+$text = substr($text, $start + strlen($C["text1"]));
 
 $hash = md5(uniqid(rand(), true));
-$text = preg_replace("/^(===.+?===\s*)$/m", $hash."$1", $text);
+$text = preg_replace("/^(===.+?===\s*)$/m", $hash . "$1", $text);
 $text = explode($hash, $text);
-echo "find ".(count($text)-1)." sections\n";
+echo "find " . (count($text) - 1) . " sections\n";
 
 $oldpagetext .= $text[0];
 unset($text[0]);
@@ -50,21 +50,21 @@ foreach ($text as $temp) {
 	if (preg_match("/===(\d+)月(\d+)日===\s*/", $temp, $m)) {
 		$year = $m[1];
 		$month = $m[2];
-		echo $year."/".$month."\t";
+		echo $year . "/" . $month . "\t";
 	} else {
 		echo "title get fail\t";
 	}
 
 	preg_match_all("/{{CopyvioEntry\|1=([^|]+)\|/", $temp, $m);
 	$titles = implode("|", $m[1]);
-	echo "find ".count($m[1])." titles\t";
+	echo "find " . count($m[1]) . " titles\t";
 
-	$res = cURL($C["wikiapi"]."?".http_build_query(array(
+	$res = cURL($C["wikiapi"] . "?" . http_build_query(array(
 		"action" => "query",
 		"prop" => "revisions",
 		"format" => "json",
 		"rvprop" => "",
-		"titles" => $titles
+		"titles" => $titles,
 	)));
 	if ($res === false) {
 		exit("fetch page fail\n");
@@ -73,15 +73,15 @@ foreach ($text as $temp) {
 	$missing = [];
 	foreach ($res["query"]["pages"] as $page) {
 		if (isset($page["missing"])) {
-			$missing []= $page["title"];
+			$missing[] = $page["title"];
 		}
 	}
 
 	$hash = md5(uniqid(rand(), true));
-	$temp = preg_replace("/^(.*{{CopyvioEntry\|.+)$/m", $hash."$1", $temp);
+	$temp = preg_replace("/^(.*{{CopyvioEntry\|.+)$/m", $hash . "$1", $temp);
 	$temp = explode($hash, $temp);
-	$origincount = (count($temp)-1);
-	echo "find ".$origincount." sections\n";
+	$origincount = (count($temp) - 1);
+	echo "find " . $origincount . " sections\n";
 
 	$oldpagetexttemp = $temp[0];
 	unset($temp[0]);
@@ -90,22 +90,22 @@ foreach ($text as $temp) {
 	foreach ($temp as $temp2) {
 		if (preg_match("/{{CopyvioEntry\|1=([^|]+)\|/", $temp2, $m)) {
 			if (in_array($m[1], $missing)) {
-				echo "\tremove ".$m[1];
+				echo "\tremove " . $m[1];
 
-				$res = cURL($C["wikiapi"]."?".http_build_query(array(
+				$res = cURL($C["wikiapi"] . "?" . http_build_query(array(
 					"action" => "query",
 					"format" => "json",
 					"list" => "logevents",
 					"leprop" => "comment",
 					"letype" => "delete",
 					"letitle" => $m[1],
-					"lelimit" => "1"
+					"lelimit" => "1",
 				)));
 				if ($res === false) {
 					exit("fetch page fail\n");
 				}
 				$res = json_decode($res, true);
-				echo "\t".$res["query"]["logevents"][0]["comment"]."\n";
+				echo "\t" . $res["query"]["logevents"][0]["comment"] . "\n";
 
 				$count++;
 				$totalcount++;
@@ -123,7 +123,7 @@ foreach ($text as $temp) {
 		echo "empty section\n";
 	}
 }
-echo "total remove ".$totalcount."\n";
+echo "total remove " . $totalcount . "\n";
 if ($totalcount > 0) {
 	$text = $oldpagetext;
 
@@ -136,9 +136,9 @@ if ($totalcount > 0) {
 		"text" => $text,
 		"token" => $edittoken,
 		"starttimestamp" => $starttimestamp,
-		"basetimestamp" => $basetimestamp
+		"basetimestamp" => $basetimestamp,
 	);
-	echo "edit ".$C["page"]." summary=".$summary."\n";
+	echo "edit " . $C["page"] . " summary=" . $summary . "\n";
 
 	echo "Press any key to continue . . .";
 	fgets(STDIN);
@@ -147,7 +147,7 @@ if ($totalcount > 0) {
 		$res = cURL($C["wikiapi"], $post);
 	} else {
 		$res = false;
-		file_put_contents(__DIR__."/out.txt", $text);
+		file_put_contents(__DIR__ . "/out.txt", $text);
 	}
 	$res = json_decode($res, true);
 	if (isset($res["error"])) {
@@ -156,5 +156,5 @@ if ($totalcount > 0) {
 	}
 }
 
-$spendtime = (microtime(true)-$starttime);
-echo "spend ".$spendtime." s.\n";
+$spendtime = (microtime(true) - $starttime);
+echo "spend " . $spendtime . " s.\n";

@@ -25,6 +25,6 @@ $C["User-Agent"] = "User:A2093064-bot sign-check";
 
 $C["DBTBprefix"] = "sign_check_";
 
-$C["cookiefile"] = __DIR__."/../tmp/sign-check-cookie.txt";
+$C["cookiefile"] = __DIR__ . "/../tmp/sign-check-cookie.txt";
 
-$G["db"] = new PDO ('mysql:host='.$C["DBhost"].';dbname='.$C["DBname"].';charset=utf8mb4', $C["DBuser"], $C["DBpass"]);
+$G["db"] = new PDO('mysql:host=' . $C["DBhost"] . ';dbname=' . $C["DBname"] . ';charset=utf8mb4', $C["DBuser"], $C["DBpass"]);

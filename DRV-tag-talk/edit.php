@@ -1,5 +1,5 @@
 <?php
-require(__DIR__."/../config/config.php");
+require __DIR__ . "/../config/config.php";
 if (!in_array(PHP_SAPI, $C["allowsapi"])) {
 	exit("No permission");
 }
@@ -7,33 +7,33 @@ if (!in_array(PHP_SAPI, $C["allowsapi"])) {
 set_time_limit(600);
 date_default_timezone_set('UTC');
 $starttime = microtime(true);
-@include(__DIR__."/config.php");
-@include(__DIR__."/function.php");
-require(__DIR__."/../function/curl.php");
-require(__DIR__."/../function/login.php");
-require(__DIR__."/../function/edittoken.php");
+@include __DIR__ . "/config.php";
+@include __DIR__ . "/function.php";
+require __DIR__ . "/../function/curl.php";
+require __DIR__ . "/../function/login.php";
+require __DIR__ . "/../function/edittoken.php";
 
-echo "The time now is ".date("Y-m-d H:i:s")." (UTC)\n";
+echo "The time now is " . date("Y-m-d H:i:s") . " (UTC)\n";
 
 login("bot");
 $C["edittoken"] = edittoken();
 
 # get previous process last revid
-$lastrevidfile = __DIR__."/lastrevid.txt";
+$lastrevidfile = __DIR__ . "/lastrevid.txt";
 $lastrevid = @file_get_contents($lastrevidfile);
 if ($lastrevid === false) {
 	$lastrevid = 0;
 }
 
 # get page history (revid, user)
-echo "lastrevid: ".$lastrevid."\n";
-$res = cURL($C["wikiapi"]."?".http_build_query(array(
+echo "lastrevid: " . $lastrevid . "\n";
+$res = cURL($C["wikiapi"] . "?" . http_build_query(array(
 	"action" => "query",
 	"format" => "json",
 	"prop" => "revisions",
 	"titles" => $C["from_page"],
 	"rvprop" => "ids|user|timestamp",
-	"rvlimit" => $C["rvlimit"]
+	"rvlimit" => $C["rvlimit"],
 )));
 if ($res === false) {
 	exit("fetch page fail\n");
@@ -41,7 +41,7 @@ if ($res === false) {
 $res = json_decode($res, true);
 $page = current($res["query"]["pages"]);
 $revs = $page["revisions"];
-echo "get ".count($revs)." revisions\n";
+echo "get " . count($revs) . " revisions\n";
 
 # get all revid of archive bot edits
 $arRevIndexs = [];
@@ -50,7 +50,7 @@ foreach ($revs as $index => $rev) {
 		break;
 	}
 	if (in_array($rev["user"], $C["archviebotname"])) {
-		$arRevIndexs []= $index;
+		$arRevIndexs[] = $index;
 	}
 }
 
@@ -61,9 +61,9 @@ foreach ($arRevIndexs as $index => $arRevIndex) {
 	}
 
 	# get before and after archive revision content
-	$beforeRevid = $revs[$arRevIndex+1]["revid"];
+	$beforeRevid = $revs[$arRevIndex + 1]["revid"];
 	$afterRevid = $revs[$arRevIndex]["revid"];
-	echo "compare ".$beforeRevid." and ".$afterRevid."\n";
+	echo "compare " . $beforeRevid . " and " . $afterRevid . "\n";
 
 	$beforeRev = getrevcontent($beforeRevid);
 	$afterRev = getrevcontent($afterRevid);
@@ -91,7 +91,7 @@ foreach ($arRevIndexs as $index => $arRevIndex) {
 
 			# if tagged, skip
 			if ($istagged) {
-				echo $title." ".date("Y/m/d H:i", $status["time"])." tagged\n";
+				echo $title . " " . date("Y/m/d H:i", $status["time"]) . " tagged\n";
 				continue;
 			}
 
@@ -102,12 +102,12 @@ foreach ($arRevIndexs as $index => $arRevIndex) {
 	}
 
 	# foreach ready to tag section, find last status changed to + revid
-	for ($curIndex=$arRevIndex+2; $curIndex < count($revs); $curIndex++) {
+	for ($curIndex = $arRevIndex + 2; $curIndex < count($revs); $curIndex++) {
 		if (count($readytotag) == 0) {
 			break;
 		}
 		$curRevid = $revs[$curIndex]["revid"];
-		echo $curRevid."\n";
+		echo $curRevid . "\n";
 		$curRev = getrevcontent($curRevid);
 		$curStatus = getstatus($curRev);
 		foreach ($readytotag as $title => $status) {
@@ -115,10 +115,10 @@ foreach ($arRevIndexs as $index => $arRevIndex) {
 			if (isset($curStatus[$title]) && $curStatus[$title]["result"] === false) {
 				echo $title;
 				if ($title !== $status["title"]) {
-					echo "->".$status["title"];
+					echo "->" . $status["title"];
 				}
-				echo " (".$status["talk"].") ".$status["status"]." ".date("Y/m/d H:i", $status["time"])." ".$revs[$curIndex-1]["revid"]."\n";
-				tagtalkpage($status["talk"], date("Y/m/d", $status["time"]), $revs[$curIndex-1]["revid"], $status["status"]);
+				echo " (" . $status["talk"] . ") " . $status["status"] . " " . date("Y/m/d H:i", $status["time"]) . " " . $revs[$curIndex - 1]["revid"] . "\n";
+				tagtalkpage($status["talk"], date("Y/m/d", $status["time"]), $revs[$curIndex - 1]["revid"], $status["status"]);
 				unset($readytotag[$title]);
 			}
 		}
@@ -127,11 +127,11 @@ foreach ($arRevIndexs as $index => $arRevIndex) {
 }
 
 if (count($arRevIndexs)) {
-	echo "update lastrevid to ".$revs[$arRevIndexs[0]]["revid"]."\n";
+	echo "update lastrevid to " . $revs[$arRevIndexs[0]]["revid"] . "\n";
 	file_put_contents($lastrevidfile, $revs[$arRevIndexs[0]]["revid"]);
 } else {
 	echo "no changed\n";
 }
 
-$spendtime = (microtime(true)-$starttime);
-echo "spend ".$spendtime." s.\n";
+$spendtime = (microtime(true) - $starttime);
+echo "spend " . $spendtime . " s.\n";

@@ -17,4 +17,4 @@ $C["hidedeleted"] = false;
 
 $C["User-Agent"] = "";
 
-$C["cookiefile"] = __DIR__."/../tmp/abusefilter-list-cookie.txt";
+$C["cookiefile"] = __DIR__ . "/../tmp/abusefilter-list-cookie.txt";

@@ -1,5 +1,5 @@
 <?php
-require(__DIR__."/../config/config.php");
+require __DIR__ . "/../config/config.php";
 if (!in_array(PHP_SAPI, $C["allowsapi"])) {
 	exit("No permission");
 }
@@ -7,12 +7,12 @@ if (!in_array(PHP_SAPI, $C["allowsapi"])) {
 set_time_limit(600);
 date_default_timezone_set('UTC');
 $starttime = microtime(true);
-@include(__DIR__."/config.php");
-require(__DIR__."/../function/curl.php");
-require(__DIR__."/../function/login.php");
-require(__DIR__."/../function/edittoken.php");
+@include __DIR__ . "/config.php";
+require __DIR__ . "/../function/curl.php";
+require __DIR__ . "/../function/login.php";
+require __DIR__ . "/../function/edittoken.php";
 
-echo "The time now is ".date("Y-m-d H:i:s")." (UTC)\n";
+echo "The time now is " . date("Y-m-d H:i:s") . " (UTC)\n";
 
 login("bot");
 $edittoken = edittoken();
@@ -27,12 +27,12 @@ foreach ($row as $page) {
 }
 
 echo "fetch list\n";
-$res = cURL($C["wikiapi"]."?".http_build_query(array(
+$res = cURL($C["wikiapi"] . "?" . http_build_query(array(
 	"action" => "query",
 	"format" => "json",
 	"list" => "querypage",
 	"qppage" => "Mostlinkedtemplates",
-	"qplimit" => "max"
+	"qplimit" => "max",
 )));
 
 if ($res === false) {
@@ -53,9 +53,9 @@ foreach ($results as $page) {
 		$sth->bindValue(":time", $C["TIME_MIN"]);
 		$res = $sth->execute();
 		if ($res === false) {
-			echo $sth->errorInfo()[2]."\n";
+			echo $sth->errorInfo()[2] . "\n";
 		}
-		echo "new ".$page["title"]." (".$page["value"].")\n";
+		echo "new " . $page["title"] . " (" . $page["value"] . ")\n";
 	} else {
 		if ($pagelist[$title]["count"] != $page["value"]) {
 			$sth = $G["db"]->prepare("UPDATE `{$C['DBTBprefix']}page` SET `count` = :count WHERE `title` = :title");
@@ -63,9 +63,9 @@ foreach ($results as $page) {
 			$sth->bindValue(":title", $title);
 			$res = $sth->execute();
 			if ($res === false) {
-				echo $sth->errorInfo()[2]."\n";
+				echo $sth->errorInfo()[2] . "\n";
 			}
-			echo "update ".$page["title"]." (".$pagelist[$title]["count"]."->".$page["value"].")\n";
+			echo "update " . $page["title"] . " (" . $pagelist[$title]["count"] . "->" . $page["value"] . ")\n";
 		}
 		unset($pagelist[$title]);
 	}
@@ -75,8 +75,8 @@ foreach ($pagelist as $page) {
 	$sth = $G["db"]->prepare("DELETE FROM `{$C['DBTBprefix']}page` WHERE `title` = :title");
 	$sth->bindValue(":title", $page["title"]);
 	$res = $sth->execute();
-	echo "remove ".$page["title"]." (".$page["count"].")\n";
+	echo "remove " . $page["title"] . " (" . $page["count"] . ")\n";
 }
 
-$spendtime = (microtime(true)-$starttime);
-echo "spend ".$spendtime." s.\n";
+$spendtime = (microtime(true) - $starttime);
+echo "spend " . $spendtime . " s.\n";

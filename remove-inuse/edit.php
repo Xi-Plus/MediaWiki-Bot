@@ -1,5 +1,5 @@
 <?php
-require(__DIR__."/../config/config.php");
+require __DIR__ . "/../config/config.php";
 if (!in_array(PHP_SAPI, $C["allowsapi"])) {
 	exit("No permission");
 }
@@ -7,13 +7,13 @@ if (!in_array(PHP_SAPI, $C["allowsapi"])) {
 set_time_limit(600);
 date_default_timezone_set('UTC');
 $starttime = microtime(true);
-@include(__DIR__."/config.php");
-require(__DIR__."/../function/curl.php");
-require(__DIR__."/../function/login.php");
-require(__DIR__."/../function/edittoken.php");
-require(__DIR__."/../function/log.php");
+@include __DIR__ . "/config.php";
+require __DIR__ . "/../function/curl.php";
+require __DIR__ . "/../function/login.php";
+require __DIR__ . "/../function/edittoken.php";
+require __DIR__ . "/../function/log.php";
 
-echo "The time now is ".date("Y-m-d H:i:s")." (UTC)\n";
+echo "The time now is " . date("Y-m-d H:i:s") . " (UTC)\n";
 
 $config_page = file_get_contents($C["config_page"]);
 if ($config_page === false) {
@@ -31,13 +31,13 @@ login("bot");
 $edittoken = edittoken();
 
 $count = 0;
-$res = cURL($C["wikiapi"]."?".http_build_query(array(
+$res = cURL($C["wikiapi"] . "?" . http_build_query(array(
 	"action" => "query",
 	"format" => "json",
 	"list" => "categorymembers",
 	"cmtitle" => $cfg["category"],
 	"cmnamespace" => $cfg["namespace"],
-	"cmlimit" => "max"
+	"cmlimit" => "max",
 )));
 if ($res === false) {
 	exit("fetch page fail\n");
@@ -47,14 +47,14 @@ $pagelist = $res["query"]["categorymembers"];
 
 $logpage = [];
 foreach ($pagelist as $page) {
-	echo $page["title"]."\n";
+	echo $page["title"] . "\n";
 	$starttimestamp = time();
-	$res = cURL($C["wikiapi"]."?".http_build_query(array(
+	$res = cURL($C["wikiapi"] . "?" . http_build_query(array(
 		"action" => "query",
 		"prop" => "revisions",
 		"format" => "json",
 		"rvprop" => "content|timestamp",
-		"pageids" => $page["pageid"]
+		"pageids" => $page["pageid"],
 	)));
 	if ($res === false) {
 		echo "fetch page fail\n";
@@ -77,9 +77,9 @@ foreach ($pagelist as $page) {
 		$text = preg_replace($cfg["inuse_regex"], "", $text);
 		$summary = $cfg["inuse_summary"];
 	}
-	
+
 	if ($pages["revisions"][0]["*"] !== $text) {
-		$logpage []= $page["title"];
+		$logpage[] = $page["title"];
 	}
 
 	$post = array(
@@ -92,12 +92,16 @@ foreach ($pagelist as $page) {
 		"minor" => "",
 		"bot" => "",
 		"starttimestamp" => $starttimestamp,
-		"basetimestamp" => $basetimestamp
+		"basetimestamp" => $basetimestamp,
 	);
-	echo "edit ".$page["title"]." summary=".$summary."\n";
+	echo "edit " . $page["title"] . " summary=" . $summary . "\n";
 
-	if (!$C["test"]) $res = cURL($C["wikiapi"], $post);
-	else $res = false;
+	if (!$C["test"]) {
+		$res = cURL($C["wikiapi"], $post);
+	} else {
+		$res = false;
+	}
+
 	$res = json_decode($res, true);
 	if (isset($res["error"])) {
 		echo "edit fail\n";
@@ -107,7 +111,7 @@ foreach ($pagelist as $page) {
 if (count($logpage) != 0 && $cfg["record"]) {
 	$text = "";
 	foreach ($logpage as $page) {
-		$text .= "*[[".$page."]]\n";
+		$text .= "*[[" . $page . "]]\n";
 	}
 	$text .= "~~~~";
 
@@ -117,17 +121,21 @@ if (count($logpage) != 0 && $cfg["record"]) {
 		"title" => $cfg["log_page"],
 		"summary" => $cfg["log_summary"],
 		"text" => $text,
-		"token" => $edittoken
+		"token" => $edittoken,
 	);
-	echo "edit ".$cfg["log_page"]." summary=".$cfg["log_summary"]."\n";
+	echo "edit " . $cfg["log_page"] . " summary=" . $cfg["log_summary"] . "\n";
 
-	if (!$C["test"]) $res = cURL($C["wikiapi"], $post);
-	else $res = false;
+	if (!$C["test"]) {
+		$res = cURL($C["wikiapi"], $post);
+	} else {
+		$res = false;
+	}
+
 	$res = json_decode($res, true);
 	if (isset($res["error"])) {
 		echo "edit fail\n";
 	}
 }
 
-$spendtime = (microtime(true)-$starttime);
-echo "spend ".$spendtime." s.\n";
+$spendtime = (microtime(true) - $starttime);
+echo "spend " . $spendtime . " s.\n";

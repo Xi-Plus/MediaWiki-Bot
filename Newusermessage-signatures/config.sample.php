@@ -14,4 +14,4 @@ $C["summary_prefix"] = "[[User:A2093064-bot/task/11|機器人11]]：檢查[[Medi
 
 $C["User-Agent"] = "User:A2093064-bot Newusermessage-signatures";
 
-$C["cookiefile"] = __DIR__."/../tmp/Newusermessage-signatures-cookie.txt";
+$C["cookiefile"] = __DIR__ . "/../tmp/Newusermessage-signatures-cookie.txt";

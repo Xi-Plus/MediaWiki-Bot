@@ -12,4 +12,4 @@ $C["summary_prefix"] = "移除已刪除頁面的提報";
 
 $C["User-Agent"] = "User:A2093064-bot cv-remove-deleted";
 
-$C["cookiefile"] = __DIR__."/../tmp/cv-remove-deleted-cookie.txt";
+$C["cookiefile"] = __DIR__ . "/../tmp/cv-remove-deleted-cookie.txt";

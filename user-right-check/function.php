@@ -1,11 +1,11 @@
 <?php
 function userid($username) {
 	global $C;
-	$res = cURL($C["wikiapi"]."?".http_build_query(array(
+	$res = cURL($C["wikiapi"] . "?" . http_build_query(array(
 		"action" => "query",
 		"format" => "json",
 		"list" => "users",
-		"ususers" => $username
+		"ususers" => $username,
 	)));
 	if ($res === false) {
 		exit("fetch page fail\n");
@@ -16,13 +16,13 @@ function userid($username) {
 
 function lastedit($username) {
 	global $C;
-	$res = cURL($C["wikiapi"]."?".http_build_query(array(
+	$res = cURL($C["wikiapi"] . "?" . http_build_query(array(
 		"action" => "query",
 		"format" => "json",
 		"list" => "usercontribs",
 		"uclimit" => "1",
 		"ucuser" => $username,
-		"ucprop" => "timestamp"
+		"ucprop" => "timestamp",
 	)));
 	if ($res === false) {
 		exit("fetch page fail\n");
@@ -36,13 +36,13 @@ function lastedit($username) {
 
 function lastlog($username) {
 	global $C;
-	$res = cURL($C["wikiapi"]."?".http_build_query(array(
+	$res = cURL($C["wikiapi"] . "?" . http_build_query(array(
 		"action" => "query",
 		"format" => "json",
 		"list" => "logevents",
 		"leprop" => "type|timestamp",
 		"leuser" => $username,
-		"lelimit" => "1"
+		"lelimit" => "1",
 	)));
 	if ($res === false) {
 		exit("fetch page fail\n");
@@ -59,42 +59,42 @@ function lastlog($username) {
 
 function userright($username, $checkawb = true) {
 	global $C, $cfg;
-	$res = cURL($C["wikiapi"]."?".http_build_query(array(
+	$res = cURL($C["wikiapi"] . "?" . http_build_query(array(
 		"action" => "query",
 		"format" => "json",
 		"list" => "users",
 		"usprop" => "groups",
-		"ususers" => $username
+		"ususers" => $username,
 	)));
 	if ($res === false) {
 		exit("fetch page fail\n");
 	}
 	$res = json_decode($res, true);
 	$rights = $res["query"]["users"][0]["groups"] ?? array();
-	
+
 	if ($checkawb) {
 		$res2 = file_get_contents($cfg["AWBpage"]);
 		if ($res2 === false) {
 			exit("fetch page fail\n");
 		}
 		if (preg_match("/^\* *{$username} *$/m", $res2)) {
-			$rights[]= $cfg["AWBright"];
+			$rights[] = $cfg["AWBright"];
 		}
 	}
-		
+
 	return $rights;
 }
 
 function lastusergetrights($username) {
 	global $C;
-	$res = cURL($C["wikiapi"]."?".http_build_query(array(
+	$res = cURL($C["wikiapi"] . "?" . http_build_query(array(
 		"action" => "query",
 		"format" => "json",
 		"list" => "logevents",
 		"leprop" => "timestamp|user",
 		"letype" => "rights",
-		"letitle" => "User:".$username,
-		"lelimit" => "10"
+		"letitle" => "User:" . $username,
+		"lelimit" => "10",
 	)));
 	if ($res === false) {
 		exit("fetch page fail\n");

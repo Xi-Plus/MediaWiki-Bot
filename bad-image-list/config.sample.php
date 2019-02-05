@@ -17,4 +17,4 @@ $C["summary_prefix"] = "[[User:A2093064-bot/task/10|機器人10]]：產生[[Medi
 
 $C["User-Agent"] = "User:A2093064-bot bad-image-list";
 
-$C["cookiefile"] = __DIR__."/../tmp/bad-image-list-cookie.txt";
+$C["cookiefile"] = __DIR__ . "/../tmp/bad-image-list-cookie.txt";

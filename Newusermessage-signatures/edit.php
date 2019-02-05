@@ -1,5 +1,5 @@
 <?php
-require(__DIR__."/../config/config.php");
+require __DIR__ . "/../config/config.php";
 if (!in_array(PHP_SAPI, $C["allowsapi"])) {
 	exit("No permission");
 }
@@ -7,12 +7,12 @@ if (!in_array(PHP_SAPI, $C["allowsapi"])) {
 set_time_limit(600);
 date_default_timezone_set('UTC');
 $starttime = microtime(true);
-@include(__DIR__."/config.php");
-require(__DIR__."/../function/curl.php");
-require(__DIR__."/../function/login.php");
-require(__DIR__."/../function/edittoken.php");
+@include __DIR__ . "/config.php";
+require __DIR__ . "/../function/curl.php";
+require __DIR__ . "/../function/login.php";
+require __DIR__ . "/../function/edittoken.php";
 
-echo "The time now is ".date("Y-m-d H:i:s")." (UTC)\n";
+echo "The time now is " . date("Y-m-d H:i:s") . " (UTC)\n";
 
 login("bot");
 $edittoken = edittoken();
@@ -20,13 +20,13 @@ $edittoken = edittoken();
 $recenteditcount = [];
 $aufrom = "";
 while (true) {
-	$res = cURL($C["wikiapi"]."?".http_build_query(array(
+	$res = cURL($C["wikiapi"] . "?" . http_build_query(array(
 		"action" => "query",
 		"format" => "json",
 		"list" => "allusers",
 		"aulimit" => "max",
 		"aufrom" => $aufrom,
-		"auactiveusers" => 1
+		"auactiveusers" => 1,
 	)));
 	if ($res === false) {
 		exit("fetch page fail\n");
@@ -40,9 +40,9 @@ while (true) {
 	}
 	$aufrom = $res["continue"]["aufrom"];
 }
-echo count($recenteditcount)." active users\n";
+echo count($recenteditcount) . " active users\n";
 
-for ($i=0; $i < $C["fail_retry"]; $i++) { 
+for ($i = 0; $i < $C["fail_retry"]; $i++) {
 	$text = file_get_contents($C["page"]);
 	if ($text === false) {
 		echo "fetch fail\n";
@@ -71,13 +71,13 @@ for ($i=0; $i < $C["fail_retry"]; $i++) {
 		if (preg_match_all("/\[\[(?:U:|UT:|User:|用户:|User talk:|User_talk:|用户讨论:|Special:Contributions\/|Special:用户贡献\/|Special:用戶貢獻\/|特殊:用户贡献\/|特殊:用戶貢獻\/)([^|\/]+)/i", $sign, $m2)) {
 			$user = $m2[1][0];
 		}
-		$res = cURL($C["wikiapi"]."?".http_build_query(array(
+		$res = cURL($C["wikiapi"] . "?" . http_build_query(array(
 			"action" => "query",
 			"format" => "json",
 			"list" => "usercontribs",
 			"uclimit" => "1",
 			"ucuser" => $user,
-			"ucprop" => "timestamp"
+			"ucprop" => "timestamp",
 		)));
 		if ($res === false) {
 			exit("fetch page fail\n");
@@ -91,28 +91,28 @@ for ($i=0; $i < $C["fail_retry"]; $i++) {
 		} else {
 			$time = 0;
 		}
-		$date = date("Y年m月d日", $time)." (".$C["day"][date("w", $time)].") ".date("H:i", $time)." (UTC)";
+		$date = date("Y年m月d日", $time) . " (" . $C["day"][date("w", $time)] . ") " . date("H:i", $time) . " (UTC)";
 		$recentedit = $recenteditcount[$user] ?? 0;
 		$len = mb_strlen($sign);
 		$byte = strlen($sign);
 		if ($byte > 255) {
-			$byte = "{{red|'''".$byte."'''}}";
+			$byte = "{{red|'''" . $byte . "'''}}";
 		}
-		echo ($key+1)."\t".$user."\t".$status."\t".$date."\t".$recentedit."\t".$len."\t".$byte."\n";
-		$user = "{{User|".$user."}}";
+		echo ($key + 1) . "\t" . $user . "\t" . $status . "\t" . $date . "\t" . $recentedit . "\t" . $len . "\t" . $byte . "\n";
+		$user = "{{User|" . $user . "}}";
 		$out .= '|-
-|'.$user.'
-| '.$sign.'
-|'.$status.'
-|data-sort-value='.$time.'|'.$date.'
-|'.$recentedit.'
-|'.$len.'
-|'.$byte.'
+|' . $user . '
+| ' . $sign . '
+|' . $status . '
+|data-sort-value=' . $time . '|' . $date . '
+|' . $recentedit . '
+|' . $len . '
+|' . $byte . '
 ';
 	}
 	$out .= '|}';
 
-	$summary = $C["summary_prefix"]."更新";
+	$summary = $C["summary_prefix"] . "更新";
 	$post = array(
 		"action" => "edit",
 		"format" => "json",
@@ -120,14 +120,14 @@ for ($i=0; $i < $C["fail_retry"]; $i++) {
 		"summary" => $summary,
 		"text" => $out,
 		"minor" => "",
-		"token" => $edittoken
+		"token" => $edittoken,
 	);
-	echo "edit ".$C["outpage"]." summary=".$summary."\n";
+	echo "edit " . $C["outpage"] . " summary=" . $summary . "\n";
 	if (!$C["test"]) {
 		$res = cURL($C["wikiapi"], $post);
 	} else {
 		$res = false;
-		file_put_contents(__DIR__."/out.txt", $out);
+		file_put_contents(__DIR__ . "/out.txt", $out);
 	}
 	$res = json_decode($res, true);
 	if (isset($res["error"])) {

@@ -12,4 +12,4 @@ $C["context_after"] = 100;
 
 $C["User-Agent"] = "";
 
-$C["cookiefile"] = __DIR__."/../tmp/fix-lbot-redirect-cookie.txt";
+$C["cookiefile"] = __DIR__ . "/../tmp/fix-lbot-redirect-cookie.txt";

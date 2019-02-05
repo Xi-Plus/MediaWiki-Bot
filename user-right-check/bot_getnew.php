@@ -1,5 +1,5 @@
 <?php
-require(__DIR__."/../config/config.php");
+require __DIR__ . "/../config/config.php";
 if (!in_array(PHP_SAPI, $C["allowsapi"])) {
 	exit("No permission");
 }
@@ -7,14 +7,14 @@ if (!in_array(PHP_SAPI, $C["allowsapi"])) {
 set_time_limit(600);
 date_default_timezone_set('UTC');
 $starttime = microtime(true);
-@include(__DIR__."/config.php");
-require(__DIR__."/../function/curl.php");
-require(__DIR__."/../function/login.php");
-require(__DIR__."/../function/edittoken.php");
-require(__DIR__."/../function/log.php");
-require(__DIR__."/function.php");
+@include __DIR__ . "/config.php";
+require __DIR__ . "/../function/curl.php";
+require __DIR__ . "/../function/login.php";
+require __DIR__ . "/../function/edittoken.php";
+require __DIR__ . "/../function/log.php";
+require __DIR__ . "/function.php";
 
-echo "The time now is ".date("Y-m-d H:i:s")." (UTC)\n";
+echo "The time now is " . date("Y-m-d H:i:s") . " (UTC)\n";
 
 login("bot");
 $edittoken = edittoken();
@@ -30,13 +30,13 @@ foreach ($row as $user) {
 }
 
 // query bot list
-$res = cURL($C["wikiapi"]."?".http_build_query(array(
+$res = cURL($C["wikiapi"] . "?" . http_build_query(array(
 	"action" => "query",
 	"format" => "json",
 	"list" => "allusers",
 	"augroup" => "bot",
 	"auprop" => "groups",
-	"aulimit" => "max"
+	"aulimit" => "max",
 )));
 if ($res === false) {
 	exit("fetch page fail\n");
@@ -45,15 +45,15 @@ $res = json_decode($res, true);
 $allusers = $res["query"]["allusers"];
 $count = 1;
 foreach ($allusers as $bot) {
-	echo ($count++)." ".$bot["name"]." ".$bot["userid"]."\n";
+	echo ($count++) . " " . $bot["name"] . " " . $bot["userid"] . "\n";
 	if (!isset($botlist[$bot["userid"]])) {
 		// get bot owner
-		$res = cURL($C["wikiapi"]."?".http_build_query(array(
+		$res = cURL($C["wikiapi"] . "?" . http_build_query(array(
 			"action" => "query",
 			"prop" => "revisions",
 			"format" => "json",
 			"rvprop" => "content|timestamp",
-			"titles" => "User:".$bot["name"]
+			"titles" => "User:" . $bot["name"],
 		)));
 		if ($res === false) {
 			exit("fetch page fail\n");
@@ -74,22 +74,22 @@ foreach ($allusers as $bot) {
 						break;
 					}
 				}
-				
+
 				$userid = userid($username);
 			}
 		}
 
-		echo "owner: ".$username."\n";
-		echo "owner userid: ".$userid."\n";
+		echo "owner: " . $username . "\n";
+		echo "owner userid: " . $userid . "\n";
 
 		$botlastedit = lastedit($bot["name"]);
 		$botlastlog = lastlog($bot["name"]);
 
-		echo "bot lastedit: ".$botlastedit."\n";
-		echo "bot lastlog: ".$botlastlog."\n";
+		echo "bot lastedit: " . $botlastedit . "\n";
+		echo "bot lastlog: " . $botlastlog . "\n";
 
 		$botrights = implode("|", userright($bot["name"]));
-		echo "botrights: ".$botrights."\n";
+		echo "botrights: " . $botrights . "\n";
 
 		$sth = $G["db"]->prepare("INSERT INTO `{$C['DBTBprefix']}botlist` (`botid`, `botname`, `botlastedit`, `botlastlog`, `botrights`, `userid`, `username`) VALUES (:botid, :botname, :botlastedit, :botlastlog, :botrights, :userid, :username)");
 		$sth->bindValue(":botid", $bot["userid"]);
@@ -100,18 +100,18 @@ foreach ($allusers as $bot) {
 		$sth->bindValue(":userid", $userid);
 		$sth->bindValue(":username", $username);
 		$res = $sth->execute();
-		WriteLog("new bot: ".$bot["name"]." ".$bot["userid"]);
+		WriteLog("new bot: " . $bot["name"] . " " . $bot["userid"]);
 	} else {
 		sort($bot["groups"]);
 		$rights = implode("|", $bot["groups"]);
 		$botlist[$bot["userid"]]["botrights"] = implode("|", $botlist[$bot["userid"]]["botrights"]);
 		if ($botlist[$bot["userid"]]["botrights"] != $rights) {
-			echo $botlist[$bot["userid"]]["botrights"]." -> ".$rights."\n";
+			echo $botlist[$bot["userid"]]["botrights"] . " -> " . $rights . "\n";
 			$sth = $G["db"]->prepare("UPDATE `{$C['DBTBprefix']}botlist` SET `botrights` = :botrights WHERE `botid` = :botid");
 			$sth->bindValue(":botid", $bot["userid"]);
 			$sth->bindValue(":botrights", $rights);
 			$res = $sth->execute();
-			WriteLog("update bot rights: ".$bot["name"]." ".$botlist[$bot["userid"]]["botrights"]."->".$rights);
+			WriteLog("update bot rights: " . $bot["name"] . " " . $botlist[$bot["userid"]]["botrights"] . "->" . $rights);
 		}
 		unset($botlist[$bot["userid"]]);
 	}
@@ -120,9 +120,9 @@ foreach ($botlist as $bot) {
 	$sth = $G["db"]->prepare("DELETE FROM `{$C['DBTBprefix']}botlist` WHERE `botid` = :botid");
 	$sth->bindValue(":botid", $bot["botid"]);
 	$res = $sth->execute();
-	echo "remove ".$bot["botname"]."\n";
-	WriteLog("remove bot: ".$bot["botname"]." ".$bot["botid"]);
+	echo "remove " . $bot["botname"] . "\n";
+	WriteLog("remove bot: " . $bot["botname"] . " " . $bot["botid"]);
 }
 
-$spendtime = (microtime(true)-$starttime);
-echo "spend ".$spendtime." s.\n";
+$spendtime = (microtime(true) - $starttime);
+echo "spend " . $spendtime . " s.\n";

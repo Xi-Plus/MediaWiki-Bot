@@ -1,5 +1,5 @@
 <?php
-require(__DIR__."/../config/config.php");
+require __DIR__ . "/../config/config.php";
 if (!in_array(PHP_SAPI, $C["allowsapi"])) {
 	exit("No permission");
 }
@@ -7,17 +7,17 @@ if (!in_array(PHP_SAPI, $C["allowsapi"])) {
 set_time_limit(600);
 date_default_timezone_set('UTC');
 $starttime = microtime(true);
-@include(__DIR__."/config.php");
-require(__DIR__."/../function/curl.php");
-require(__DIR__."/../function/login.php");
-require(__DIR__."/../function/edittoken.php");
+@include __DIR__ . "/config.php";
+require __DIR__ . "/../function/curl.php";
+require __DIR__ . "/../function/login.php";
+require __DIR__ . "/../function/edittoken.php";
 
-echo "The time now is ".date("Y-m-d H:i:s")." (UTC)\n";
+echo "The time now is " . date("Y-m-d H:i:s") . " (UTC)\n";
 
 login("bot");
 $edittoken = edittoken();
 
-for ($i=0; $i < $C["fail_retry"]; $i++) { 
+for ($i = 0; $i < $C["fail_retry"]; $i++) {
 	$text = file_get_contents($C["page"]);
 	if ($text === false) {
 		echo "fetch fail\n";
@@ -30,10 +30,10 @@ for ($i=0; $i < $C["fail_retry"]; $i++) {
 	}
 
 	$hash = md5(uniqid(rand(), true));
-	echo "hash ".$hash."\n";
-	$text = preg_replace("/^(\* \[\[:File:.+?)\n([^*])/m", "$1".$hash."$2", $text);
+	echo "hash " . $hash . "\n";
+	$text = preg_replace("/^(\* \[\[:File:.+?)\n([^*])/m", "$1" . $hash . "$2", $text);
 	$text = explode($hash, $text);
-	echo "find ".count($text)." sections\n";
+	echo "find " . count($text) . " sections\n";
 	if (count($text) != 3) {
 		echo "split fail\n";
 		continue;
@@ -54,35 +54,35 @@ for ($i=0; $i < $C["fail_retry"]; $i++) {
 					if (preg_match_all("/\[\[([^]]+?)\]\]/", $m[2], $m2)) {
 						foreach ($m2[1] as $page) {
 							$page = str_replace("_", " ", $page);
-							$except[$file] []= $page;
+							$except[$file][] = $page;
 						}
 					}
 				} else {
-					$out .= "\n".$temp2."\n";
+					$out .= "\n" . $temp2 . "\n";
 				}
 			}
 			preg_match_all("/^\* \[\[(:File:[^]]+)/mi", $entext, $m);
 			foreach ($m[1] as $file) {
 				$file = str_replace("_", " ", $file);
-				$out .= "* [[".$file."]]";
+				$out .= "* [[" . $file . "]]";
 				if (isset($except[$file]) && count($except[$file]) > 0) {
-					$out .= " except on [[".implode("]], [[", $except[$file])."]]";
+					$out .= " except on [[" . implode("]], [[", $except[$file]) . "]]";
 				}
 				$out .= "\n";
 				unset($except[$file]);
 			}
 			$out .= "\n";
 		} else {
-			$out .= "\n".$temp."\n";
+			$out .= "\n" . $temp . "\n";
 		}
 	}
 	$out = preg_replace("/^\n+/", "", $out);
 	$out = preg_replace("/\n+$/", "", $out);
 	$out = preg_replace("/\n{3,}/", "\n\n", $out);
 	$date = date("Y/m/d");
-	$out = preg_replace("/更新至\d+\/\d+\/\d+/", "更新至".$date, $out);
+	$out = preg_replace("/更新至\d+\/\d+\/\d+/", "更新至" . $date, $out);
 
-	$summary = $C["summary_prefix"]."更新";
+	$summary = $C["summary_prefix"] . "更新";
 	$post = array(
 		"action" => "edit",
 		"format" => "json",
@@ -90,9 +90,9 @@ for ($i=0; $i < $C["fail_retry"]; $i++) {
 		"summary" => $summary,
 		"text" => $out,
 		"minor" => "",
-		"token" => $edittoken
+		"token" => $edittoken,
 	);
-	echo "edit ".$C["outpage"]." summary=".$summary."\n";
+	echo "edit " . $C["outpage"] . " summary=" . $summary . "\n";
 	if (!$C["test"]) {
 		$res = cURL($C["wikiapi"], $post);
 	} else {
@@ -107,7 +107,7 @@ for ($i=0; $i < $C["fail_retry"]; $i++) {
 
 	$remove = "";
 	foreach ($except as $page => $temp) {
-		$remove .= "* [[".$page."]]\n";
+		$remove .= "* [[" . $page . "]]\n";
 	}
 	file_put_contents("remove.txt", $remove);
 

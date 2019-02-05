@@ -1,5 +1,5 @@
 <?php
-require(__DIR__."/../config/config.php");
+require __DIR__ . "/../config/config.php";
 if (!in_array(PHP_SAPI, $C["allowsapi"])) {
 	exit("No permission");
 }
@@ -7,12 +7,12 @@ if (!in_array(PHP_SAPI, $C["allowsapi"])) {
 set_time_limit(600);
 date_default_timezone_set('UTC');
 $starttime = microtime(true);
-@include(__DIR__."/config.php");
-require(__DIR__."/../function/curl.php");
-require(__DIR__."/../function/login.php");
-require(__DIR__."/../function/edittoken.php");
+@include __DIR__ . "/config.php";
+require __DIR__ . "/../function/curl.php";
+require __DIR__ . "/../function/login.php";
+require __DIR__ . "/../function/edittoken.php";
 
-echo "The time now is ".date("Y-m-d H:i:s")." (UTC)\n";
+echo "The time now is " . date("Y-m-d H:i:s") . " (UTC)\n";
 
 login("bot");
 $edittoken = edittoken();
@@ -35,18 +35,18 @@ while (true) {
 		"list" => "blocks",
 		"bklimit" => "max",
 		"bkprop" => "id|user|expiry",
-		"bkshow" => "temp"
+		"bkshow" => "temp",
 	);
 	if ($bkcontinue !== "") {
 		$post["bkcontinue"] = $bkcontinue;
 	}
-	$res = cURL($C["wikiapi"]."?".http_build_query($post));
+	$res = cURL($C["wikiapi"] . "?" . http_build_query($post));
 	if ($res === false) {
 		exit("fetch page fail\n");
 	}
 	$res = json_decode($res, true);
 	$blocks = $res["query"]["blocks"];
-	echo "get ".count($blocks)."\n";
+	echo "get " . count($blocks) . "\n";
 	foreach ($blocks as $block) {
 		$expiry = date("Y-m-d H:i:s", strtotime($block["expiry"]));
 		if (!isset($blocklist[$block["id"]])) {
@@ -59,9 +59,9 @@ while (true) {
 			$sth->bindValue(":expiry", $expiry);
 			$res2 = $sth->execute();
 			if ($res2 === false) {
-				echo $sth->errorInfo()[2]."\n";
+				echo $sth->errorInfo()[2] . "\n";
 			}
-			echo $block["id"]." ".$block["user"]." ".$block["expiry"]."\n";
+			echo $block["id"] . " " . $block["user"] . " " . $block["expiry"] . "\n";
 		} else {
 			if ($expiry !== $blocklist[$block["id"]]["expiry"]) {
 				$sth = $G["db"]->prepare("UPDATE `{$C['DBTBprefix']}` SET `expiry` = :expiry WHERE `id` = :id");
@@ -69,9 +69,9 @@ while (true) {
 				$sth->bindValue(":expiry", $expiry);
 				$res2 = $sth->execute();
 				if ($res2 === false) {
-					echo $sth->errorInfo()[2]."\n";
+					echo $sth->errorInfo()[2] . "\n";
 				}
-				echo $block["id"]." ".$block["user"]." ".$block["expiry"]." (update)\n";
+				echo $block["id"] . " " . $block["user"] . " " . $block["expiry"] . " (update)\n";
 			}
 			unset($blocklist[$block["id"]]);
 		}
@@ -87,8 +87,8 @@ foreach ($blocklist as $block) {
 	$sth = $G["db"]->prepare("DELETE FROM `{$C['DBTBprefix']}` WHERE `id` = :id");
 	$sth->bindValue(":id", $block["id"]);
 	$res = $sth->execute();
-	echo "remove ".$block["user"]."\n";
+	echo "remove " . $block["user"] . "\n";
 }
 
-$spendtime = (microtime(true)-$starttime);
-echo "spend ".$spendtime." s.\n";
+$spendtime = (microtime(true) - $starttime);
+echo "spend " . $spendtime . " s.\n";

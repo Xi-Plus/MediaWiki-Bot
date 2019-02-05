@@ -10,4 +10,4 @@ $C["fail_retry"] = 5;
 
 $C["User-Agent"] = "User:A2093064-bot revoke-archive";
 
-$C["cookiefile"] = __DIR__."/../tmp/revoke-archive-cookie.txt";
+$C["cookiefile"] = __DIR__ . "/../tmp/revoke-archive-cookie.txt";

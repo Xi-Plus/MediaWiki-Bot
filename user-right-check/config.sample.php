@@ -20,8 +20,8 @@ $C["User-Agent"] = "User:A2093064-bot user-right-check";
 
 $C["DBTBprefix"] = "user_right_check_";
 
-$C["cookiefile"] = __DIR__."/../tmp/user-right-check-cookie.txt";
+$C["cookiefile"] = __DIR__ . "/../tmp/user-right-check-cookie.txt";
 
 $C["fail_retry"] = 5;
 
-$G["db"] = new PDO ('mysql:host='.$C["DBhost"].';dbname='.$C["DBname"].';charset=utf8mb4', $C["DBuser"], $C["DBpass"]);
+$G["db"] = new PDO('mysql:host=' . $C["DBhost"] . ';dbname=' . $C["DBname"] . ';charset=utf8mb4', $C["DBuser"], $C["DBpass"]);

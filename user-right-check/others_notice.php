@@ -1,5 +1,5 @@
 <?php
-require(__DIR__."/../config/config.php");
+require __DIR__ . "/../config/config.php";
 if (!in_array(PHP_SAPI, $C["allowsapi"])) {
 	exit("No permission");
 }
@@ -7,13 +7,13 @@ if (!in_array(PHP_SAPI, $C["allowsapi"])) {
 set_time_limit(600);
 date_default_timezone_set('UTC');
 $starttime = microtime(true);
-@include(__DIR__."/config.php");
-require(__DIR__."/../function/curl.php");
-require(__DIR__."/../function/login.php");
-require(__DIR__."/../function/edittoken.php");
-require(__DIR__."/function.php");
+@include __DIR__ . "/config.php";
+require __DIR__ . "/../function/curl.php";
+require __DIR__ . "/../function/login.php";
+require __DIR__ . "/../function/edittoken.php";
+require __DIR__ . "/function.php";
 
-echo "The time now is ".date("Y-m-d H:i:s")." (UTC)\n";
+echo "The time now is " . date("Y-m-d H:i:s") . " (UTC)\n";
 
 $config_page = file_get_contents($C["config_page_notice"]);
 if ($config_page === false) {
@@ -29,7 +29,7 @@ login("bot");
 $edittoken = edittoken();
 
 $timelimit = date("Y-m-d H:i:s", strtotime($cfg["time_to_notice"]));
-echo "timelimit < ".$timelimit." (".$cfg["time_to_notice"].")\n";
+echo "timelimit < " . $timelimit . " (" . $cfg["time_to_notice"] . ")\n";
 
 $sth = $G["db"]->prepare("SELECT * FROM `{$C['DBTBprefix']}userlist` WHERE `lasttime` < :lasttime AND `noticetime` < :noticetime ORDER BY `lasttime` ASC, `lastlog` ASC");
 $sth->bindValue(":lasttime", $timelimit);
@@ -51,7 +51,7 @@ foreach ($row as $key => $user) {
 }
 $row = array_values($row);
 
-echo "共有".count($row)."筆\n\n";
+echo "共有" . count($row) . "筆\n\n";
 if (count($row) === 0) {
 	exit("nothing to notice\n");
 }
@@ -62,16 +62,16 @@ $out = "";
 $sthnot = $G["db"]->prepare("UPDATE `{$C['DBTBprefix']}userlist` SET `noticetime` = :noticetime WHERE `name` = :name");
 $sthnot->bindValue(":noticetime", date("Y-m-d H:i:s"));
 foreach ($row as $user) {
-	echo $user["name"]."\t".$user["lastedit"]."\t".$user["lastlog"]."\t".$user["lastusergetrights"]."\n";
-	for ($i=$C["fail_retry"]; $i > 0; $i--) {
+	echo $user["name"] . "\t" . $user["lastedit"] . "\t" . $user["lastlog"] . "\t" . $user["lastusergetrights"] . "\n";
+	for ($i = $C["fail_retry"]; $i > 0; $i--) {
 		$starttimestamp = time();
-		$page = "User_talk:".$user["name"];
-		$res = cURL($C["wikiapi"]."?".http_build_query(array(
+		$page = "User_talk:" . $user["name"];
+		$res = cURL($C["wikiapi"] . "?" . http_build_query(array(
 			"action" => "query",
 			"prop" => "revisions",
 			"format" => "json",
 			"rvprop" => "content|timestamp",
-			"titles" => $page
+			"titles" => $page,
 		)));
 		if ($res === false) {
 			exit("fetch page fail\n");
@@ -113,7 +113,7 @@ foreach ($row as $user) {
 		}
 
 		if ($contentmodel == "wikitext") {
-			$text .= "\n".$out;
+			$text .= "\n" . $out;
 
 			$summary = $cfg["notice_summary"];
 			$post = array(
@@ -125,9 +125,9 @@ foreach ($row as $user) {
 				"token" => $edittoken,
 				"bot" => "",
 				"starttimestamp" => $starttimestamp,
-				"basetimestamp" => $basetimestamp
+				"basetimestamp" => $basetimestamp,
 			);
-			echo "edit ".$page." summary=".$summary."\n";
+			echo "edit " . $page . " summary=" . $summary . "\n";
 		} else if ($contentmodel == "flow-board") {
 			$post = array(
 				"action" => "flow",
@@ -137,9 +137,9 @@ foreach ($row as $user) {
 				"token" => $edittoken,
 				"nttopic" => $topic,
 				"ntcontent" => $out,
-				"ntformat" => "wikitext"
+				"ntformat" => "wikitext",
 			);
-			echo "edit ".$page." topic=".$topic."\n";
+			echo "edit " . $page . " topic=" . $topic . "\n";
 		} else {
 			echo "cannot check contentmodel\n";
 			break;
@@ -149,7 +149,7 @@ foreach ($row as $user) {
 			$res = cURL($C["wikiapi"], $post);
 		} else {
 			$res = false;
-			file_put_contents(__DIR__."/out.txt", $text);
+			file_put_contents(__DIR__ . "/out.txt", $text);
 		}
 		$res = json_decode($res, true);
 		if (isset($res["error"])) {
@@ -162,7 +162,7 @@ foreach ($row as $user) {
 				echo "retry\n";
 			}
 		} else {
-			$count ++;
+			$count++;
 			$sthnot->bindValue(":name", $user["name"]);
 			$res2 = $sthnot->execute();
 			if ($res2 === false) {

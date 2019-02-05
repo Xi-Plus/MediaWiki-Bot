@@ -1,5 +1,5 @@
 <?php
-require(__DIR__."/../config/config.php");
+require __DIR__ . "/../config/config.php";
 if (!in_array(PHP_SAPI, $C["allowsapi"])) {
 	exit("No permission");
 }
@@ -7,14 +7,14 @@ if (!in_array(PHP_SAPI, $C["allowsapi"])) {
 set_time_limit(600);
 date_default_timezone_set('UTC');
 $starttime = microtime(true);
-@include(__DIR__."/config.php");
-require(__DIR__."/../function/curl.php");
-require(__DIR__."/../function/login.php");
-require(__DIR__."/../function/edittoken.php");
-require(__DIR__."/../function/log.php");
-require(__DIR__."/function.php");
+@include __DIR__ . "/config.php";
+require __DIR__ . "/../function/curl.php";
+require __DIR__ . "/../function/login.php";
+require __DIR__ . "/../function/edittoken.php";
+require __DIR__ . "/../function/log.php";
+require __DIR__ . "/function.php";
 
-echo "The time now is ".date("Y-m-d H:i:s")." (UTC)\n";
+echo "The time now is " . date("Y-m-d H:i:s") . " (UTC)\n";
 
 login("bot");
 $edittoken = edittoken();
@@ -31,11 +31,11 @@ foreach ($row as $user) {
 	$userlist[$user["name"]] = $user;
 }
 
-echo "result count: ".count($userlist)."\n";
+echo "result count: " . count($userlist) . "\n";
 
 $count = 0;
 foreach ($userlist as $user) {
-	echo (++$count)." ".$user["name"]."\t";
+	echo (++$count) . " " . $user["name"] . "\t";
 	$lastedit = lastedit($user["name"]);
 	$lastlog = lastlog($user["name"]);
 	$lastusergetrights = lastusergetrights($user["name"]);
@@ -51,9 +51,9 @@ foreach ($userlist as $user) {
 	$sth->bindValue(":lastusergetrights", $lastusergetrights);
 	$sth->bindValue(":lasttime", max($lastedit, $lastlog, $lastusergetrights, $lasttime));
 	$res = $sth->execute();
-	echo " update lastedit=".$lastedit." lastlog=".$lastlog." lastusergetrights=".$lastusergetrights."\n";
-	WriteLog("update user=".$user["name"]." lastedit=".$lastedit." lastlog=".$lastlog." lastusergetrights=".$lastusergetrights);
+	echo " update lastedit=" . $lastedit . " lastlog=" . $lastlog . " lastusergetrights=" . $lastusergetrights . "\n";
+	WriteLog("update user=" . $user["name"] . " lastedit=" . $lastedit . " lastlog=" . $lastlog . " lastusergetrights=" . $lastusergetrights);
 }
 
-$spendtime = (microtime(true)-$starttime);
-echo "spend ".$spendtime." s.\n";
+$spendtime = (microtime(true) - $starttime);
+echo "spend " . $spendtime . " s.\n";

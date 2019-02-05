@@ -1,5 +1,5 @@
 <?php
-require(__DIR__."/../config/config.php");
+require __DIR__ . "/../config/config.php";
 if (!in_array(PHP_SAPI, $C["allowsapi"])) {
 	exit("No permission");
 }
@@ -7,34 +7,34 @@ if (!in_array(PHP_SAPI, $C["allowsapi"])) {
 set_time_limit(600);
 date_default_timezone_set('UTC');
 $starttime = microtime(true);
-@include(__DIR__."/config.php");
-require(__DIR__."/../function/curl.php");
-require(__DIR__."/../function/login.php");
-require(__DIR__."/../function/edittoken.php");
+@include __DIR__ . "/config.php";
+require __DIR__ . "/../function/curl.php";
+require __DIR__ . "/../function/login.php";
+require __DIR__ . "/../function/edittoken.php";
 
 function purge($page) {
-	echo "purge ".$page."\n";
+	echo "purge " . $page . "\n";
 	global $edittoken, $C;
 
 	$starttimestamp = time();
-	$res = cURL($C["wikiapi"]."?".http_build_query(array(
+	$res = cURL($C["wikiapi"] . "?" . http_build_query(array(
 		"action" => "query",
 		"prop" => "revisions",
 		"format" => "json",
 		"rvprop" => "content|timestamp",
-		"titles" => $page
+		"titles" => $page,
 	)));
 	if ($res === false) {
 		exit("fetch page fail\n");
 	}
 	$res = json_decode($res, true);
 	if (!isset($res["query"]["pages"])) {
-		echo $page." not found!\n";
+		echo $page . " not found!\n";
 		return;
 	}
 	$pages = current($res["query"]["pages"]);
 	if (isset($pages["missing"])) {
-		echo $page." not found!\n";
+		echo $page . " not found!\n";
 		return;
 	}
 	$text = $pages["revisions"][0]["*"];
@@ -50,13 +50,13 @@ function purge($page) {
 		"minor" => "",
 		"nocreate" => "",
 		"starttimestamp" => $starttimestamp,
-		"basetimestamp" => $basetimestamp
+		"basetimestamp" => $basetimestamp,
 	);
 	if (!$C["test"]) {
 		$res = cURL($C["wikiapi"], $post);
 	} else {
 		$res = false;
-		file_put_contents(__DIR__."/out.txt", $text);
+		file_put_contents(__DIR__ . "/out.txt", $text);
 	}
 	$res = json_decode($res, true);
 	if (isset($res["error"])) {
@@ -73,12 +73,12 @@ if ($options === false) {
 	exit("parse parameter failed\n");
 }
 
-echo "The time now is ".date("Y-m-d H:i:s")." (UTC)\n";
+echo "The time now is " . date("Y-m-d H:i:s") . " (UTC)\n";
 
 if (isset($options["target"])) {
 	$target = $options["target"];
 	if (!isset($C["target"][$target])) {
-		exit("target not accepted: ".implode("、", array_keys($C["target"]))."\n");
+		exit("target not accepted: " . implode("、", array_keys($C["target"])) . "\n");
 	}
 	foreach ($C["target"][$target] as $key => $value) {
 		$C[$key] = $value;
@@ -91,8 +91,8 @@ if (isset($options["sleep"])) {
 login("user");
 $edittoken = edittoken();
 
-echo "wikiapi = ".$C["wikiapi"]."\n";
-echo "sleep = ".$C["sleep"]."\n";
+echo "wikiapi = " . $C["wikiapi"] . "\n";
+echo "sleep = " . $C["sleep"] . "\n";
 
 if (!isset($options["p"]) && !isset($options["c"]) && !isset($options["t"])) {
 	echo "no options given, input pages:\n";
@@ -102,7 +102,7 @@ if (!isset($options["p"]) && !isset($options["c"]) && !isset($options["t"])) {
 		if ($line === "") {
 			break;
 		}
-		$options["p"] []= $line;
+		$options["p"][] = $line;
 	}
 }
 if (isset($options["p"])) {
@@ -119,15 +119,15 @@ if (isset($options["t"])) {
 	}
 	foreach ($options["t"] as $template) {
 		if (!preg_match("/^(t|template|模板)?:/i", $template)) {
-			$template = "Template:".$template;
+			$template = "Template:" . $template;
 		}
-		echo "template ".$template."\n";
-		$res = cURL($C["wikiapi"]."?".http_build_query(array(
+		echo "template " . $template . "\n";
+		$res = cURL($C["wikiapi"] . "?" . http_build_query(array(
 			"action" => "query",
 			"format" => "json",
 			"list" => "embeddedin",
 			"eititle" => $template,
-			"eilimit" => "max"
+			"eilimit" => "max",
 		)));
 		if ($res === false) {
 			exit("fetch page fail\n");
@@ -146,15 +146,15 @@ if (isset($options["c"])) {
 	}
 	foreach ($options["c"] as $category) {
 		if (!preg_match("/^(cat|category|分類|分类):/i", $category)) {
-			$category = "Category:".$category;
+			$category = "Category:" . $category;
 		}
-		echo "category ".$category."\n";
-		$res = cURL($C["wikiapi"]."?".http_build_query(array(
+		echo "category " . $category . "\n";
+		$res = cURL($C["wikiapi"] . "?" . http_build_query(array(
 			"action" => "query",
 			"format" => "json",
 			"list" => "categorymembers",
 			"cmtitle" => $category,
-			"cmlimit" => "max"
+			"cmlimit" => "max",
 		)));
 		if ($res === false) {
 			exit("fetch page fail\n");

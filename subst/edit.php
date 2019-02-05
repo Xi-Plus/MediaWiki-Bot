@@ -1,5 +1,5 @@
 <?php
-require(__DIR__."/../config/config.php");
+require __DIR__ . "/../config/config.php";
 if (!in_array(PHP_SAPI, $C["allowsapi"])) {
 	exit("No permission");
 }
@@ -7,19 +7,19 @@ if (!in_array(PHP_SAPI, $C["allowsapi"])) {
 set_time_limit(600);
 date_default_timezone_set('UTC');
 $starttime = microtime(true);
-@include(__DIR__."/config.php");
-require(__DIR__."/../function/curl.php");
-require(__DIR__."/../function/login.php");
-require(__DIR__."/../function/edittoken.php");
+@include __DIR__ . "/config.php";
+require __DIR__ . "/../function/curl.php";
+require __DIR__ . "/../function/login.php";
+require __DIR__ . "/../function/edittoken.php";
 
-echo "The time now is ".date("Y-m-d H:i:s")." (UTC)\n";
+echo "The time now is " . date("Y-m-d H:i:s") . " (UTC)\n";
 
-$nexttime = file_get_contents(__DIR__."/nexttime.txt");
+$nexttime = file_get_contents(__DIR__ . "/nexttime.txt");
 if ($nexttime === false) {
 	exit("read nexttime fail\n");
 }
 if (time() < $nexttime) {
-	exit("next edit is ".date("Y-m-d H:i:s", $nexttime).", not yet\n");
+	exit("next edit is " . date("Y-m-d H:i:s", $nexttime) . ", not yet\n");
 }
 
 login();
@@ -27,10 +27,10 @@ $edittoken = edittoken();
 
 $month = date("n");
 $date = date("j");
-$tag_timestamp = mktime(0, 0, 0, $month, $date)+86400*7;
-echo "tag ".$month."月".$date."日 (timestamp > ".$tag_timestamp.")\n";
+$tag_timestamp = mktime(0, 0, 0, $month, $date) + 86400 * 7;
+echo "tag " . $month . "月" . $date . "日 (timestamp > " . $tag_timestamp . ")\n";
 
-$pagelist = file_get_contents(__DIR__."/input.txt");
+$pagelist = file_get_contents(__DIR__ . "/input.txt");
 if ($pagelist === false) {
 	exit("read input fail\n");
 }
@@ -38,20 +38,20 @@ $pagelist = str_replace("\r\n", "\n", $pagelist);
 $pagelist = explode("\n", $pagelist);
 
 $count = rand(2, 3);
-echo "edit ".$count." pages\n";
+echo "edit " . $count . " pages\n";
 
-for ($j=0; $j < $count; $j++) { 
-	for ($i=$C["fail_retry"]; $i > 0; $i--) {
+for ($j = 0; $j < $count; $j++) {
+	for ($i = $C["fail_retry"]; $i > 0; $i--) {
 		$page = $pagelist[$j];
-		echo "edit ".$page."\n";
+		echo "edit " . $page . "\n";
 
 		$starttimestamp = time();
-		$res = cURL($C["wikiapi"]."?".http_build_query(array(
+		$res = cURL($C["wikiapi"] . "?" . http_build_query(array(
 			"action" => "query",
 			"prop" => "revisions",
 			"format" => "json",
 			"rvprop" => "content|timestamp",
-			"titles" => $page
+			"titles" => $page,
 		)));
 		if ($res === false) {
 			echo "fetch page fail\n";
@@ -70,7 +70,7 @@ for ($j=0; $j < $count; $j++) {
 		echo "start edit\n";
 
 		echo "edit main page\n";
-		$summary = $C["summary_prefix"]."處理未subst的{{CopyvioNotice}}";
+		$summary = $C["summary_prefix"] . "處理未subst的{{CopyvioNotice}}";
 		$post = array(
 			"action" => "edit",
 			"format" => "json",
@@ -80,11 +80,15 @@ for ($j=0; $j < $count; $j++) {
 			"token" => $edittoken,
 			"minor" => "",
 			"starttimestamp" => $starttimestamp,
-			"basetimestamp" => $basetimestamp
+			"basetimestamp" => $basetimestamp,
 		);
-		echo "edit ".$page." summary=".$summary."\n";
-		if (!$C["test"]) $res = cURL($C["wikiapi"], $post);
-		else $res = false;
+		echo "edit " . $page . " summary=" . $summary . "\n";
+		if (!$C["test"]) {
+			$res = cURL($C["wikiapi"], $post);
+		} else {
+			$res = false;
+		}
+
 		$res = json_decode($res, true);
 		if (isset($res["error"])) {
 			echo "edit fail\n";
@@ -100,11 +104,11 @@ for ($j=0; $j < $count; $j++) {
 	}
 }
 
-file_put_contents(__DIR__."/input.txt", implode("\n", $pagelist));
+file_put_contents(__DIR__ . "/input.txt", implode("\n", $pagelist));
 
-$nexttime = time()+60*rand(8, 15);
-file_put_contents(__DIR__."/nexttime.txt", $nexttime);
-echo "next edit: ".date("Y-m-d H:i:s", $nexttime)."\n";
+$nexttime = time() + 60 * rand(8, 15);
+file_put_contents(__DIR__ . "/nexttime.txt", $nexttime);
+echo "next edit: " . date("Y-m-d H:i:s", $nexttime) . "\n";
 
-$spendtime = (microtime(true)-$starttime);
-echo "spend ".$spendtime." s.\n";
+$spendtime = (microtime(true) - $starttime);
+echo "spend " . $spendtime . " s.\n";

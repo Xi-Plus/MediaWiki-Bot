@@ -1,13 +1,13 @@
 <?php
-require_once(__DIR__.'/curl.php');
+require_once __DIR__ . '/curl.php';
 
 function getPage($api, $title) {
-	$res = cURL($api."?".http_build_query(array(
+	$res = cURL($api . "?" . http_build_query(array(
 		"action" => "query",
 		"prop" => "revisions",
 		"format" => "json",
 		"rvprop" => "content|timestamp",
-		"titles" => $title
+		"titles" => $title,
 	)));
 	if ($res === false) {
 		return false;

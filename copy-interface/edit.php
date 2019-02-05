@@ -1,5 +1,5 @@
 <?php
-require(__DIR__."/../config/config.php");
+require __DIR__ . "/../config/config.php";
 if (!in_array(PHP_SAPI, $C["allowsapi"])) {
 	exit("No permission");
 }
@@ -7,10 +7,10 @@ if (!in_array(PHP_SAPI, $C["allowsapi"])) {
 set_time_limit(600);
 date_default_timezone_set('UTC');
 $starttime = microtime(true);
-@include(__DIR__."/config.php");
-require(__DIR__."/../function/curl.php");
-require(__DIR__."/../function/login.php");
-require(__DIR__."/../function/edittoken.php");
+@include __DIR__ . "/config.php";
+require __DIR__ . "/../function/curl.php";
+require __DIR__ . "/../function/login.php";
+require __DIR__ . "/../function/edittoken.php";
 
 $options = getopt("", ["target:", "summary:", "page:", "copy:"]);
 if ($options === false) {
@@ -19,13 +19,13 @@ if ($options === false) {
 if (isset($options["target"])) {
 	$target = $options["target"];
 	if (!isset($C["target"][$target])) {
-		exit("target not accepted: ".implode("、", array_keys($C["target"]))."\n");
+		exit("target not accepted: " . implode("、", array_keys($C["target"])) . "\n");
 	}
 	foreach ($C["target"][$target] as $key => $value) {
 		$C[$key] = $value;
 	}
 } else {
-	exit("target requireed: ".implode("、", array_keys($C["target"]))."\n");
+	exit("target requireed: " . implode("、", array_keys($C["target"])) . "\n");
 }
 if (isset($options["page"])) {
 	$page = $options["page"];
@@ -39,16 +39,16 @@ if (isset($options["copy"])) {
 	if (is_array($options["copy"])) {
 		foreach ($options["copy"] as $copy) {
 			if (!isset($C["target"][$target]["copylist"][$copy])) {
-				exit("--copy ".$copy." not found\n");
+				exit("--copy " . $copy . " not found\n");
 			} else {
-				$copylist[]= $copy;
+				$copylist[] = $copy;
 			}
 		}
 	} else {
 		if (!isset($C["target"][$target]["copylist"][$options["copy"]])) {
-			exit("--copy ".$options["copy"]." not found\n");
+			exit("--copy " . $options["copy"] . " not found\n");
 		} else {
-			$copylist[]= $options["copy"];
+			$copylist[] = $options["copy"];
 		}
 	}
 } else {
@@ -57,29 +57,29 @@ if (isset($options["copy"])) {
 if (isset($options["summary"])) {
 	$C["summary_prefix"] = $options["summary"];
 }
-echo "target = ".$C["wikiapi"]."\n";
-echo "page = ".$page."\n";
+echo "target = " . $C["wikiapi"] . "\n";
+echo "page = " . $page . "\n";
 
-login($C["bot"]?"bot":"user");
+login($C["bot"] ? "bot" : "user");
 $edittoken = edittoken();
 
-echo "The time now is ".date("Y-m-d H:i:s")." (UTC)\n";
+echo "The time now is " . date("Y-m-d H:i:s") . " (UTC)\n";
 
 $exist = [];
 $summarylist = [];
 foreach ($copylist as $copy) {
-	echo "copylist: ".$copy."\n\n";
+	echo "copylist: " . $copy . "\n\n";
 	foreach ($C["target"][$target]["copylist"][$copy] as $temp) {
 		$from = $temp[0];
 		$to = $temp[1];
-		echo "copy ".$from." to ".$to."\n";
+		echo "copy " . $from . " to " . $to . "\n";
 		if (!isset($exist[$from])) {
-			$res = cURL($C["wikiapi"]."?".http_build_query(array(
+			$res = cURL($C["wikiapi"] . "?" . http_build_query(array(
 				"action" => "query",
 				"prop" => "revisions",
 				"format" => "json",
 				"rvprop" => "timestamp|comment",
-				"titles" => "Mediawiki:".$page.$from
+				"titles" => "Mediawiki:" . $page . $from,
 			)));
 			$res = json_decode($res, true);
 			$pages = current($res["query"]["pages"]);
@@ -92,27 +92,27 @@ foreach ($copylist as $copy) {
 		}
 		if ($exist[$from] === true) {
 			$summary = $summarylist[$from];
-			$topage = "Mediawiki:".$page.$to;
-			$text = "{{subst:msgnw:MediaWiki:".$page.$from."}}";
+			$topage = "Mediawiki:" . $page . $to;
+			$text = "{{subst:msgnw:MediaWiki:" . $page . $from . "}}";
 			$post = array(
 				"action" => "edit",
 				"format" => "json",
 				"title" => $topage,
 				"summary" => $summary,
 				"text" => $text,
-				"token" => $edittoken
+				"token" => $edittoken,
 			);
 			if (isset($C["bot"])) {
 				$post["bot"] = "";
 			}
-			echo "edit ".$topage."\n";
-			echo "summary = ".$summary."\n";
-			echo "text = ".$text."\n";
+			echo "edit " . $topage . "\n";
+			echo "summary = " . $summary . "\n";
+			echo "text = " . $text . "\n";
 			if (!$C["test"]) {
 				$res = cURL($C["wikiapi"], $post);
 			} else {
 				$res = false;
-				file_put_contents(__DIR__."/out.txt", $text);
+				file_put_contents(__DIR__ . "/out.txt", $text);
 			}
 			$res = json_decode($res, true);
 			if (isset($res["error"])) {
@@ -120,7 +120,7 @@ foreach ($copylist as $copy) {
 				var_dump($res["error"]);
 			}
 		} else {
-			echo "Mediawiki:".$page.$from." not exist\n";
+			echo "Mediawiki:" . $page . $from . " not exist\n";
 		}
 		echo "\n";
 	}

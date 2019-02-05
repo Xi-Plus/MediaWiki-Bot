@@ -13,6 +13,6 @@ $C["User-Agent"] = "User:A2093064-bot user-name-check";
 
 $C["DBTBprefix"] = "ActiveUser";
 
-$C["cookiefile"] = __DIR__."/../tmp/user-name-check-cookie.txt";
+$C["cookiefile"] = __DIR__ . "/../tmp/user-name-check-cookie.txt";
 
-$G["db"] = new PDO ('mysql:host='.$C["DBhost"].';dbname='.$C["DBname"].';charset=utf8mb4', $C["DBuser"], $C["DBpass"]);
+$G["db"] = new PDO('mysql:host=' . $C["DBhost"] . ';dbname=' . $C["DBname"] . ';charset=utf8mb4', $C["DBuser"], $C["DBpass"]);

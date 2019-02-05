@@ -12,4 +12,4 @@ $C["summary_prefix"] = "[[User:A2093064-bot/task/3|機器人3]]";
 
 $C["User-Agent"] = "User:A2093064-bot copyright-violation-add-section";
 
-$C["cookiefile"] = __DIR__."/../tmp/copyright-violation-add-section-cookie.txt";
+$C["cookiefile"] = __DIR__ . "/../tmp/copyright-violation-add-section-cookie.txt";

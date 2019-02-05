@@ -19,4 +19,4 @@ $C["summary_config_page"] = "[[User:A2093064-bot/task/1/config|門檻]]";
 
 $C["User-Agent"] = "User:A2093064-bot spam-blacklist-archive";
 
-$C["cookiefile"] = __DIR__."/../tmp/spam-blacklist-archive-cookie.txt";
+$C["cookiefile"] = __DIR__ . "/../tmp/spam-blacklist-archive-cookie.txt";

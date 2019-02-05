@@ -12,4 +12,4 @@ $C["summary_prefix"] = "[[User:A2093064-bot/task/5|機器人5]]";
 
 $C["User-Agent"] = "User:A2093064-bot remove-draft-copyvio";
 
-$C["cookiefile"] = __DIR__."/../tmp/remove-draft-copyvio-cookie.txt";
+$C["cookiefile"] = __DIR__ . "/../tmp/remove-draft-copyvio-cookie.txt";

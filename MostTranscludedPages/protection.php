@@ -1,5 +1,5 @@
 <?php
-require(__DIR__."/../config/config.php");
+require __DIR__ . "/../config/config.php";
 if (!in_array(PHP_SAPI, $C["allowsapi"])) {
 	exit("No permission");
 }
@@ -7,12 +7,12 @@ if (!in_array(PHP_SAPI, $C["allowsapi"])) {
 set_time_limit(600);
 date_default_timezone_set('UTC');
 $starttime = microtime(true);
-@include(__DIR__."/config.php");
-require(__DIR__."/../function/curl.php");
-require(__DIR__."/../function/login.php");
-require(__DIR__."/../function/edittoken.php");
+@include __DIR__ . "/config.php";
+require __DIR__ . "/../function/curl.php";
+require __DIR__ . "/../function/login.php";
+require __DIR__ . "/../function/edittoken.php";
 
-echo "The time now is ".date("Y-m-d H:i:s")." (UTC)\n";
+echo "The time now is " . date("Y-m-d H:i:s") . " (UTC)\n";
 
 login("bot");
 $edittoken = edittoken();
@@ -25,14 +25,14 @@ $pages = [];
 foreach ($pagelist as $temp) {
 	$pages[$temp["title"]] = $temp;
 }
-echo "update ".count($pagelist)." pages\n";
+echo "update " . count($pagelist) . " pages\n";
 
 $pagelist = array_chunk($pagelist, 500, true);
 
 foreach ($pagelist as $pagelist2) {
 	$titles = [];
 	foreach ($pagelist2 as $page) {
-		$titles []= $page["title"];
+		$titles[] = $page["title"];
 	}
 	$titles = implode("|", $titles);
 
@@ -42,7 +42,7 @@ foreach ($pagelist as $pagelist2) {
 		"format" => "json",
 		"prop" => "info",
 		"titles" => $titles,
-		"inprop" => "protection"
+		"inprop" => "protection",
 	));
 	echo "fetched\n";
 	if ($res === false) {
@@ -54,7 +54,7 @@ foreach ($pagelist as $pagelist2) {
 	foreach ($results as $result) {
 		$title = $result["title"];
 		$protect = ["edit" => "", "move" => ""];
-		$redirect = (isset($result["redirect"])?1:0);
+		$redirect = (isset($result["redirect"]) ? 1 : 0);
 		foreach ($result["protection"] as $protection) {
 			$protect[$protection["type"]] = $protection["level"];
 		}
@@ -66,9 +66,9 @@ foreach ($pagelist as $pagelist2) {
 			$sth->bindValue(":redirect", $redirect);
 			$sth->bindValue(":time", date("Y-m-d H:i:s"));
 			$res = $sth->execute();
-			echo $result["title"]." edit=".$protect["edit"]." move=".$protect["move"]." ".($redirect?"(redirect)":"")."\n";
+			echo $result["title"] . " edit=" . $protect["edit"] . " move=" . $protect["move"] . " " . ($redirect ? "(redirect)" : "") . "\n";
 			if ($res === false) {
-				echo $sth->errorInfo()[2]."\n";
+				echo $sth->errorInfo()[2] . "\n";
 			}
 		} else {
 			$sth = $G["db"]->prepare("UPDATE `{$C['DBTBprefix']}page` SET `time` = :time WHERE `title` = :title");
@@ -79,5 +79,5 @@ foreach ($pagelist as $pagelist2) {
 	}
 }
 
-$spendtime = (microtime(true)-$starttime);
-echo "spend ".$spendtime." s.\n";
+$spendtime = (microtime(true) - $starttime);
+echo "spend " . $spendtime . " s.\n";

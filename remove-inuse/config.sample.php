@@ -8,4 +8,4 @@ $C["pass"] = "";
 
 $C["User-Agent"] = "User:A2093064-bot remove-inuse";
 
-$C["cookiefile"] = __DIR__."/../tmp/remove-inuse-cookie.txt";
+$C["cookiefile"] = __DIR__ . "/../tmp/remove-inuse-cookie.txt";

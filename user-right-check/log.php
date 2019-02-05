@@ -5,15 +5,15 @@
 </head>
 <body>
 <?php
-require(__DIR__."/../config/config.php");
+require __DIR__ . "/../config/config.php";
 date_default_timezone_set('UTC');
-@include(__DIR__."/config.php");
+@include __DIR__ . "/config.php";
 
 $limit = 25;
 if (isset($_GET["limit"]) && is_numeric($_GET["limit"])) {
-	$limit = (int)$_GET["limit"];
+	$limit = (int) $_GET["limit"];
 }
-$sth = $G["db"]->prepare("SELECT * FROM `{$C['DBTBprefix']}log` ORDER BY `time` DESC LIMIT ".$limit);
+$sth = $G["db"]->prepare("SELECT * FROM `{$C['DBTBprefix']}log` ORDER BY `time` DESC LIMIT " . $limit);
 $sth->execute();
 $sth->execute();
 $row = $sth->fetchAll(PDO::FETCH_ASSOC);
