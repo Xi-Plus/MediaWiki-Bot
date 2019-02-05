@@ -72,7 +72,12 @@ for ($i=$C["fail_retry"]; $i > 0; $i--) {
 	unset($text[0]);
 	echo "find ".count($text)." reports\n";
 
-	$archive_count = 0;
+	$archive_count = [
+		"sum" => 0,
+		"blocked" => 0,
+		"tagged" => 0,
+		"timeout" => 0,
+	];
 	foreach ($text as $temp) {
 		$temp = trim($temp);
 		$blocked = false;
@@ -122,35 +127,50 @@ for ($i=$C["fail_retry"]; $i > 0; $i--) {
 		echo date("Y/m/d H:i", $starttime)."\t";
 		echo date("Y/m/d H:i", $lasttime)."\t";
 
+		$archive_type = null;
 		if (
-			(
-				$blocked
-				&& time()-$lasttime > $cfg["time_to_live_for_blocked"])
-			|| (
-				$tagged
-				&& time() - $lasttime > $cfg["time_to_live_for_tagged"]
-			) || (
-				!$blocked
-				&& time()-$lasttime > $cfg["time_to_live_for_not_blocked"]
-				&& time()-$starttime > $cfg["minimum_time_to_live_for_not_blocked"])
+			$blocked
+			&& time() - $lasttime > $cfg["time_to_live_for_blocked"]
 		) {
+			$archive_type = "blocked";
+		} else if (
+			$tagged
+			&& time() - $lasttime > $cfg["time_to_live_for_tagged"]
+		) {
+			$archive_type = "tagged";
+		} else if (
+			!$blocked
+			&& time() - $lasttime > $cfg["time_to_live_for_not_blocked"]
+			&& time() - $starttime > $cfg["minimum_time_to_live_for_not_blocked"]
+		) {
+			$archive_type = "timeout";
+		}
+
+		if (is_string($archive_type)) {
 			echo "archive\n";
 			$newpagetext .= "\n".$temp;
 			$archive_count++;
+			$archive_count["sum"]++;
 		} else {
 			echo "not archive\n";
-			$oldpagetext .= "\n".$temp;
+			$oldpagetext .= "\n" . $temp;
 		}
 	}
 
-	if ($archive_count === 0) {
+	if ($archive_count["sum"] === 0) {
 		exit("no change\n");
 	}
 
 	echo "start edit\n";
 
 	echo "edit main page\n";
-	$summary = sprintf($cfg["main_page_summary"], $archive_count);
+	$summary_append = [];
+	foreach ($cfg["summary_append"] as $type => $_) {
+		if ($archive_count[$type] > 0) {
+			$summary_append[] = sprintf($cfg["summary_append"][$type], $archive_count[$type]);
+		}
+	}
+	$summary = sprintf($cfg["main_page_summary"], $archive_count["sum"], implode("、", $summary_append));
 	$post = array(
 		"action" => "edit",
 		"format" => "json",
@@ -217,7 +237,7 @@ for ($i=$C["fail_retry"]; $i > 0; $i--) {
 
 	$text = preg_replace("/\n{3,}/", "\n\n", $oldtext);
 
-	$summary = sprintf($cfg["archive_page_summary"], $archive_count);
+	$summary = sprintf($cfg["archive_page_summary"], $archive_count["sum"]);
 	$post = array(
 		"action" => "edit",
 		"format" => "json",
