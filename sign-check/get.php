@@ -31,16 +31,16 @@ echo "fetch from web\n";
 $text = file_get_contents($C["quarry"]);
 if ($text === false) {
 	echo "fetch fail\n";
-	continue;
+	exit;
 }
 if (!preg_match('/"qrun_id": (\d+),/', $text, $m)) {
 	echo "match fail\n";
-	continue;
+	exit;
 }
 $text = file_get_contents("https://quarry.wmflabs.org/run/".$m[1]."/output/0/json");
 if ($text === false) {
 	echo "fetch fail\n";
-	continue;
+	exit;
 }
 $text = json_decode($text, true);
 $data = $text["rows"];
