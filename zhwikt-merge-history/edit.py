@@ -35,22 +35,23 @@ for targetPage in site.categorymembers(cat):
 
     print('Merging history from {} to {}'.format(sourceTitle, targetTitle))
 
+    sourcePage = pywikibot.Page(site, sourceTitle)
+
+    targetText = re.sub(
+        r'\{\{\s*(Histmerge|History[ _]merge)\s*(\|(?:\{\{[^{}]*\}\}|[^{}])*)?\}\}\s*', '', targetText, flags=re.I)
+
+    sourcePage.text = targetText
+    print('Editing {}'.format(sourceTitle))
+    sourcePage.save(summary='準備進行合併歷史', minor=False)
+
     print('Deleting {}'.format(targetTitle))
     targetPage.delete(reason='[[Wiktionary:CSD|G8]]: 刪除以便移動', prompt=False)
 
-    sourcePage = pywikibot.Page(site, sourceTitle)
     print('Moving {} to {}'.format(sourceTitle, targetTitle))
     sourcePage.move(targetTitle, reason='合併歷史', movetalk=True,
                     sysop=True, noredirect=True)
 
     print('Undeleting {}'.format(targetTitle))
     targetPage.undelete(reason='合併歷史')
-
-    targetText = re.sub(
-        r'\{\{\s*(Histmerge|History[ _]merge)\s*(\|(?:\{\{[^{}]*\}\}|[^{}])*)?\}\}\s*', '', targetText, flags=re.I)
-
-    targetPage.text = targetText
-    print('Editing {}'.format(targetTitle))
-    targetPage.save(summary='合併歷史', minor=False)
 
     cnt += 1
