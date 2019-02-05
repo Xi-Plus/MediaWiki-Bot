@@ -76,6 +76,7 @@ for ($i=$C["fail_retry"]; $i > 0; $i--) {
 	foreach ($text as $temp) {
 		$temp = trim($temp);
 		$blocked = false;
+		$tagged = false;
 		$starttime = time();
 		$lasttime = 0;
 		if (preg_match("/{{user-uaa\|(?:1=)?(.+?)}}/", $temp, $m)) {
@@ -96,6 +97,9 @@ for ($i=$C["fail_retry"]; $i > 0; $i--) {
 				$blocked = true;
 				$lasttime = strtotime($res["query"]["users"][0]["blockedtimestamp"]);
 			}
+			if (preg_match($cfg["tagged_regex"], $temp)) {
+				$tagged = true;
+			}
 		} else  if (preg_match("/^\* *{{deltalk|/i", $temp)) {
 			echo "Deltalk\t";
 			$blocked = true;
@@ -103,6 +107,7 @@ for ($i=$C["fail_retry"]; $i > 0; $i--) {
 			echo "Unknown user\t";
 		}
 		echo ($blocked?"blocked":"not blocked")."\t";
+		echo ($tagged?"tagged\t":"");
 
 		if (preg_match_all("/\d{4}年\d{1,2}月\d{1,2}日 \(.{3}\) \d{2}\:\d{2} \(UTC\)/", $temp, $m)) {
 			foreach ($m[0] as $timestr) {
@@ -122,6 +127,9 @@ for ($i=$C["fail_retry"]; $i > 0; $i--) {
 				$blocked
 				&& time()-$lasttime > $cfg["time_to_live_for_blocked"])
 			|| (
+				$tagged
+				&& time() - $lasttime > $cfg["time_to_live_for_tagged"]
+			) || (
 				!$blocked
 				&& time()-$lasttime > $cfg["time_to_live_for_not_blocked"]
 				&& time()-$starttime > $cfg["minimum_time_to_live_for_not_blocked"])
