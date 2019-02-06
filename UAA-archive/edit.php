@@ -149,7 +149,7 @@ for ($i=$C["fail_retry"]; $i > 0; $i--) {
 		if (is_string($archive_type)) {
 			echo "archive\n";
 			$newpagetext .= "\n".$temp;
-			$archive_count++;
+			$archive_count[$archive_type]++;
 			$archive_count["sum"]++;
 		} else {
 			echo "not archive\n";
