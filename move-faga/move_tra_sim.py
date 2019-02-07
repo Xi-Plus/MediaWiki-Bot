@@ -30,7 +30,10 @@ with open('list.csv', 'r') as f:
             if re.search(r'^Wikipedia:优良条目/\d+年\d+月\d+日$', backlink.title()):
                 print(backlink.title())
                 text = backlink.text
-                text = text.replace('{{Wikipedia:優良條目/', '{{Wikipedia:优良条目/')
+                if re.search(r'Wikipedia:優良條目/s', text):
+                    print('skip')
+                    continue
+                text = re.sub(r'{{(Wikipedia|维基百科):優良條目/', '{{Wikipedia:优良条目/', text)
 
                 pywikibot.showDiff(backlink.text, text)
 
