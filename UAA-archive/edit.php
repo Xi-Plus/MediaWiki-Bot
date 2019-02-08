@@ -76,7 +76,7 @@ for ($i = $C["fail_retry"]; $i > 0; $i--) {
 	$hash = md5(uniqid(rand(), true));
 	$text = preg_replace("/^(\*\s*{{\s*user-uaa\s*\|)/mi", $hash . "$1", $text);
 	$text = explode($hash, $text);
-	$oldpagetext = $text[0];
+	$oldpagetext = trim($text[0]);
 	$newpagetext = "";
 	unset($text[0]);
 	echo "find " . count($text) . " reports\n";
@@ -168,7 +168,7 @@ for ($i = $C["fail_retry"]; $i > 0; $i--) {
 			$archive_count["sum"]++;
 		} else {
 			echo "not archive\n";
-			$oldpagetext .= "\n" . $temp;
+			$oldpagetext .= "\n\n" . $temp;
 		}
 	}
 
