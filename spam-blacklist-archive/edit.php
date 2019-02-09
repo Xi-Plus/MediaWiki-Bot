@@ -139,7 +139,7 @@ for ($i = $C["fail_retry"]; $i > 0; $i--) {
 			$oldpagetext .= $temp;
 			echo "not archive (EP)\t";
 		} else if (time() - $lasttime > $retention_time || $pagesize > $retention_bytes) {
-			$date = date("Y年n月j日", $firsttime);
+			$date = date("Y年", $firsttime);
 			if (!isset($newpagetext[$date])) {
 				$newpagetext[$date] = "";
 				$archive_count[$date] = 0;
