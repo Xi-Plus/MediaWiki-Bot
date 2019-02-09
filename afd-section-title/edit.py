@@ -60,7 +60,7 @@ def appendComment(text, mode):
 
 
 def fix(pagename):
-    if not pagename.startswith("Wikipedia:頁面存廢討論/記錄/"):
+    if re.search(r'\d{4}/\d{2}/\d{2}', pagename):
         pagename = "Wikipedia:頁面存廢討論/記錄/" + pagename
 
     print("-"*50)
