@@ -32,7 +32,7 @@ rndstr = hashlib.md5(str(time.time()).encode()).hexdigest()
 text = re.sub(r'^(===[^=]+===)$', rndstr + r'\1', text, flags=re.M)
 text = text.split(rndstr)
 
-mainPageText = text[0]
+mainPageText = text[0].strip()
 text = text[1:]
 
 archivelist = {}
