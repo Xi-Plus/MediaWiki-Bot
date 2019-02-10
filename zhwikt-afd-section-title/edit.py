@@ -13,6 +13,11 @@ from config import *
 site = pywikibot.Site()
 site.login()
 
+config_page = pywikibot.Page(site, config_page_name)
+cfg = config_page.text
+cfg = json.loads(cfg)
+print(json.dumps(cfg, indent=4, ensure_ascii=False))
+
 if not cfg["enable"]:
 	exit("disabled\n")
 
