@@ -6,9 +6,9 @@ import re
 import time
 from datetime import datetime
 
+os.environ['PYWIKIBOT2_DIR'] = os.path.dirname(os.path.realpath(__file__))
 import pywikibot
 
-os.environ['PYWIKIBOT2_DIR'] = os.path.dirname(os.path.realpath(__file__))
 os.environ['TZ'] = 'UTC'
 
 site = pywikibot.Site()
