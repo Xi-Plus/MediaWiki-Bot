@@ -304,6 +304,8 @@ for page in site.categorymembers(cat):
         skipfile.write(pagetitle + "\n")
         continue
 
+    text = re.sub(r'(\|align=center\|)<br ?/?>', r'\1', text)
+
     pywikibot.showDiff(page.text, text)
 
     summary = []
