@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
-import os
-import pywikibot
 import json
+import os
 import re
-from config import *
 
+import pywikibot
+
+from config import *
 
 os.environ["PYWIKIBOT2_DIR"] = os.path.dirname(os.path.realpath(__file__))
 os.environ["TZ"] = "UTC"
@@ -28,16 +29,18 @@ with open("skipedpage.txt", "r") as f:
     skippages = f.read()
 skipfile = open("skipedpage.txt", "a")
 
+
 def checkImageExists(title):
-    image = pywikibot.Page(site, title)
+    image = pywikibot.FilePage(site, title)
     if image.exists():
         return True
     try:
         if image.fileIsShared():
             return True
-    except Exception as e:
+    except Exception:
         pass
     return False
+
 
 def followMove(title, commons=False):
     if commons:
@@ -53,10 +56,11 @@ def followMove(title, commons=False):
             "list": "logevents",
             "letype": "move",
             "lelimit": "1"
-            }).submit()
+        }).submit()
         if len(data["query"]["logevents"]) > 0:
             movelog = data["query"]["logevents"][0]
-            movelog["params"]["target_title_without_ns"] = pywikibot.Page(site, movelog["params"]["target_title"]).titleWithoutNamespace()
+            movelog["params"]["target_title_without_ns"] = pywikibot.Page(
+                site, movelog["params"]["target_title"]).titleWithoutNamespace()
             logs.append(movelog)
             title = movelog["params"]["target_title"]
 
@@ -68,6 +72,7 @@ def followMove(title, commons=False):
         else:
             break
     return logs
+
 
 cnt = 1
 for page in site.categorymembers(cat):
@@ -91,7 +96,8 @@ for page in site.categorymembers(cat):
             image_fullname = image.title()
             imagename = image.title(with_ns=False)
 
-            imageregex = "[" + imagename[0].upper() + imagename[0].lower() + "]" + re.escape(imagename[1:])
+            imageregex = "[" + imagename[0].upper() + \
+                imagename[0].lower() + "]" + re.escape(imagename[1:])
             imageregex = imageregex.replace("\\ ", "[ _]")
 
             # comment_other start
@@ -105,12 +111,15 @@ for page in site.categorymembers(cat):
                 print("{} exist on {}".format(image_fullname, existother))
 
                 for regex_type in cfg["regex"]:
-                    regex = cfg["regex"][regex_type]["pattern"].format(imageregex)
-                    replace = cfg["regex"][regex_type]["replace"]["comment_other"].format(cfg["check_other_wiki"][existother])
+                    regex = cfg["regex"][regex_type]["pattern"].format(
+                        imageregex)
+                    replace = cfg["regex"][regex_type]["replace"]["comment_other"].format(
+                        cfg["check_other_wiki"][existother])
 
                     text = re.sub(regex, replace, text, flags=re.M)
 
-                summary_comment.append(cfg["summary"]["comment_other"].format(imagename, existother))
+                summary_comment.append(
+                    cfg["summary"]["comment_other"].format(imagename, existother))
 
                 continue
             # coment_other end
@@ -122,16 +131,19 @@ for page in site.categorymembers(cat):
                     print("File:{} moved".format(imagename))
 
                     for regex_type in cfg["regex"]:
-                        regex = cfg["regex"][regex_type]["pattern"].format(imageregex)
-                        replace = cfg["regex"][regex_type]["replace"]["moved"].format(movelog[-1]["params"]["target_title_without_ns"])
+                        regex = cfg["regex"][regex_type]["pattern"].format(
+                            imageregex)
+                        replace = cfg["regex"][regex_type]["replace"]["moved"].format(
+                            movelog[-1]["params"]["target_title_without_ns"])
 
                         text = re.sub(regex, replace, text, flags=re.M)
 
                     summary_temp = image_fullname
                     for log in movelog:
-                        summary_temp = cfg["summary"]["moved"].format(summary_temp, log["params"]["target_title_without_ns"], log["user"], log["logid"], log["comment"])
+                        summary_temp = cfg["summary"]["moved"].format(
+                            summary_temp, log["params"]["target_title_without_ns"], log["user"], log["logid"], log["comment"])
                     summary_moved.append(summary_temp)
-                    
+
                     continue
                 else:
                     image_fullname = movelog[-1]["params"]["target_title"]
@@ -150,7 +162,7 @@ for page in site.categorymembers(cat):
                 "list": "logevents",
                 "leaction": "delete/delete",
                 "lelimit": "1"
-                }).submit()
+            }).submit()
             if len(data["query"]["logevents"]) > 0:
                 deletelog = data["query"]["logevents"][0]
                 if re.search(cfg["ignored_csd_comment"], deletelog["comment"]):
@@ -166,7 +178,7 @@ for page in site.categorymembers(cat):
                     "list": "logevents",
                     "leaction": "delete/delete",
                     "lelimit": "1"
-                    }).submit()
+                }).submit()
                 if len(data["query"]["logevents"]) > 0:
                     deleted = True
                     deleted_commons = True
@@ -175,22 +187,26 @@ for page in site.categorymembers(cat):
             if deleted_comment or deleted:
                 summary_prefix = imagename
                 for log in movelog:
-                    summary_prefix = cfg["summary"]["moved_deleted"].format(summary_prefix, log["params"]["target_title_without_ns"], log["logid"])
+                    summary_prefix = cfg["summary"]["moved_deleted"].format(
+                        summary_prefix, log["params"]["target_title_without_ns"], log["logid"])
 
             if deleted_comment:
                 print("{} deleted by F6".format(image_fullname))
 
                 for regex_type in cfg["regex"]:
-                    regex = cfg["regex"][regex_type]["pattern"].format(imageregex)
+                    regex = cfg["regex"][regex_type]["pattern"].format(
+                        imageregex)
                     replace = cfg["regex"][regex_type]["replace"]["deleted_comment"]
 
                     text = re.sub(regex, replace, text, flags=re.M)
 
-                summary_comment.append(cfg["summary"]["deleted"]["local"].format(summary_prefix, deletelog["user"], deletelog["logid"], deletelog["comment"]))
+                summary_comment.append(cfg["summary"]["deleted"]["local"].format(
+                    summary_prefix, deletelog["user"], deletelog["logid"], deletelog["comment"]))
 
                 drv_page = pywikibot.Page(site, cfg["drv_page"])
                 drv_page_text = drv_page.text
-                drv_page_text += cfg["drv_append_text"].format(image_fullname, pagetitle, deletelog["user"], deletelog["comment"], deletelog["logid"])
+                drv_page_text += cfg["drv_append_text"].format(
+                    image_fullname, pagetitle, deletelog["user"], deletelog["comment"], deletelog["logid"])
                 pywikibot.showDiff(drv_page.text, drv_page_text)
                 summary = cfg["drv_summary"]
                 print("summary = {}".format(summary))
@@ -209,16 +225,20 @@ for page in site.categorymembers(cat):
                     print("{} deleted".format(image_fullname))
 
                 for regex_type in cfg["regex"]:
-                    regex = cfg["regex"][regex_type]["pattern"].format(imageregex)
+                    regex = cfg["regex"][regex_type]["pattern"].format(
+                        imageregex)
                     replace = cfg["regex"][regex_type]["replace"]["deleted"]
 
                     text = re.sub(regex, replace, text, flags=re.M)
 
                 if deleted_commons:
-                    comment = re.sub(r"\[\[([^\[\]]+?)]]", r"[[:c:\1]]", deletelog["comment"])
-                    summary_deleted.append(cfg["summary"]["deleted"]["commons"].format(imagename, deletelog["user"], deletelog["logid"], comment))
+                    comment = re.sub(r"\[\[([^\[\]]+?)]]",
+                                     r"[[:c:\1]]", deletelog["comment"])
+                    summary_deleted.append(cfg["summary"]["deleted"]["commons"].format(
+                        imagename, deletelog["user"], deletelog["logid"], comment))
                 else:
-                    summary_deleted.append(cfg["summary"]["deleted"]["local"].format(summary_prefix, deletelog["user"], deletelog["logid"], deletelog["comment"]))
+                    summary_deleted.append(cfg["summary"]["deleted"]["local"].format(
+                        summary_prefix, deletelog["user"], deletelog["logid"], deletelog["comment"]))
 
                 continue
 
@@ -233,7 +253,7 @@ for page in site.categorymembers(cat):
                 "list": "logevents",
                 "letype": "upload",
                 "lelimit": "1"
-                }).submit()
+            }).submit()
             if len(data["query"]["logevents"]) > 0:
                 uploaded = True
             if not uploaded:
@@ -243,7 +263,7 @@ for page in site.categorymembers(cat):
                     "list": "logevents",
                     "letype": "upload",
                     "lelimit": "1"
-                    }).submit()
+                }).submit()
                 if len(data["query"]["logevents"]) > 0:
                     uploaded = True
 
@@ -251,12 +271,14 @@ for page in site.categorymembers(cat):
                 print("{} never uploaded".format(image_fullname))
 
                 for regex_type in cfg["regex"]:
-                    regex = cfg["regex"][regex_type]["pattern"].format(imageregex)
+                    regex = cfg["regex"][regex_type]["pattern"].format(
+                        imageregex)
                     replace = cfg["regex"][regex_type]["replace"]["comment"]
 
                     text = re.sub(regex, replace, text, flags=re.M)
 
-                summary_comment.append(cfg["summary"]["comment"].format(imagename))
+                summary_comment.append(
+                    cfg["summary"]["comment"].format(imagename))
 
                 continue
 
@@ -276,11 +298,14 @@ for page in site.categorymembers(cat):
 
     summary = []
     if len(summary_comment):
-        summary.append(cfg["summary"]["prepend"]["comment"] + "、".join(summary_comment))
+        summary.append(cfg["summary"]["prepend"]
+                       ["comment"] + "、".join(summary_comment))
     if len(summary_moved):
-        summary.append(cfg["summary"]["prepend"]["moved"] + "、".join(summary_moved))
+        summary.append(cfg["summary"]["prepend"]
+                       ["moved"] + "、".join(summary_moved))
     if len(summary_deleted):
-        summary.append(cfg["summary"]["prepend"]["deleted"] + "、".join(summary_deleted))
+        summary.append(cfg["summary"]["prepend"]
+                       ["deleted"] + "、".join(summary_deleted))
     summary = cfg["summary"]["prepend"]["all"] + "；".join(summary)
     print("summary = {}".format(summary))
 
