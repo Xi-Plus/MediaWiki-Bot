@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import argparse
 import json
 import os
 import re
@@ -9,6 +10,11 @@ from config import *
 
 os.environ["PYWIKIBOT2_DIR"] = os.path.dirname(os.path.realpath(__file__))
 os.environ["TZ"] = "UTC"
+
+parser = argparse.ArgumentParser()
+parser.add_argument('--confirm', type=bool, default=False,)
+args = parser.parse_args()
+print(args)
 
 site = pywikibot.Site()
 site.login()
@@ -309,7 +315,10 @@ for page in site.categorymembers(cat):
     summary = cfg["summary"]["prepend"]["all"] + "；".join(summary)
     print("summary = {}".format(summary))
 
-    save = input("save?")
+    if args.confirm:
+        save = input("save?")
+    else:
+        save = "Yes"
     if save in ["Yes", "yes", "Y", "y"]:
         page.text = text
         page.save(summary=summary, minor=False, botflag=False)
