@@ -21,8 +21,8 @@ cfg = config_page.text
 cfg = json.loads(cfg)
 print(json.dumps(cfg, indent=4, ensure_ascii=False))
 
-if not cfg["enable"]:
-    exit("disabled\n")
+if not cfg['enable']:
+    exit('disabled\n')
 
 
 def converttitle(title):
@@ -30,8 +30,8 @@ def converttitle(title):
     r = Request(site=site, parameters={
         'action': 'query',
         'titles': title,
-        "redirects": 1,
-        "converttitles": 1
+        'redirects': 1,
+        'converttitles': 1
     })
     data = r.submit()
     title = list(data['query']['pages'].values())[0]['title']
@@ -85,10 +85,10 @@ def appendComment(text, mode):
 
 def fix(pagename):
     if re.search(r'\d{4}/\d{2}/\d{2}', pagename):
-        pagename = "Wikipedia:頁面存廢討論/記錄/" + pagename
+        pagename = 'Wikipedia:頁面存廢討論/記錄/' + pagename
 
-    print("-"*50)
-    print("running for "+pagename)
+    print('-' * 50)
+    print('running for ' + pagename)
 
     afdpage = pywikibot.Page(site, pagename)
     text = afdpage.text
@@ -101,16 +101,16 @@ def fix(pagename):
             continue
         title = str(section.get(0).title)
         print(secid, title)
-        if re.search(r"{{\s*(delh|TalkendH)\s*\|", str(section), re.IGNORECASE) != None:
-            print("  closed, skip")
+        if re.search(r'{{\s*(delh|TalkendH)\s*\|', str(section), re.IGNORECASE) != None:
+            print('  closed, skip')
             continue
 
-        m = re.search(r"^\[\[([^\]]+)\]\]$", title, re.IGNORECASE)
+        m = re.search(r'^\[\[([^\]]+)\]\]$', title, re.IGNORECASE)
         if m != None:
             title = m.group(1)
-            start = ""
-            if title[0] == ":":
-                start = ":"
+            start = ''
+            if title[0] == ':':
+                start = ':'
                 title = title[1:]
 
             mode = []
@@ -123,30 +123,30 @@ def fix(pagename):
             mode += convert['mode']
             print('    ', mode)
 
-            title = "[["+start+title+"]]"
+            title = '[[' + start + title + ']]'
 
             if str(section.get(0).title) != title:
-                if str(section.get(0).title).replace("_", " ") != title:
+                if str(section.get(0).title).replace('_', ' ') != title:
                     section.insert(
-                        1, "\n{{formerly|"+str(section.get(0).title)+"}}")
+                        1, '\n{{formerly|' + str(section.get(0).title) + '}}')
                     pass
-                print("  set new title = "+title)
+                print('  set new title = ' + title)
                 section.get(0).title = title
             newtext = appendComment(str(section), mode)
             changes.append([secid, newtext])
             continue
 
         m = re.search(
-            r"^(\[\[[^\]]+\]\][、，])+\[\[[^\]]+\]\]$", title, re.IGNORECASE)
+            r'^(\[\[[^\]]+\]\][、，])+\[\[[^\]]+\]\]$', title, re.IGNORECASE)
         if m != None:
-            titlelist = m.group(0).replace("]]，[[", "]]、[[").split("、")
+            titlelist = m.group(0).replace(']]，[[', ']]、[[').split('、')
             newtitlelist = []
             mode = []
             for title in titlelist:
-                if title.startswith("[[") and title.endswith("]]"):
+                if title.startswith('[[') and title.endswith(']]'):
                     title = title[2:-2]
 
-                    if title[0] == ":":
+                    if title[0] == ':':
                         title = title[1:]
 
                     convert = converttitle(title)
@@ -158,23 +158,23 @@ def fix(pagename):
 
                     newtitlelist.append(title)
                 else:
-                    print("  wrong title: "+title)
+                    print('  wrong title: ' + title)
                     return
-            title = "{{al|"+"|".join(newtitlelist)+"}}"
+            title = '{{al|' + '|'.join(newtitlelist) + '}}'
             if str(section.get(0).title) != title:
-                print("  set new title = "+title)
+                print('  set new title = ' + title)
                 section.get(0).title = title
             newtext = appendComment(str(section), mode)
             changes.append([section, newtext])
             continue
 
-        m = re.search(r"^{{al\|([^\]]+\|)+[^\]]+}}$", title, re.IGNORECASE)
+        m = re.search(r'^{{al\|([^\]]+\|)+[^\]]+}}$', title, re.IGNORECASE)
         if m != None:
-            titlelist = m.group(0)[5:-2].split("|")
+            titlelist = m.group(0)[5:-2].split('|')
             newtitlelist = []
             mode = []
             for title in titlelist:
-                if title[0] == ":":
+                if title[0] == ':':
                     title = title[1:]
 
                 convert = converttitle(title)
@@ -185,15 +185,15 @@ def fix(pagename):
                 mode += convert['mode']
 
                 newtitlelist.append(title)
-            title = "{{al|"+"|".join(newtitlelist)+"}}"
+            title = '{{al|' + '|'.join(newtitlelist) + '}}'
             if str(section.get(0).title) != title:
-                print("  set new title = "+title)
+                print('  set new title = ' + title)
                 section.get(0).title = title
             newtext = appendComment(str(section), mode)
             section.replace(section, newtext)
             continue
 
-        print("  unknown format, skip")
+        print('  unknown format, skip')
 
     for change in changes:
         wikicode = mwparserfromhell.parse(text)
@@ -203,11 +203,11 @@ def fix(pagename):
         text = str(wikicode)
 
     if re.sub(r'\s+', '', afdpage.text) == re.sub(r'\s+', '', text):
-        print("  nothing changed")
+        print('  nothing changed')
         return
 
     pywikibot.showDiff(afdpage.text, text)
-    summary = cfg["summary"]
+    summary = cfg['summary']
     print(summary)
     afdpage.text = text
     afdpage.save(summary=summary, minor=False)
@@ -217,8 +217,8 @@ if len(sys.argv) >= 2:
     pagename = sys.argv[1]
     fix(pagename)
 else:
-    print("run past {} days".format(cfg["run_past_days"]))
-    for delta in range(cfg["run_past_days"]):
+    print('run past {} days'.format(cfg['run_past_days']))
+    for delta in range(cfg['run_past_days']):
         rundate = datetime.now() - timedelta(days=delta)
         pagename = rundate.strftime('%Y/%m/%d')
         fix(pagename)
