@@ -44,14 +44,14 @@ def converttitle(title):
         mode.append('normalized')
     if 'redirects' not in mode:
         page = pywikibot.Page(site, title)
-        if page.exists() and re.search(r'{{\s*[vaictumr]fd', page.text):
+        if page.exists() and ('flow-workflow' in page.text or re.search(r'{{\s*[vaictumr]fd', page.text, flags=re.I)):
             mode.append('vfd_on_source')
     else:
         page = pywikibot.Page(site, oldtitle)
-        if page.exists() and re.search(r'{{\s*[vaictumr]fd', page.text):
+        if page.exists() and ('flow-workflow' in page.text or re.search(r'{{\s*[vaictumr]fd', page.text, flags=re.I)):
             mode.append('vfd_on_source')
         page = pywikibot.Page(site, title)
-        if page.exists() and re.search(r'{{\s*[vaictumr]fd', page.text):
+        if page.exists() and ('flow-workflow' in page.text or re.search(r'{{\s*[vaictumr]fd', page.text, flags=re.I)):
             mode.append('vfd_on_target')
     if not 'vfd_on_source' in mode and not 'vfd_on_target' in mode:
         mode.append('no_vfd')
@@ -60,18 +60,25 @@ def converttitle(title):
 
 def appendComment(text, mode):
     text = text.strip()
-    if 'fix' in mode:
-        comment = []
-        if 'redirects' in mode and isinstance(cfg['comment_fix']['redirects'], str):
-            comment.append(cfg['comment_fix']['redirects'])
-        if 'converted' in mode and isinstance(cfg['comment_fix']['converted'], str):
-            comment.append(cfg['comment_fix']['converted'])
-        if 'normalized' in mode and isinstance(cfg['comment_fix']['normalized'], str):
-            comment.append(cfg['comment_fix']['normalized'])
-        if len(comment) > 0:
-            text += '\n' + cfg['comment_fix']['main'].format(''.join(comment))
-    if 'no_vfd' in mode:
-        text += '\n' + cfg['comment_vfd']
+    if 'A2093064-bot' not in text:
+        if 'fix' in mode:
+            comment = []
+            if 'redirects' in mode and isinstance(cfg['comment_fix']['redirects'], str):
+                comment.append(cfg['comment_fix']['redirects'])
+                print('\tcomment_fix - redirects')
+            if 'converted' in mode and isinstance(cfg['comment_fix']['converted'], str):
+                comment.append(cfg['comment_fix']['converted'])
+                print('\tcomment_fix - converted')
+            if 'normalized' in mode and isinstance(cfg['comment_fix']['normalized'], str):
+                comment.append(cfg['comment_fix']['normalized'])
+                print('\tcomment_fix - normalized')
+            if len(comment) > 0:
+                text += '\n' + \
+                    cfg['comment_fix']['main'].format(''.join(comment))
+                print('\tcomment_fix - redirects')
+        if 'no_vfd' in mode:
+            text += '\n' + cfg['comment_vfd']
+            print('\tcomment_vfd')
     text += '\n\n'
     return text
 
@@ -195,7 +202,7 @@ def fix(pagename):
         wikicode.replace(sections[secid], newtext)
         text = str(wikicode)
 
-    if afdpage.text == text:
+    if re.sub(r'\s+', '', afdpage.text) == re.sub(r'\s+', '', text):
         print("  nothing changed")
         return
 
