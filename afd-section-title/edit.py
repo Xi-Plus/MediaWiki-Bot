@@ -6,13 +6,12 @@ import sys
 from datetime import datetime, timedelta
 
 import mwparserfromhell
+os.environ['PYWIKIBOT2_DIR'] = os.path.dirname(os.path.realpath(__file__))
 import pywikibot
 from pywikibot.data.api import Request
 
 from config import *
 
-
-os.environ['PYWIKIBOT2_DIR'] = os.path.dirname(os.path.realpath(__file__))
 
 site = pywikibot.Site()
 site.login()
