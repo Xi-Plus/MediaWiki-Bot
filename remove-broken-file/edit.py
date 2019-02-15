@@ -217,8 +217,11 @@ for page in site.categorymembers(cat):
                 summary = cfg["drv_summary"]
                 print("summary = {}".format(summary))
 
-                save = input("save?")
-                if save in ["Yes", "yes", "Y", "y"]:
+                if args.confirm:
+                    save = input("save?")
+                else:
+                    save = "Yes"
+                if save in ["Yes", "yes", "Y", "y", ""]:
                     drv_page.text = drv_page_text
                     drv_page.save(summary=summary, minor=False, botflag=False)
 
@@ -296,7 +299,8 @@ for page in site.categorymembers(cat):
 
     if page.text == text:
         print("nothing changed")
-        input()
+        if args.confirm:
+            input()
         skipfile.write(pagetitle + "\n")
         continue
 
@@ -319,7 +323,7 @@ for page in site.categorymembers(cat):
         save = input("save?")
     else:
         save = "Yes"
-    if save in ["Yes", "yes", "Y", "y"]:
+    if save in ["Yes", "yes", "Y", "y", ""]:
         page.text = text
         page.save(summary=summary, minor=False, botflag=False)
         cnt += 1
