@@ -327,7 +327,7 @@ for page in site.categorymembers(cat):
         save = "Yes"
     if save in ["Yes", "yes", "Y", "y", ""]:
         page.text = text
-        page.save(summary=summary, minor=False, botflag=False)
+        page.save(summary=summary, minor=False)
         cnt += 1
     else:
         print("skip")
