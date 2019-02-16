@@ -12,7 +12,8 @@ os.environ["PYWIKIBOT2_DIR"] = os.path.dirname(os.path.realpath(__file__))
 os.environ["TZ"] = "UTC"
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--confirm', type=bool, default=False,)
+parser.add_argument('--confirm', type=bool, default=False)
+parser.add_argument('--limit', type=int, default=0)
 args = parser.parse_args()
 print(args)
 
@@ -332,3 +333,7 @@ for page in site.categorymembers(cat):
     else:
         print("skip")
         skipfile.write(pagetitle + "\n")
+    
+    if args.limit > 0 and cnt > args.limit:
+        print('Reach the limit. Quitting.')
+        break
