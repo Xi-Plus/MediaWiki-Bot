@@ -215,19 +215,22 @@ for page in site.categorymembers(cat):
 
                 drv_page = pywikibot.Page(site, cfg["drv_page"])
                 drv_page_text = drv_page.text
-                drv_page_text += cfg["drv_append_text"].format(
-                    image_fullname, pagetitle, deletelog["user"], deletelog["comment"], deletelog["logid"])
-                pywikibot.showDiff(drv_page.text, drv_page_text)
-                summary = cfg["drv_summary"]
-                print("summary = {}".format(summary))
+                if image_fullname not in drv_page_text:
+                    drv_page_text += cfg["drv_append_text"].format(
+                        image_fullname, pagetitle, deletelog["user"], deletelog["comment"], deletelog["logid"])
+                    pywikibot.showDiff(drv_page.text, drv_page_text)
+                    summary = cfg["drv_summary"]
+                    print("summary = {}".format(summary))
 
-                if args.confirm:
-                    save = input("save?")
+                    if args.confirm:
+                        save = input("save?")
+                    else:
+                        save = "Yes"
+                    if save in ["Yes", "yes", "Y", "y", ""]:
+                        drv_page.text = drv_page_text
+                        drv_page.save(summary=summary, minor=False, botflag=False)
                 else:
-                    save = "Yes"
-                if save in ["Yes", "yes", "Y", "y", ""]:
-                    drv_page.text = drv_page_text
-                    drv_page.save(summary=summary, minor=False, botflag=False)
+                    print('Already reported to DRV.')
 
                 continue
 
