@@ -33,9 +33,11 @@ if not cfg["enable"]:
 cat = pywikibot.Page(site, cfg["category"])
 
 skippages = ""
-with open("skipedpage.txt", "r") as f:
+skippagespath = os.path.join(os.path.dirname(
+    os.path.realpath(__file__)), "skipedpage.txt")
+with open(skippagespath, "r") as f:
     skippages = f.read()
-skipfile = open("skipedpage.txt", "a")
+skipfile = open(skippagespath, "a")
 
 
 def checkImageExists(title):
