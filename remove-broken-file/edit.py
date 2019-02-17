@@ -4,11 +4,12 @@ import json
 import os
 import re
 
+os.environ["PYWIKIBOT2_DIR"] = os.path.dirname(os.path.realpath(__file__))
 import pywikibot
 
 from config import *
 
-os.environ["PYWIKIBOT2_DIR"] = os.path.dirname(os.path.realpath(__file__))
+
 os.environ["TZ"] = "UTC"
 
 parser = argparse.ArgumentParser()
@@ -333,7 +334,7 @@ for page in site.categorymembers(cat):
     else:
         print("skip")
         skipfile.write(pagetitle + "\n")
-    
+
     if args.limit > 0 and cnt > args.limit:
         print('Reach the limit. Quitting.')
         break
