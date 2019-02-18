@@ -53,7 +53,7 @@ with open('list.csv', 'r') as f:
                 if re.search(r'Wikipedia:優良條目/s', text):
                     print('skip')
                     continue
-                text = re.sub(r'{{(Wikipedia|维基百科):優良條目/',
+                text = re.sub(r'{{(Wikipedia|维基百科|維基百科):優良條目/',
                               '{{Wikipedia:优良条目/', text)
 
                 pywikibot.showDiff(backlink.text, text)
