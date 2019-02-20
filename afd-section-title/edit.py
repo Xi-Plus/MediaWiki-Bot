@@ -165,7 +165,7 @@ def fix(pagename):
                 print('  set new title = ' + title)
                 section.get(0).title = title
             newtext = appendComment(str(section), mode)
-            changes.append([section, newtext])
+            changes.append([secid, newtext])
             continue
 
         m = re.search(r'^{{al\|([^\]]+\|)+[^\]]+}}$', title, re.IGNORECASE)
@@ -190,7 +190,7 @@ def fix(pagename):
                 print('  set new title = ' + title)
                 section.get(0).title = title
             newtext = appendComment(str(section), mode)
-            section.replace(section, newtext)
+            changes.append([secid, newtext])
             continue
 
         print('  unknown format, skip')
