@@ -48,7 +48,7 @@ with open('list.csv', 'r') as f:
 
         for backlink in (list(page.embeddedin()) + list(page.backlinks(filter_redirects=True))):
             print('backlink: {}'.format(backlink.title()))
-            if re.search(r'^Wikipedia:优良条目/\d+年\d+月\d+日$', backlink.title()):
+            if re.search(r'^Wikipedia:优良条目/\d+年\d+月\d+日$|^Portal:', backlink.title()):
                 print('{} Editing {}'.format(cnt2, backlink.title()))
                 text = backlink.text
                 if re.search(r'Wikipedia:(優良條目|优良条目)/s', text):
@@ -58,6 +58,10 @@ with open('list.csv', 'r') as f:
                               r'{{Wikipedia:优良条目/\1}}', text, flags=re.I)
                 text = re.sub(r'{{(Wikipedia|维基百科|維基百科):優良條目/',
                               '{{Wikipedia:优良条目/', text)
+
+                if backlink.text == text:
+                    print('Nothing changed.')
+                    continue
 
                 pywikibot.showDiff(backlink.text, text)
 
