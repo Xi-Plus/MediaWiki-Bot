@@ -54,7 +54,7 @@ with open('list.csv', 'r') as f:
                 if re.search(r'Wikipedia:(優良條目|优良条目)/s', text):
                     print('skip')
                     continue
-                text = re.sub(r'^#REDIRECT \[\[Wikipedia:(?:优良条目|優良條目)/(.+?)]][\s\S]*$',
+                text = re.sub(r'^#(?:REDIRECT|重定向) \[\[Wikipedia:(?:优良条目|優良條目)/(.+?)]][\s\S]*$',
                               r'{{Wikipedia:优良条目/\1}}', text, flags=re.I)
                 text = re.sub(r'{{(Wikipedia|维基百科|維基百科):優良條目/',
                               '{{Wikipedia:优良条目/', text)
