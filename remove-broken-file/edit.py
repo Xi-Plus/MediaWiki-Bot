@@ -88,6 +88,14 @@ cnt = 1
 for page in site.categorymembers(cat):
     pagetitle = page.title()
     print(cnt, pagetitle)
+    is_skip = False
+    for skip_regex in cfg['skip_title']:
+        if re.search(skip_regex, pagetitle):
+            print('skip ({0})'.format(skip_regex))
+            is_skip = True
+            break
+    if is_skip:
+        continue
     if pagetitle in skippages:
         print("skip")
         continue
