@@ -126,7 +126,10 @@ for page in site.categorymembers(cat):
                     replace = cfg["regex"][regex_type]["replace"]["comment_other"].format(
                         cfg["check_other_wiki"][existother])
 
-                    text = re.sub(regex, replace, text, flags=re.M)
+                    text, count = re.subn(regex, replace, text, flags=re.M)
+
+                    if count > 0:
+                        break
 
                 summary_comment.append(
                     cfg["summary"]["comment_other"].format(imagename, existother))
@@ -146,7 +149,10 @@ for page in site.categorymembers(cat):
                         replace = cfg["regex"][regex_type]["replace"]["moved"].format(
                             movelog[-1]["params"]["target_title_without_ns"])
 
-                        text = re.sub(regex, replace, text, flags=re.M)
+                        text, count = re.subn(regex, replace, text, flags=re.M)
+
+                        if count > 0:
+                            break
 
                     summary_temp = image_fullname
                     for log in movelog:
@@ -208,7 +214,10 @@ for page in site.categorymembers(cat):
                         imageregex)
                     replace = cfg["regex"][regex_type]["replace"]["deleted_comment"]
 
-                    text = re.sub(regex, replace, text, flags=re.M)
+                    text, count = re.subn(regex, replace, text, flags=re.M)
+
+                    if count > 0:
+                        break
 
                 summary_comment.append(cfg["summary"]["deleted"]["local"].format(
                     summary_prefix, deletelog["user"], deletelog["logid"], deletelog["comment"]))
@@ -245,7 +254,10 @@ for page in site.categorymembers(cat):
                         imageregex)
                     replace = cfg["regex"][regex_type]["replace"]["deleted"]
 
-                    text = re.sub(regex, replace, text, flags=re.M)
+                    text, count = re.subn(regex, replace, text, flags=re.M)
+
+                    if count > 0:
+                        break
 
                 if deleted_commons:
                     comment = re.sub(r"\[\[([^\[\]]+?)]]",
@@ -291,7 +303,10 @@ for page in site.categorymembers(cat):
                         imageregex)
                     replace = cfg["regex"][regex_type]["replace"]["comment"]
 
-                    text = re.sub(regex, replace, text, flags=re.M)
+                    text, count = re.subn(regex, replace, text, flags=re.M)
+
+                    if count > 0:
+                        break
 
                 summary_comment.append(
                     cfg["summary"]["comment"].format(imagename))
