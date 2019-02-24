@@ -9,22 +9,20 @@ from datetime import datetime, timezone
 os.environ['PYWIKIBOT2_DIR'] = os.path.dirname(os.path.realpath(__file__))
 import pywikibot
 
+from config import *
+
+
 os.environ['TZ'] = 'UTC'
 
 site = pywikibot.Site()
 site.login()
 
-token = site.getToken()
+config_page = pywikibot.Page(site, config_page_name)
+cfg = config_page.text
+cfg = json.loads(cfg)
+print(json.dumps(cfg, indent=4, ensure_ascii=False))
 
-cat = pywikibot.Page(site, 'Category:維基百科編輯被保護頁面請求')
-
-whitelist = [
-    'Category:已處理的維基百科編輯被保護頁面請求',
-    'Category:待回應的維基百科編輯被保護頁面請求',
-    'Category:維基百科編輯全保護頁面請求',
-    'Category:維基百科編輯半保護頁面請求',
-    'Category:維基百科編輯無保護頁面請求'
-]
+cat = pywikibot.Page(site, cfg['category'])
 
 output = (
     '{| class="wikitable sortable"'
@@ -33,7 +31,7 @@ output = (
 )
 for page in site.categorymembers(cat):
     title = page.title()
-    if title in whitelist:
+    if title in cfg['whitelist']:
         continue
     print(title)
     text = page.text
@@ -93,6 +91,6 @@ for page in site.categorymembers(cat):
 output += '\n|}'
 
 print(output)
-outputPage = pywikibot.Page(site, 'User:Xiplus/EP')
+outputPage = pywikibot.Page(site, cfg['output_page_name'])
 outputPage.text = output
-outputPage.save(summary='產生EP列表', minor=False)
+outputPage.save(summary=cfg['summary'])
