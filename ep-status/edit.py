@@ -4,7 +4,7 @@ import json
 import os
 import re
 import time
-from datetime import datetime
+from datetime import datetime, timezone
 
 os.environ['PYWIKIBOT2_DIR'] = os.path.dirname(os.path.realpath(__file__))
 import pywikibot
@@ -61,22 +61,22 @@ for page in site.categorymembers(cat):
         if (re.search(r'{{(Editprotected|Editprotect|Sudo|EP|请求编辑|编辑请求|請求編輯受保護的頁面|Editsemiprotected|FPER|Fper|Edit[ _]fully-protected|SPER|Edit[ _]semi-protected|Edit[ _]protected|Ep)(\||}})', section, flags=re.I)
                 and not re.search(r'{{(Editprotected|Editprotect|Sudo|EP|请求编辑|编辑请求|請求編輯受保護的頁面|Editsemiprotected|FPER|Fper|Edit[ _]fully-protected|SPER|Edit[ _]semi-protected|Edit[ _]protected|Ep).*?\|(ok|no)=1', section, flags=re.I)):
 
-            firsttime = datetime(9999, 12, 31)
-            lasttime = datetime(1, 1, 1)
+            firsttime = datetime(9999, 12, 31, tzinfo=timezone.utc)
+            lasttime = datetime(1, 1, 1, tzinfo=timezone.utc)
             for m in re.findall(r'(\d{4})年(\d{1,2})月(\d{1,2})日 \(.\) (\d{2}):(\d{2}) \(UTC\)', str(section)):
-                d = datetime(int(m[0]), int(m[1]), int(
-                    m[2]), int(m[3]), int(m[4]))
+                d = datetime(int(m[0]), int(m[1]), int(m[2]),
+                             int(m[3]), int(m[4]), tzinfo=timezone.utc)
                 lasttime = max(lasttime, d)
                 firsttime = min(firsttime, d)
             print(firsttime, lasttime)
-            if firsttime == datetime(9999, 12, 31):
+            if firsttime == datetime(9999, 12, 31, tzinfo=timezone.utc):
                 firstvalue = 0
                 firsttimetext = '無法抓取時間'
             else:
                 firstvalue = int(firsttime.timestamp())
                 firsttimetext = '{{{{subst:#time:Y年n月j日 (D) H:i|{0}}}}} (UTC)'.format(
                     str(firsttime))
-            if lasttime == datetime(1, 1, 1):
+            if lasttime == datetime(1, 1, 1, tzinfo=timezone.utc):
                 lastvalue = 0
                 lasttimetext = '無法抓取時間'
             else:
