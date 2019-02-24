@@ -6,6 +6,8 @@ import re
 os.environ['PYWIKIBOT2_DIR'] = os.path.dirname(os.path.realpath(__file__))
 import pywikibot
 
+from config import purge
+
 
 os.environ['TZ'] = 'UTC'
 
@@ -52,6 +54,7 @@ with open('list.csv', 'r') as f:
                 print('{} Editing {}'.format(cnt2, backlink.title()))
                 text = backlink.text
                 if re.search(r'Wikipedia:(優良條目|优良条目)/s', text):
+                    purge(backlink.title())
                     print('skip')
                     continue
                 text = re.sub(r'^#(?:REDIRECT|重定向) \[\[Wikipedia:(?:优良条目|優良條目)/(.+?)]][\s\S]*$',
@@ -60,6 +63,7 @@ with open('list.csv', 'r') as f:
                               '{{Wikipedia:优良条目/', text)
 
                 if backlink.text == text:
+                    purge(backlink.title())
                     print('Nothing changed.')
                     continue
 
@@ -69,6 +73,8 @@ with open('list.csv', 'r') as f:
                 print(summary)
                 backlink.save(summary=summary, minor=True)
                 cnt2 += 1
+            else:
+                purge(backlink.title())
 
         if args.limit > 0 and cnt > args.limit:
             print('Reach the limit. Quitting.')
