@@ -13,8 +13,12 @@ require __DIR__ . "/../function/login.php";
 require __DIR__ . "/../function/edittoken.php";
 
 function purge($page) {
-	echo "purge " . $page . "\n";
 	global $edittoken, $C;
+
+	if ($C["sleep"] !== 0) {
+		usleep($C["sleep"] * 1000 * 1000);
+	}
+	echo "purge " . $page . "\n";
 
 	$starttimestamp = time();
 	$res = cURL($C["wikiapi"] . "?" . http_build_query(array(
@@ -62,9 +66,6 @@ function purge($page) {
 	if (isset($res["error"])) {
 		echo "edit fail\n";
 		var_dump($res["error"]);
-	}
-	if ($C["sleep"] !== 0) {
-		usleep($C["sleep"] * 1000 * 1000);
 	}
 }
 
