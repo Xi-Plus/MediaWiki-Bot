@@ -4,6 +4,7 @@ config.php
 config.py
 input.txt
 list*.csv
+list*.txt
 out*.csv
 out*.txt
 user-config.py
