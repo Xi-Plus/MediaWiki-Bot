@@ -22,7 +22,7 @@ site.login()
 
 summary = '機器人：[[Special:PermaLink/53078964#優良條目和典范条目子頁面繁簡皆有的問題|統一子頁面繁簡]]'
 
-with open('list.csv', 'r') as f:
+with open('list.txt', 'r') as f:
     cnt = 1
     cnt2 = 1
     for title in f:
@@ -36,7 +36,7 @@ with open('list.csv', 'r') as f:
             print('{} is redirect'.format(oldtitle))
             continue
 
-        newtitle = oldtitle.replace('Wikipedia:優良條目', 'Wikipedia:优良条目')
+        newtitle = oldtitle.replace('Wikipedia:典範條目', 'Wikipedia:典范条目')
         print('{} {} Moving from {} to {}'.format(
             cnt, cnt2, oldtitle, newtitle))
 
@@ -50,17 +50,17 @@ with open('list.csv', 'r') as f:
 
         for backlink in (list(page.embeddedin()) + list(page.backlinks(filter_redirects=True))):
             print('backlink: {}'.format(backlink.title()))
-            if re.search(r'^Wikipedia:优良条目/\d+年\d+月\d+日$|^Portal:', backlink.title()):
+            if re.search(r'^Wikipedia:典范条目/\d+年\d+月\d+日$|^Portal:', backlink.title()):
                 print('{} Editing {}'.format(cnt2, backlink.title()))
                 text = backlink.text
-                if re.search(r'Wikipedia:(優良條目|优良条目)/s', text):
+                if re.search(r'Wikipedia:(典範條目|典范条目|特色條目|特色条目)/s', text):
                     purge(backlink.title())
                     print('skip')
                     continue
-                text = re.sub(r'^#(?:REDIRECT|重定向) \[\[Wikipedia:(?:优良条目|優良條目)/(.+?)]][\s\S]*$',
-                              r'{{Wikipedia:优良条目/\1}}', text, flags=re.I)
-                text = re.sub(r'{{(Wikipedia|维基百科|維基百科):優良條目/',
-                              '{{Wikipedia:优良条目/', text)
+                text = re.sub(r'^#(?:REDIRECT|重定向) \[\[Wikipedia:(?:典範條目|典范条目|特色條目|特色条目)/(.+?)]][\s\S]*$',
+                              r'{{Wikipedia:典范条目/\1}}', text, flags=re.I)
+                text = re.sub(r'{{(Wikipedia|维基百科|維基百科):(?:典範條目|典范条目|特色條目|特色条目)/',
+                              '{{Wikipedia:典范条目/', text)
 
                 if backlink.text == text:
                     purge(backlink.title())
