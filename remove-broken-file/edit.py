@@ -1,13 +1,22 @@
 # -*- coding: utf-8 -*-
-import os
-import pywikibot
+import argparse
 import json
+import os
 import re
+
+os.environ["PYWIKIBOT2_DIR"] = os.path.dirname(os.path.realpath(__file__))
+import pywikibot
+
 from config import *
 
 
-os.environ["PYWIKIBOT2_DIR"] = os.path.dirname(os.path.realpath(__file__))
 os.environ["TZ"] = "UTC"
+
+parser = argparse.ArgumentParser()
+parser.add_argument('--confirm', type=bool, default=False)
+parser.add_argument('--limit', type=int, default=0)
+args = parser.parse_args()
+print(args)
 
 site = pywikibot.Site()
 site.login()
@@ -24,20 +33,24 @@ if not cfg["enable"]:
 cat = pywikibot.Page(site, cfg["category"])
 
 skippages = ""
-with open("skipedpage.txt", "r") as f:
+skippagespath = os.path.join(os.path.dirname(
+    os.path.realpath(__file__)), "skipedpage.txt")
+with open(skippagespath, "r") as f:
     skippages = f.read()
-skipfile = open("skipedpage.txt", "a")
+skipfile = open(skippagespath, "a")
+
 
 def checkImageExists(title):
-    image = pywikibot.Page(site, title)
+    image = pywikibot.FilePage(site, title)
     if image.exists():
         return True
     try:
         if image.fileIsShared():
             return True
-    except Exception as e:
+    except Exception:
         pass
     return False
+
 
 def followMove(title, commons=False):
     if commons:
@@ -53,10 +66,11 @@ def followMove(title, commons=False):
             "list": "logevents",
             "letype": "move",
             "lelimit": "1"
-            }).submit()
+        }).submit()
         if len(data["query"]["logevents"]) > 0:
             movelog = data["query"]["logevents"][0]
-            movelog["params"]["target_title_without_ns"] = pywikibot.Page(site, movelog["params"]["target_title"]).titleWithoutNamespace()
+            movelog["params"]["target_title_without_ns"] = pywikibot.Page(
+                site, movelog["params"]["target_title"]).titleWithoutNamespace()
             logs.append(movelog)
             title = movelog["params"]["target_title"]
 
@@ -69,10 +83,19 @@ def followMove(title, commons=False):
             break
     return logs
 
+
 cnt = 1
 for page in site.categorymembers(cat):
     pagetitle = page.title()
     print(cnt, pagetitle)
+    is_skip = False
+    for skip_regex in cfg['skip_title']:
+        if re.search(skip_regex, pagetitle):
+            print('skip ({0})'.format(skip_regex))
+            is_skip = True
+            break
+    if is_skip:
+        continue
     if pagetitle in skippages:
         print("skip")
         continue
@@ -91,7 +114,8 @@ for page in site.categorymembers(cat):
             image_fullname = image.title()
             imagename = image.title(with_ns=False)
 
-            imageregex = "[" + imagename[0].upper() + imagename[0].lower() + "]" + re.escape(imagename[1:])
+            imageregex = "[" + imagename[0].upper() + \
+                imagename[0].lower() + "]" + re.escape(imagename[1:])
             imageregex = imageregex.replace("\\ ", "[ _]")
 
             # comment_other start
@@ -105,12 +129,18 @@ for page in site.categorymembers(cat):
                 print("{} exist on {}".format(image_fullname, existother))
 
                 for regex_type in cfg["regex"]:
-                    regex = cfg["regex"][regex_type]["pattern"].format(imageregex)
-                    replace = cfg["regex"][regex_type]["replace"]["comment_other"].format(cfg["check_other_wiki"][existother])
+                    regex = cfg["regex"][regex_type]["pattern"].format(
+                        imageregex)
+                    replace = cfg["regex"][regex_type]["replace"]["comment_other"].format(
+                        cfg["check_other_wiki"][existother])
 
-                    text = re.sub(regex, replace, text, flags=re.M)
+                    text, count = re.subn(regex, replace, text, flags=re.M)
 
-                summary_comment.append(cfg["summary"]["comment_other"].format(imagename, existother))
+                    if count > 0:
+                        break
+
+                summary_comment.append(
+                    cfg["summary"]["comment_other"].format(imagename, existother))
 
                 continue
             # coment_other end
@@ -122,16 +152,22 @@ for page in site.categorymembers(cat):
                     print("File:{} moved".format(imagename))
 
                     for regex_type in cfg["regex"]:
-                        regex = cfg["regex"][regex_type]["pattern"].format(imageregex)
-                        replace = cfg["regex"][regex_type]["replace"]["moved"].format(movelog[-1]["params"]["target_title_without_ns"])
+                        regex = cfg["regex"][regex_type]["pattern"].format(
+                            imageregex)
+                        replace = cfg["regex"][regex_type]["replace"]["moved"].format(
+                            movelog[-1]["params"]["target_title_without_ns"])
 
-                        text = re.sub(regex, replace, text, flags=re.M)
+                        text, count = re.subn(regex, replace, text, flags=re.M)
+
+                        if count > 0:
+                            break
 
                     summary_temp = image_fullname
                     for log in movelog:
-                        summary_temp = cfg["summary"]["moved"].format(summary_temp, log["params"]["target_title_without_ns"], log["user"], log["logid"], log["comment"])
+                        summary_temp = cfg["summary"]["moved"].format(
+                            summary_temp, log["params"]["target_title_without_ns"], log["user"], log["logid"], log["comment"])
                     summary_moved.append(summary_temp)
-                    
+
                     continue
                 else:
                     image_fullname = movelog[-1]["params"]["target_title"]
@@ -150,7 +186,7 @@ for page in site.categorymembers(cat):
                 "list": "logevents",
                 "leaction": "delete/delete",
                 "lelimit": "1"
-                }).submit()
+            }).submit()
             if len(data["query"]["logevents"]) > 0:
                 deletelog = data["query"]["logevents"][0]
                 if re.search(cfg["ignored_csd_comment"], deletelog["comment"]):
@@ -166,7 +202,7 @@ for page in site.categorymembers(cat):
                     "list": "logevents",
                     "leaction": "delete/delete",
                     "lelimit": "1"
-                    }).submit()
+                }).submit()
                 if len(data["query"]["logevents"]) > 0:
                     deleted = True
                     deleted_commons = True
@@ -175,30 +211,43 @@ for page in site.categorymembers(cat):
             if deleted_comment or deleted:
                 summary_prefix = imagename
                 for log in movelog:
-                    summary_prefix = cfg["summary"]["moved_deleted"].format(summary_prefix, log["params"]["target_title_without_ns"], log["logid"])
+                    summary_prefix = cfg["summary"]["moved_deleted"].format(
+                        summary_prefix, log["params"]["target_title_without_ns"], log["logid"])
 
             if deleted_comment:
                 print("{} deleted by F6".format(image_fullname))
 
                 for regex_type in cfg["regex"]:
-                    regex = cfg["regex"][regex_type]["pattern"].format(imageregex)
+                    regex = cfg["regex"][regex_type]["pattern"].format(
+                        imageregex)
                     replace = cfg["regex"][regex_type]["replace"]["deleted_comment"]
 
-                    text = re.sub(regex, replace, text, flags=re.M)
+                    text, count = re.subn(regex, replace, text, flags=re.M)
 
-                summary_comment.append(cfg["summary"]["deleted"]["local"].format(summary_prefix, deletelog["user"], deletelog["logid"], deletelog["comment"]))
+                    if count > 0:
+                        break
+
+                summary_comment.append(cfg["summary"]["deleted"]["local"].format(
+                    summary_prefix, deletelog["user"], deletelog["logid"], deletelog["comment"]))
 
                 drv_page = pywikibot.Page(site, cfg["drv_page"])
                 drv_page_text = drv_page.text
-                drv_page_text += cfg["drv_append_text"].format(image_fullname, pagetitle, deletelog["user"], deletelog["comment"], deletelog["logid"])
-                pywikibot.showDiff(drv_page.text, drv_page_text)
-                summary = cfg["drv_summary"]
-                print("summary = {}".format(summary))
+                if image_fullname not in drv_page_text:
+                    drv_page_text += cfg["drv_append_text"].format(
+                        image_fullname, pagetitle, deletelog["user"], deletelog["comment"], deletelog["logid"])
+                    pywikibot.showDiff(drv_page.text, drv_page_text)
+                    summary = cfg["drv_summary"]
+                    print("summary = {}".format(summary))
 
-                save = input("save?")
-                if save in ["Yes", "yes", "Y", "y"]:
-                    drv_page.text = drv_page_text
-                    drv_page.save(summary=summary, minor=False, botflag=False)
+                    if args.confirm:
+                        save = input("save?")
+                    else:
+                        save = "Yes"
+                    if save in ["Yes", "yes", "Y", "y", ""]:
+                        drv_page.text = drv_page_text
+                        drv_page.save(summary=summary, minor=False, botflag=False)
+                else:
+                    print('Already reported to DRV.')
 
                 continue
 
@@ -209,16 +258,23 @@ for page in site.categorymembers(cat):
                     print("{} deleted".format(image_fullname))
 
                 for regex_type in cfg["regex"]:
-                    regex = cfg["regex"][regex_type]["pattern"].format(imageregex)
+                    regex = cfg["regex"][regex_type]["pattern"].format(
+                        imageregex)
                     replace = cfg["regex"][regex_type]["replace"]["deleted"]
 
-                    text = re.sub(regex, replace, text, flags=re.M)
+                    text, count = re.subn(regex, replace, text, flags=re.M)
+
+                    if count > 0:
+                        break
 
                 if deleted_commons:
-                    comment = re.sub(r"\[\[([^\[\]]+?)]]", r"[[:c:\1]]", deletelog["comment"])
-                    summary_deleted.append(cfg["summary"]["deleted"]["commons"].format(imagename, deletelog["user"], deletelog["logid"], comment))
+                    comment = re.sub(r"\[\[([^\[\]]+?)]]",
+                                     r"[[:c:\1]]", deletelog["comment"])
+                    summary_deleted.append(cfg["summary"]["deleted"]["commons"].format(
+                        imagename, deletelog["user"], deletelog["logid"], comment))
                 else:
-                    summary_deleted.append(cfg["summary"]["deleted"]["local"].format(summary_prefix, deletelog["user"], deletelog["logid"], deletelog["comment"]))
+                    summary_deleted.append(cfg["summary"]["deleted"]["local"].format(
+                        summary_prefix, deletelog["user"], deletelog["logid"], deletelog["comment"]))
 
                 continue
 
@@ -233,7 +289,7 @@ for page in site.categorymembers(cat):
                 "list": "logevents",
                 "letype": "upload",
                 "lelimit": "1"
-                }).submit()
+            }).submit()
             if len(data["query"]["logevents"]) > 0:
                 uploaded = True
             if not uploaded:
@@ -243,7 +299,7 @@ for page in site.categorymembers(cat):
                     "list": "logevents",
                     "letype": "upload",
                     "lelimit": "1"
-                    }).submit()
+                }).submit()
                 if len(data["query"]["logevents"]) > 0:
                     uploaded = True
 
@@ -251,12 +307,17 @@ for page in site.categorymembers(cat):
                 print("{} never uploaded".format(image_fullname))
 
                 for regex_type in cfg["regex"]:
-                    regex = cfg["regex"][regex_type]["pattern"].format(imageregex)
+                    regex = cfg["regex"][regex_type]["pattern"].format(
+                        imageregex)
                     replace = cfg["regex"][regex_type]["replace"]["comment"]
 
-                    text = re.sub(regex, replace, text, flags=re.M)
+                    text, count = re.subn(regex, replace, text, flags=re.M)
 
-                summary_comment.append(cfg["summary"]["comment"].format(imagename))
+                    if count > 0:
+                        break
+
+                summary_comment.append(
+                    cfg["summary"]["comment"].format(imagename))
 
                 continue
 
@@ -268,27 +329,40 @@ for page in site.categorymembers(cat):
 
     if page.text == text:
         print("nothing changed")
-        input()
+        if args.confirm:
+            input()
         skipfile.write(pagetitle + "\n")
         continue
+
+    text = re.sub(r'(\|align=center\|)<br ?/?>', r'\1', text)
 
     pywikibot.showDiff(page.text, text)
 
     summary = []
     if len(summary_comment):
-        summary.append(cfg["summary"]["prepend"]["comment"] + "、".join(summary_comment))
+        summary.append(cfg["summary"]["prepend"]
+                       ["comment"] + "、".join(summary_comment))
     if len(summary_moved):
-        summary.append(cfg["summary"]["prepend"]["moved"] + "、".join(summary_moved))
+        summary.append(cfg["summary"]["prepend"]
+                       ["moved"] + "、".join(summary_moved))
     if len(summary_deleted):
-        summary.append(cfg["summary"]["prepend"]["deleted"] + "、".join(summary_deleted))
+        summary.append(cfg["summary"]["prepend"]
+                       ["deleted"] + "、".join(summary_deleted))
     summary = cfg["summary"]["prepend"]["all"] + "；".join(summary)
     print("summary = {}".format(summary))
 
-    save = input("save?")
-    if save in ["Yes", "yes", "Y", "y"]:
+    if args.confirm:
+        save = input("save?")
+    else:
+        save = "Yes"
+    if save in ["Yes", "yes", "Y", "y", ""]:
         page.text = text
-        page.save(summary=summary, minor=False, botflag=False)
+        page.save(summary=summary, minor=False)
         cnt += 1
     else:
         print("skip")
         skipfile.write(pagetitle + "\n")
+
+    if args.limit > 0 and cnt > args.limit:
+        print('Reach the limit. Quitting.')
+        break
