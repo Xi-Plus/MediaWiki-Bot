@@ -53,7 +53,7 @@ with open('list.txt', 'r') as f:
             if re.search(r'^Wikipedia:典范条目/\d+年\d+月\d+日$|^Portal:', backlink.title()):
                 print('{} Editing {}'.format(cnt2, backlink.title()))
                 text = backlink.text
-                if re.search(r'Wikipedia:(典範條目|典范条目|特色條目|特色条目)/s', text):
+                if re.search(r'Wikipedia:(典範條目|典范条目|特色條目|特色条目)/(s|摘要)', text):
                     purge(backlink.title())
                     print('skip')
                     continue

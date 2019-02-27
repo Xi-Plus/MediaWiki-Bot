@@ -103,7 +103,7 @@ for gatitle in runpages:
         if re.search(r'^Wikipedia:典范条目/\d+年\d+月\d+日$|^Portal:', backlink.title()):
             print('{} {} Editing {}'.format(cnt, cnt2, backlink.title()))
             text = backlink.text
-            if re.search(r'Wikipedia:(典範條目|典范条目|特色條目|特色条目)/s', text):
+            if re.search(r'Wikipedia:(典範條目|典范条目|特色條目|特色条目)/(s|摘要)', text):
                 toPurgePages.append(backlink.title())
                 print('skip')
                 continue
