@@ -15,11 +15,23 @@ require __DIR__ . "/../function/log.php";
 
 echo "The time now is " . date("Y-m-d H:i:s") . " (UTC)\n";
 
+$config_page = file_get_contents($C["config_page"]);
+if ($config_page === false) {
+	exit("get config failed\n");
+}
+$cfg = json_decode($config_page, true);
+
+if (!$cfg["enable"]) {
+	exit("disabled\n");
+}
+
+var_dump($cfg);
+
 login("bot");
 $edittoken = edittoken();
 
 $count = 0;
-foreach ($C["category"] as $category) {
+foreach ($cfg["category"] as $category) {
 	$res = cURL($C["wikiapi"] . "?" . http_build_query(array(
 		"action" => "query",
 		"format" => "json",
@@ -88,7 +100,7 @@ foreach ($C["category"] as $category) {
 				$newtext = $text;
 			}
 
-			$summary = $C["summary_prefix"] . "，修正[[:" . $category . "]]";
+			$summary = sprintf($cfg["summary"], $category);
 			$post = array(
 				"action" => "edit",
 				"format" => "json",
