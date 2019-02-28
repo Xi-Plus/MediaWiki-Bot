@@ -22,6 +22,16 @@ cfg = config_page.text
 cfg = json.loads(cfg)
 print(json.dumps(cfg, indent=4, ensure_ascii=False))
 
+if not cfg['enable']:
+    exit('disabled\n')
+
+outputPage = pywikibot.Page(site, cfg['output_page_name'])
+lastEditTime = list(outputPage.revisions(total=1))[0]['timestamp']
+lastEditTimestamp = datetime(lastEditTime.year, lastEditTime.month, lastEditTime.day,
+                             lastEditTime.hour, lastEditTime.minute, tzinfo=timezone.utc).timestamp()
+if time.time() - lastEditTimestamp < cfg['interval']:
+    exit('Last edit on {0}\n'.format(lastEditTime))
+
 cat = pywikibot.Page(site, cfg['category'])
 
 output = (
@@ -91,6 +101,5 @@ for page in site.categorymembers(cat):
 output += '\n|}'
 
 print(output)
-outputPage = pywikibot.Page(site, cfg['output_page_name'])
 outputPage.text = output
 outputPage.save(summary=cfg['summary'])
