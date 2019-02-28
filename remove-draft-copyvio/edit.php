@@ -14,6 +14,18 @@ require __DIR__ . "/../function/edittoken.php";
 
 echo "The time now is " . date("Y-m-d H:i:s") . " (UTC)\n";
 
+$config_page = file_get_contents($C["config_page"]);
+if ($config_page === false) {
+	exit("get config failed\n");
+}
+$cfg = json_decode($config_page, true);
+
+if (!$cfg["enable"]) {
+	exit("disabled\n");
+}
+
+var_dump($cfg);
+
 login("bot");
 $edittoken = edittoken();
 
@@ -21,7 +33,7 @@ $res = cURL($C["wikiapi"] . "?" . http_build_query(array(
 	"action" => "query",
 	"format" => "json",
 	"list" => "categorymembers",
-	"cmtitle" => $C["category"],
+	"cmtitle" => $cfg["category"],
 	"cmlimit" => "max",
 )));
 if ($res === false) {
@@ -50,7 +62,7 @@ foreach ($pagelist as $page) {
 		$text = preg_replace("/{{Draft Copyvio(\|[^{}]+?)?}} *\n*/i", "", $text);
 		$text = preg_replace("/<!--請勿刪除此行，並由下一行開始編輯--> *\n*/i", "", $text);
 
-		$summary = $C["summary_prefix"] . "，清理[[Category:已完成侵權驗證的頁面]]";
+		$summary = $cfg["summary"];
 		$post = array(
 			"action" => "edit",
 			"format" => "json",
