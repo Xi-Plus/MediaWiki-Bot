@@ -15,6 +15,18 @@ require __DIR__ . "/../function/edittoken.php";
 
 echo "The time now is " . date("Y-m-d H:i:s") . " (UTC)\n";
 
+$config_page = file_get_contents($C["config_page"]);
+if ($config_page === false) {
+	exit("get config failed\n");
+}
+$cfg = json_decode($config_page, true);
+
+if (!$cfg["enable"]) {
+	exit("disabled\n");
+}
+
+var_dump($cfg);
+
 login("bot");
 $C["edittoken"] = edittoken();
 
@@ -31,7 +43,7 @@ $res = cURL($C["wikiapi"] . "?" . http_build_query(array(
 	"action" => "query",
 	"format" => "json",
 	"prop" => "revisions",
-	"titles" => $C["from_page"],
+	"titles" => $cfg["from_page"],
 	"rvprop" => "ids|user|timestamp",
 	"rvlimit" => $C["rvlimit"],
 )));
@@ -49,7 +61,7 @@ foreach ($revs as $index => $rev) {
 	if ($rev["revid"] <= $lastrevid) {
 		break;
 	}
-	if (in_array($rev["user"], $C["archviebotname"])) {
+	if (in_array($rev["user"], $cfg["archviebotname"])) {
 		$arRevIndexs[] = $index;
 	}
 }

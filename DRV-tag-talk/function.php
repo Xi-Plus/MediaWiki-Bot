@@ -170,7 +170,7 @@ function getfirsttime($text) {
 
 # check page exist, solve converttitle and redirect, get talk page title
 function getpageinfo($pagename) {
-	global $C;
+	global $C, $cfg;
 	if (!isset($C["ns"])) {
 		$C["ns"] = [];
 
@@ -208,7 +208,7 @@ function getpageinfo($pagename) {
 		return false;
 	}
 
-	if (in_array($page["ns"], $C["nsignore"])) {
+	if (in_array($page["ns"], $cfg["nsignore"])) {
 		echo $pagename . "in ignore ns (" . $page["ns"] . ")\n";
 		return false;
 	}
@@ -254,7 +254,7 @@ function checktalkpagetagged($text, $date) {
 }
 
 function tagtalkpage($title, $date, $diff, $result) {
-	global $C;
+	global $C, $cfg;
 	if (trim($title) === "") {
 		echo "bad title\n";
 		return false;
@@ -304,7 +304,8 @@ function tagtalkpage($title, $date, $diff, $result) {
 
 	$text = $add . "\n" . trim($text);
 
-	$summary = $C["summary_prefix"] . "[[Special:diff/" . $diff . "|" . $result . "]]";
+	$summary = sprintf($cfg["summary"],
+		"[[Special:diff/" . $diff . "|" . $result . "]]");
 	$post = array(
 		"action" => "edit",
 		"format" => "json",
