@@ -334,7 +334,10 @@ for page in site.categorymembers(cat):
         skipfile.write(pagetitle + "\n")
         continue
 
+    # General fixes start
     text = re.sub(r'(\|align=center\|)<br ?/?>', r'\1', text)
+    text = re.sub(r'(^<!--.+-->$\n)\n+', r'\1', text, flags=re.M)
+    # General fixes end
 
     pywikibot.showDiff(page.text, text)
 
