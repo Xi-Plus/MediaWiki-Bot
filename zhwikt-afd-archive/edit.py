@@ -7,11 +7,12 @@ import time
 from datetime import datetime
 
 import mwparserfromhell
+os.environ['PYWIKIBOT2_DIR'] = os.path.dirname(os.path.realpath(__file__))
 import pywikibot
 
 from config import *
 
-os.environ['PYWIKIBOT2_DIR'] = os.path.dirname(os.path.realpath(__file__))
+
 os.environ['TZ'] = 'UTC'
 
 site = pywikibot.Site()

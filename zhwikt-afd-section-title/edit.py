@@ -1,14 +1,17 @@
 # -*- coding: utf-8 -*-
-import os
-os.environ['PYWIKIBOT2_DIR'] = os.path.dirname(os.path.realpath(__file__))
-import sys
 import json
+import os
 import re
-import pywikibot
-import mwparserfromhell
+import sys
 from datetime import datetime, timedelta
+
+import mwparserfromhell
+os.environ['PYWIKIBOT2_DIR'] = os.path.dirname(os.path.realpath(__file__))
+import pywikibot
 from pywikibot.data.api import Request
+
 from config import *
+
 
 site = pywikibot.Site()
 site.login()
