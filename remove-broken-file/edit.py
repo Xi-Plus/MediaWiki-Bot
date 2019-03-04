@@ -245,7 +245,8 @@ for page in site.categorymembers(cat):
                         save = "Yes"
                     if save in ["Yes", "yes", "Y", "y", ""]:
                         drv_page.text = drv_page_text
-                        drv_page.save(summary=summary, minor=False, botflag=False)
+                        drv_page.save(summary=summary,
+                                      minor=False, botflag=False)
                 else:
                     print('Already reported to DRV.')
 
@@ -337,6 +338,7 @@ for page in site.categorymembers(cat):
     # General fixes start
     text = re.sub(r'(\|align=center\|)<br ?/?>', r'\1', text)
     text = re.sub(r'(^<!--.+-->$\n)\n+', r'\1', text, flags=re.M)
+    text = re.sub(r'^\n+', '', text)
     # General fixes end
 
     pywikibot.showDiff(page.text, text)
