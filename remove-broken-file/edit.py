@@ -340,8 +340,8 @@ for page in site.categorymembers(cat):
     text = re.sub(r'(^<!--.+-->$\n)\n+', r'\1', text, flags=re.M)
     text = re.sub(r'^\n+', '', text)
     text = re.sub(r'\n{3,}', '\n\n', text)
-    text = re.sub(r'\n<gallery>[\s\S]+</gallery>\n', '\n', text)
-    text = re.sub(r'<gallery>[\s\S]+</gallery>', '', text)
+    text = re.sub(r'\n<gallery>\s+</gallery>\n', '\n', text)
+    text = re.sub(r'<gallery>\s+</gallery>', '', text)
     # General fixes end
 
     pywikibot.showDiff(page.text, text)
