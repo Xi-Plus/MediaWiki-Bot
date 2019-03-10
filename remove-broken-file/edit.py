@@ -13,6 +13,7 @@ from config import *
 os.environ["TZ"] = "UTC"
 
 parser = argparse.ArgumentParser()
+parser.add_argument('--category', type=str, default=None)
 parser.add_argument('--confirm', type=bool, default=False)
 parser.add_argument('--limit', type=int, default=0)
 parser.add_argument('--skiplimit', type=int, default=20)
@@ -31,7 +32,10 @@ print(json.dumps(cfg, indent=4, ensure_ascii=False))
 if not cfg["enable"]:
     exit("disabled\n")
 
-cat = pywikibot.Page(site, cfg["category"])
+if args.category:
+    cat = pywikibot.Page(site, args.category)
+else:
+    cat = pywikibot.Page(site, cfg["category"])
 
 skippages = ""
 skippagespath = os.path.join(os.path.dirname(
