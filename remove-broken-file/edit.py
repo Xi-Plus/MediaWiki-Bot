@@ -15,6 +15,7 @@ os.environ["TZ"] = "UTC"
 parser = argparse.ArgumentParser()
 parser.add_argument('--confirm', type=bool, default=False)
 parser.add_argument('--limit', type=int, default=0)
+parser.add_argument('--skiplimit', type=int, default=20)
 args = parser.parse_args()
 print(args)
 
@@ -90,10 +91,11 @@ def checkReplace(oldText, newText):
     return newText
 
 
-cnt = 1
+limit = 1
+skiplimit = 0
 for page in site.categorymembers(cat):
     pagetitle = page.title()
-    print(cnt, pagetitle)
+    print(limit, pagetitle)
     is_skip = False
     for skip_regex in cfg['skip_title']:
         if re.search(skip_regex, pagetitle):
@@ -345,6 +347,10 @@ for page in site.categorymembers(cat):
         if args.confirm:
             input()
         skipfile.write(pagetitle + "\n")
+        skiplimit += 1
+        if args.skiplimit > 0 and skiplimit >= args.skiplimit:
+            print('Reach the skiplimit. Quitting.')
+            break
         continue
 
     # General fixes start
@@ -378,11 +384,11 @@ for page in site.categorymembers(cat):
     if save in ["Yes", "yes", "Y", "y", ""]:
         page.text = text
         page.save(summary=summary, minor=False)
-        cnt += 1
+        limit += 1
     else:
         print("skip")
         skipfile.write(pagetitle + "\n")
 
-    if args.limit > 0 and cnt > args.limit:
+    if args.limit > 0 and limit > args.limit:
         print('Reach the limit. Quitting.')
         break
