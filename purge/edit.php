@@ -119,9 +119,6 @@ if (isset($options["t"])) {
 		$options["t"] = [$options["t"]];
 	}
 	foreach ($options["t"] as $template) {
-		if (!preg_match("/^(t|template|模板)?:/i", $template)) {
-			$template = "Template:" . $template;
-		}
 		echo "template " . $template . "\n";
 		$res = cURL($C["wikiapi"] . "?" . http_build_query(array(
 			"action" => "query",
