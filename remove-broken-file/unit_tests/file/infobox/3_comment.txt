@@ -1,0 +1,1 @@
+{{Infobox|name=xxx|image=<!-- 檔案不存在 example image.png -->|caption=xxx}}

@@ -1,0 +1,5 @@
+{{Infobox |
+name=xxx |
+image=<!-- 檔案不存在 example image.png ，可從英文維基百科取得 --> |
+caption=xxx |
+}}
