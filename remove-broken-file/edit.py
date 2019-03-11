@@ -146,7 +146,8 @@ for page in site.categorymembers(cat):
                     replace = cfg["regex"][regex_type]["replace"]["comment_other"].format(
                         cfg["check_other_wiki"][existother])
 
-                    newtext, count = re.subn(regex, replace, text, flags=re.M)
+                    newtext, count = re.subn(
+                        regex, replace, text, flags=re.M | re.I)
                     text = checkReplace(text, newtext)
 
                     if count > 0:
@@ -171,7 +172,7 @@ for page in site.categorymembers(cat):
                             movelog[-1]["params"]["target_title_without_ns"])
 
                         newtext, count = re.subn(
-                            regex, replace, text, flags=re.M)
+                            regex, replace, text, flags=re.M | re.I)
                         text = checkReplace(text, newtext)
 
                         if count > 0:
@@ -237,7 +238,8 @@ for page in site.categorymembers(cat):
                         imageregex)
                     replace = cfg["regex"][regex_type]["replace"]["deleted_comment"]
 
-                    newtext, count = re.subn(regex, replace, text, flags=re.M)
+                    newtext, count = re.subn(
+                        regex, replace, text, flags=re.M | re.I)
                     text = checkReplace(text, newtext)
 
                     if count > 0:
@@ -279,7 +281,8 @@ for page in site.categorymembers(cat):
                         imageregex)
                     replace = cfg["regex"][regex_type]["replace"]["deleted"]
 
-                    newtext, count = re.subn(regex, replace, text, flags=re.M)
+                    newtext, count = re.subn(
+                        regex, replace, text, flags=re.M | re.I)
                     text = checkReplace(text, newtext)
 
                     if count > 0:
@@ -329,7 +332,8 @@ for page in site.categorymembers(cat):
                         imageregex)
                     replace = cfg["regex"][regex_type]["replace"]["comment"]
 
-                    newtext, count = re.subn(regex, replace, text, flags=re.M)
+                    newtext, count = re.subn(
+                        regex, replace, text, flags=re.M | re.I)
                     text = checkReplace(text, newtext)
 
                     if count > 0:
