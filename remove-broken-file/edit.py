@@ -98,6 +98,13 @@ def checkReplace(oldText, newText):
 limit = 1
 skiplimit = 0
 for page in site.categorymembers(cat):
+    if args.limit > 0 and limit > args.limit:
+        print('Reach the limit. Quitting.')
+        break
+    if args.skiplimit > 0 and skiplimit >= args.skiplimit:
+        print('Reach the skiplimit. Quitting.')
+        break
+
     pagetitle = page.title()
     print(limit, pagetitle)
     is_skip = False
@@ -391,12 +398,15 @@ for page in site.categorymembers(cat):
         save = "Yes"
     if save in ["Yes", "yes", "Y", "y", ""]:
         page.text = text
-        page.save(summary=summary, minor=False)
+        try:
+            page.save(summary=summary, minor=False)
+        except pywikibot.exceptions.SpamfilterError as e:
+            print(e)
+        if args.confirm:
+            input()
+        skipfile.write(pagetitle + "\n")
+        skiplimit += 1
         limit += 1
     else:
         print("skip")
         skipfile.write(pagetitle + "\n")
-
-    if args.limit > 0 and limit > args.limit:
-        print('Reach the limit. Quitting.')
-        break
