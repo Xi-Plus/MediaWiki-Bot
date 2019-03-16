@@ -402,11 +402,11 @@ for page in site.categorymembers(cat):
             page.save(summary=summary, minor=False)
         except pywikibot.exceptions.SpamfilterError as e:
             print(e)
-        if args.confirm:
-            input()
-        skipfile.write(pagetitle + "\n")
-        skiplimit += 1
-        limit += 1
+            if args.confirm:
+                input()
+            skipfile.write(pagetitle + "\n")
+            skiplimit += 1
+            limit += 1
     else:
         print("skip")
         skipfile.write(pagetitle + "\n")
