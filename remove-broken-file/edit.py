@@ -137,7 +137,7 @@ for page in site.categorymembers(cat):
 
             imageregex = "[" + imagename[0].upper() + \
                 imagename[0].lower() + "]" + re.escape(imagename[1:])
-            imageregex = imageregex.replace("\\ ", "[ _]")
+            imageregex = imageregex.replace("\\ ", "[ _]+")
 
             # comment_other start
             existother = None
