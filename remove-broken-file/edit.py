@@ -16,7 +16,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--category', type=str, default=None)
 parser.add_argument('--confirm', type=bool, default=False)
 parser.add_argument('--limit', type=int, default=0)
-parser.add_argument('--skiplimit', type=int, default=20)
+parser.add_argument('--skiplimit', type=int, default=100)
 args = parser.parse_args()
 print(args)
 
@@ -113,6 +113,8 @@ for page in site.categorymembers(cat):
             print('skip ({0})'.format(skip_regex))
             is_skip = True
             break
+    if re.search(skip_title, pagetitle):
+        is_skip = True
     if is_skip:
         continue
     if pagetitle in skippages:
