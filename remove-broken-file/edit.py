@@ -199,7 +199,7 @@ for page in site.categorymembers(cat):
             # moved end
 
             # deleted start
-            deleted = False
+            deleted_local = False
             deleted_commons = False
             deleted_comment = False
             deleted_f6 = False
@@ -212,14 +212,14 @@ for page in site.categorymembers(cat):
                 "lelimit": "1"
             }).submit()
             if len(data["query"]["logevents"]) > 0:
+                deleted_local = True
                 deletelog = data["query"]["logevents"][0]
-                deleted = True
                 if re.search(cfg["ignored_csd_comment"], deletelog["comment"]):
                     deleted_comment = True
                 elif re.search(cfg["drv_csd_comment"], deletelog["comment"]):
                     deleted_comment = True
                     deleted_f6 = True
-            if not deleted:
+            if not deleted_local:
                 data = pywikibot.data.api.Request(site=sitecommons, parameters={
                     "action": "query",
                     "letitle": image_fullname,
@@ -228,11 +228,10 @@ for page in site.categorymembers(cat):
                     "lelimit": "1"
                 }).submit()
                 if len(data["query"]["logevents"]) > 0:
-                    deleted = True
                     deleted_commons = True
                     deletelog = data["query"]["logevents"][0]
 
-            if deleted_comment or deleted:
+            if deleted_local:
                 summary_prefix = imagename
                 for log in movelog:
                     summary_prefix = cfg["summary"]["moved_deleted"].format(
@@ -279,11 +278,11 @@ for page in site.categorymembers(cat):
 
                 continue
 
-            if deleted:
-                if deleted_commons:
+            if deleted_local or deleted_commons:
+                if deleted_local:
+                    print("{} deleted on local".format(image_fullname))
+                elif deleted_commons:
                     print("{} deleted on commons".format(image_fullname))
-                else:
-                    print("{} deleted".format(image_fullname))
 
                 for regex_type in cfg["regex"]:
                     regex = cfg["regex"][regex_type]["pattern"].format(
@@ -302,9 +301,10 @@ for page in site.categorymembers(cat):
                                      r"[[:c:\1]]", deletelog["comment"])
                     summary_deleted.append(cfg["summary"]["deleted"]["commons"].format(
                         imagename, deletelog["user"], deletelog["logid"], comment))
-                else:
+                elif deleted_local:
                     summary_deleted.append(cfg["summary"]["deleted"]["local"].format(
-                        summary_prefix, deletelog["user"], deletelog["logid"], deletelog["comment"]))
+                        summary_prefix, deletelog["user"],
+                        deletelog["logid"], deletelog["comment"]))
 
                 continue
 
@@ -402,13 +402,13 @@ for page in site.categorymembers(cat):
         page.text = text
         try:
             page.save(summary=summary, minor=False)
+            limit += 1
         except pywikibot.exceptions.SpamfilterError as e:
             print(e)
             if args.confirm:
                 input()
             skipfile.write(pagetitle + "\n")
             skiplimit += 1
-            limit += 1
     else:
         print("skip")
         skipfile.write(pagetitle + "\n")
