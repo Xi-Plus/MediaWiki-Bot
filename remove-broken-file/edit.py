@@ -359,6 +359,19 @@ for page in site.categorymembers(cat):
             print("{} missed for unknown reason".format(image_fullname))
             # unknown end
 
+    summary = []
+    if len(summary_comment):
+        summary.append(cfg["summary"]["prepend"]
+                       ["comment"] + "、".join(summary_comment))
+    if len(summary_moved):
+        summary.append(cfg["summary"]["prepend"]
+                       ["moved"] + "、".join(summary_moved))
+    if len(summary_deleted):
+        summary.append(cfg["summary"]["prepend"]
+                       ["deleted"] + "、".join(summary_deleted))
+    summary = cfg["summary"]["prepend"]["all"] + "；".join(summary)
+    print("summary = {}".format(summary))
+
     if page.text == text:
         print("nothing changed")
         if args.confirm:
@@ -380,19 +393,6 @@ for page in site.categorymembers(cat):
     # General fixes end
 
     pywikibot.showDiff(page.text, text)
-
-    summary = []
-    if len(summary_comment):
-        summary.append(cfg["summary"]["prepend"]
-                       ["comment"] + "、".join(summary_comment))
-    if len(summary_moved):
-        summary.append(cfg["summary"]["prepend"]
-                       ["moved"] + "、".join(summary_moved))
-    if len(summary_deleted):
-        summary.append(cfg["summary"]["prepend"]
-                       ["deleted"] + "、".join(summary_deleted))
-    summary = cfg["summary"]["prepend"]["all"] + "；".join(summary)
-    print("summary = {}".format(summary))
 
     if args.confirm:
         save = input("save?")
