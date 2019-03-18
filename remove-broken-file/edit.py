@@ -299,7 +299,7 @@ for page in site.categorymembers(cat):
                         break
 
                 if deleted_commons:
-                    comment = re.sub(r"\[\[([^\[\]]+?)]]",
+                    comment = re.sub(r"\[\[:?([^\[\]]+?)]]",
                                      r"[[:c:\1]]", deletelog["comment"])
                     summary_deleted.append(cfg["summary"]["deleted"]["commons"].format(
                         imagename, deletelog["user"], deletelog["logid"], comment))
