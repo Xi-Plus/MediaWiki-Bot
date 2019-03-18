@@ -17,6 +17,7 @@ parser.add_argument('--category', type=str, default=None)
 parser.add_argument('--confirm', type=bool, default=False)
 parser.add_argument('--limit', type=int, default=0)
 parser.add_argument('--skiplimit', type=int, default=100)
+parser.add_argument('--regex', type=bool, default=False)
 args = parser.parse_args()
 print(args)
 
@@ -154,6 +155,9 @@ for page in site.categorymembers(cat):
                         imageregex)
                     replace = cfg["regex"][regex_type]["replace"]["comment_other"].format(
                         cfg["check_other_wiki"][existother])
+                    if args.regex:
+                        print('comment_other regex: {}'.format(regex))
+                        print('comment_other replace: {}'.format(replace))
 
                     newtext, count = re.subn(
                         regex, replace, text, flags=re.M | re.I)
@@ -179,6 +183,9 @@ for page in site.categorymembers(cat):
                             imageregex)
                         replace = cfg["regex"][regex_type]["replace"]["moved"].format(
                             movelog[-1]["params"]["target_title_without_ns"])
+                        if args.regex:
+                            print('moved regex: {}'.format(regex))
+                            print('moved replace: {}'.format(replace))
 
                         newtext, count = re.subn(
                             regex, replace, text, flags=re.M | re.I)
@@ -246,6 +253,9 @@ for page in site.categorymembers(cat):
                     regex = cfg["regex"][regex_type]["pattern"].format(
                         imageregex)
                     replace = cfg["regex"][regex_type]["replace"]["deleted_comment"]
+                    if args.regex:
+                        print('deleted_comment regex: {}'.format(regex))
+                        print('deleted_comment replace: {}'.format(replace))
 
                     newtext, count = re.subn(
                         regex, replace, text, flags=re.M | re.I)
@@ -290,6 +300,9 @@ for page in site.categorymembers(cat):
                     regex = cfg["regex"][regex_type]["pattern"].format(
                         imageregex)
                     replace = cfg["regex"][regex_type]["replace"]["deleted"]
+                    if args.regex:
+                        print('deleted regex: {}'.format(regex))
+                        print('deleted replace: {}'.format(replace))
 
                     newtext, count = re.subn(
                         regex, replace, text, flags=re.M | re.I)
@@ -342,6 +355,9 @@ for page in site.categorymembers(cat):
                     regex = cfg["regex"][regex_type]["pattern"].format(
                         imageregex)
                     replace = cfg["regex"][regex_type]["replace"]["comment"]
+                    if args.regex:
+                        print('comment regex: {}'.format(regex))
+                        print('comment replace: {}'.format(replace))
 
                     newtext, count = re.subn(
                         regex, replace, text, flags=re.M | re.I)
