@@ -44,6 +44,8 @@ def converttitle(title):
         mode.append('normalized')
     if 'redirects' not in mode:
         page = pywikibot.Page(site, title)
+        if not page.exists():
+            mode.append('vfd_on_source')
         if page.exists() and (page.content_model != 'wikitext' or re.search(r'{{\s*[vaictumr]fd', page.text, flags=re.I)):
             mode.append('vfd_on_source')
     else:
