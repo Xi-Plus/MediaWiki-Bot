@@ -66,6 +66,8 @@ for page in site.categorymembers(cat):
                 headers[sechash] = 1
             sechash = '#{{{{subst:anchorencode:{0}}}}}'.format(sechash)
 
+        section = re.sub(r'<nowiki>[\s\S]+?</nowiki>', '', section)
+
         if (re.search(r'{{(Editprotected|Editprotect|Sudo|EP|请求编辑|编辑请求|請求編輯受保護的頁面|Editsemiprotected|FPER|Fper|Edit[ _]fully-protected|SPER|Edit[ _]semi-protected|Edit[ _]protected|Ep)(\||}})', section, flags=re.I)
                 and not re.search(r'{{(Editprotected|Editprotect|Sudo|EP|请求编辑|编辑请求|請求編輯受保護的頁面|Editsemiprotected|FPER|Fper|Edit[ _]fully-protected|SPER|Edit[ _]semi-protected|Edit[ _]protected|Ep).*?\|(ok|no)=1', section, flags=re.I)):
 
