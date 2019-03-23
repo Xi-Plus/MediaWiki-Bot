@@ -126,6 +126,7 @@ $output = str_replace("<!--time-->", $time, $output);
 $result = array_reverse($result);
 $comment = voting_info($result[0]["support"], $result[0]["oppose"]);
 $output = str_replace("<!--comment-->", $comment, $output);
+$output = str_replace("Wikipedia:申请成为管理员/Example", $C["page"], $output);
 @mkdir(__DIR__ . "/list");
 $outpath = __DIR__ . "/list/" . str_replace([":", "/"], ["_", "_"], $C["page"]) . ".html";
 echo "output: " . $outpath . "\n";
