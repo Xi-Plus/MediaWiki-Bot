@@ -68,8 +68,8 @@ for page in site.categorymembers(cat):
 
         section = re.sub(r'<nowiki>[\s\S]+?</nowiki>', '', section)
 
-        if (re.search(r'{{(Editprotected|Editprotect|Sudo|EP|请求编辑|编辑请求|請求編輯受保護的頁面|Editsemiprotected|FPER|Fper|Edit[ _]fully-protected|SPER|Edit[ _]semi-protected|Edit[ _]protected|Ep)(\||}})', section, flags=re.I)
-                and not re.search(r'{{(Editprotected|Editprotect|Sudo|EP|请求编辑|编辑请求|請求編輯受保護的頁面|Editsemiprotected|FPER|Fper|Edit[ _]fully-protected|SPER|Edit[ _]semi-protected|Edit[ _]protected|Ep).*?\|(ok|no)=', section, flags=re.I)):
+        if (re.search(r'{{(Editprotected|Editprotect|Sudo|EP|请求编辑|编辑请求|請求編輯受保護的頁面|Editsemiprotected|FPER|Fper|Edit[ _]fully-protected|SPER|Edit[ _]semi-protected|Edit[ _]protected|Ep)(\||}})', section, flags=re.I) and
+                not re.search(r'{{(Editprotected|Editprotect|Sudo|EP|请求编辑|编辑请求|請求編輯受保護的頁面|Editsemiprotected|FPER|Fper|Edit[ _]fully-protected|SPER|Edit[ _]semi-protected|Edit[ _]protected|Ep).*?\|(ok|no)=', section, flags=re.I)):
 
             firsttime = datetime(9999, 12, 31, tzinfo=timezone.utc)
             lasttime = datetime(1, 1, 1, tzinfo=timezone.utc)
@@ -81,24 +81,14 @@ for page in site.categorymembers(cat):
             print(firsttime, lasttime)
             if firsttime == datetime(9999, 12, 31, tzinfo=timezone.utc):
                 firstvalue = 0
-                firsttimetext = '無法抓取時間'
             else:
                 firstvalue = int(firsttime.timestamp())
-                firsttimetext = '{{{{subst:#time:Y年n月j日 (D) H:i|{0}}}}} (UTC)'.format(
-                    str(firsttime))
             if lasttime == datetime(1, 1, 1, tzinfo=timezone.utc):
                 lastvalue = 0
-                lasttimetext = '無法抓取時間'
             else:
                 lastvalue = int(lasttime.timestamp())
-                lasttimetext = '{{{{subst:#time:Y年n月j日 (D) H:i|{0}}}}} (UTC)'.format(
-                    str(lasttime))
-            output += (
-                '\n|-'
-                '\n| [[{0}{1}|{0}]]'
-                '\n|data-sort-value={2}| {3}'
-                '\n|data-sort-value={4}| {5}'
-            ).format(title, sechash, firstvalue, firsttimetext, lastvalue, lasttimetext)
+            output += '\n{{{{/item|[[{0}{1}|{0}]]|{2}|{3}}}}}'.format(
+                title, sechash, firstvalue, lastvalue)
 
 output += '\n|}'
 
