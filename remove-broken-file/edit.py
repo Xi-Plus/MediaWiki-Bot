@@ -423,10 +423,17 @@ for page in site.categorymembers(cat):
             limit += 1
         except pywikibot.exceptions.SpamfilterError as e:
             print(e)
-            if args.confirm:
-                input()
-            skipfile.write(pagetitle + "\n")
-            skiplimit += 1
+            summary = re.sub(r'https?:', '', summary)
+            print('Trying to remove url in summary and save again.')
+            try:
+                page.save(summary=summary, minor=False)
+                limit += 1
+            except pywikibot.exceptions.SpamfilterError as e:
+                print(e)
+                if args.confirm:
+                    input()
+                skipfile.write(pagetitle + "\n")
+                skiplimit += 1
     else:
         print("skip")
         skipfile.write(pagetitle + "\n")
