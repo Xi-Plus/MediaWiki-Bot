@@ -64,7 +64,7 @@ if cupage.text == text:
 
 pywikibot.showDiff(cupage.text, text)
 cupage.text = text
-cupage.save(summary=cfg["main_page_summary"].format(count), minor=False)
+cupage.save(summary=cfg["main_page_summary"].format(count), minor=True)
 
 for target in archivelist:
 	targetpage = pywikibot.Page(site, cfg["archive_page_name"].format(target[0], target[1]))
@@ -76,4 +76,4 @@ for target in archivelist:
 
 	pywikibot.showDiff(targetpage.text, text)
 	targetpage.text = text
-	targetpage.save(summary=cfg["archive_page_summary"].format(len(archivelist[target])), minor=False)
+	targetpage.save(summary=cfg["archive_page_summary"].format(len(archivelist[target])), minor=True)

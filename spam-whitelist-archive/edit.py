@@ -64,7 +64,7 @@ pywikibot.showDiff(signpage.text, text)
 signpage.text = text
 summary = cfg['main_page_summary'].format(count)
 print(summary)
-signpage.save(summary=summary, minor=False)
+signpage.save(summary=summary, minor=True)
 
 archivepagename = cfg['archive_page_name'].format(datetime.now().year)
 archivepage = pywikibot.Page(site, archivepagename)
@@ -75,4 +75,4 @@ pywikibot.showDiff(archivepage.text, text)
 archivepage.text = text
 summary = cfg['archive_page_summary'].format(count)
 print(summary)
-archivepage.save(summary=summary, minor=False)
+archivepage.save(summary=summary, minor=True)
