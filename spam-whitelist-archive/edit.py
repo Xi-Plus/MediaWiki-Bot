@@ -63,7 +63,8 @@ summary = cfg["main_page_summary"].format(count)
 print(summary)
 signpage.save(summary=summary, minor=False)
 
-archivepage = pywikibot.Page(site, cfg["archive_page_name"])
+archivepagename = cfg["archive_page_name"].format(datetime.now().year)
+archivepage = pywikibot.Page(site, archivepagename)
 text = archivepage.text
 text += "\n\n"+"\n\n".join(archivelist)
 
