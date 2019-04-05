@@ -1,63 +1,78 @@
 # -*- coding: utf-8 -*-
+import argparse
 import os
-import pywikibot
-import json
 import re
 
+os.environ['PYWIKIBOT2_DIR'] = os.path.dirname(os.path.realpath(__file__))
+import pywikibot
 
-os.environ["PYWIKIBOT2_DIR"] = os.path.dirname(os.path.realpath(__file__))
-os.environ["TZ"] = "UTC"
+os.environ['TZ'] = 'UTC'
 
 site = pywikibot.Site()
 site.login()
 
-token = site.getToken()
+token = site.tokens['csrf']
 
-runpages = ""
-with open("page.txt", "r") as f:
-    runpages = f.read().split("\n")
 
-for title in runpages:
-
+def move_date_to_title(title, confirm=False, dry_run=False):
     page = pywikibot.Page(site, title)
 
     pagetitle = page.title()
-    print(title, pagetitle)
+    print(pagetitle)
 
     if not page.exists():
-        print("not exists")
-        continue
+        print('not exists')
+        return
 
     text = page.text
-    print("-----\n"+text+"\n--------")
+    print('-----\n' + text + '\n--------')
 
     m = re.search(r"'''《?\[\[(.+?)(\|.+?)?]]》?'''", text)
     if not m:
-        print("cannot find title")
-        continue
+        print('cannot find title')
+        return
 
     target = m.group(1)
 
     targetpage = pywikibot.Page(site, target)
     if targetpage.isRedirectPage():
         targetpage = targetpage.getRedirectTarget()
-        print("follow redirect")
+        print('follow redirect')
 
     print(targetpage.title())
 
-    print("move {} to {}".format(page.title(), "Wikipedia:优良条目/"+targetpage.title())+" ?")
-    data = pywikibot.data.api.Request(site=site, parameters={
-        "action": "move",
-        "from": page.title(),
-        "to": "Wikipedia:优良条目/"+targetpage.title(),
-        "reason": "機器人：整理標題格式",
-        "movetalk": "1",
-        "noredirect": "1",
-        "token": token
+    movefrom = page.title()
+    moveto = 'Wikipedia:优良条目/' + targetpage.title()
+    print('move {} to {} ?'.format(movefrom, moveto))
+    if not dry_run:
+        if confirm:
+            input()
+        data = pywikibot.data.api.Request(site=site, parameters={
+            'action': 'move',
+            'from': page.title(),
+            'to': 'Wikipedia:优良条目/' + targetpage.title(),
+            'reason': '整理標題格式',
+            'noredirect': '1',
+            'token': token
         }).submit()
-    print(data)
+        print(data)
 
-    print("save {} as {}".format(page.title(), "Wikipedia:优良条目/"+targetpage.title())+" ?")
-    page = pywikibot.Page(site, title)
-    page.text = "{{Wikipedia:优良条目/"+targetpage.title()+"}}"
-    page.save(summary="機器人：整理標題格式")
+    print('save {} as {} ?'.format(movefrom, moveto))
+    if not dry_run:
+        if confirm:
+            input()
+        page = pywikibot.Page(site, movefrom)
+        page.text = '{{' + moveto + '}}'
+        page.save(summary='整理標題格式')
+
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument('page')
+    parser.add_argument('--confirm', type=bool, default=False)
+    parser.add_argument('--dry_run', type=bool, default=False)
+    args = parser.parse_args()
+
+    print(args)
+
+    move_date_to_title(args.page, confirm=args.confirm, dry_run=args.dry_run)
