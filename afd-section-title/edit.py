@@ -66,6 +66,7 @@ def converttitle(title):
 def appendComment(text, mode):
     text = text.strip()
     if 'A2093064-bot' not in text:
+        append_text = ''
         if 'fix' in mode:
             comment = []
             if 'redirects' in mode and isinstance(cfg['comment_fix']['redirects'], str):
@@ -78,12 +79,19 @@ def appendComment(text, mode):
                 comment.append(cfg['comment_fix']['normalized'])
                 print('\tcomment_fix - normalized')
             if len(comment) > 0:
-                text += '\n' + \
-                    cfg['comment_fix']['main'].format(''.join(comment))
+                append_text = cfg['comment_fix']['main'].format(
+                    ''.join(comment))
                 print('\tcomment_fix - redirects')
         if 'no_vfd' in mode:
-            text += '\n' + cfg['comment_vfd']
+            append_text = cfg['comment_vfd']
             print('\tcomment_vfd')
+        if append_text != '':
+            hr = '\n----'
+            if hr in text:
+                temp = text.split(hr)
+                text = hr.join(temp[:-1]) + '\n' + append_text + hr + temp[-1]
+            else:
+                text += '\n' + append_text
     text += '\n\n'
     return text
 
