@@ -277,7 +277,7 @@ for page in pages:
                 summary_comment.append(cfg["summary"]["deleted"]["local"].format(
                     summary_prefix, deletelog["user"], deletelog["logid"], deletelog["comment"]))
 
-                if deleted_f6:
+                if deleted_f6 and page.namespace().id == 0:
                     drv_page = pywikibot.Page(site, cfg["drv_page"])
                     drv_page_text = drv_page.text
                     if image_fullname not in drv_page_text:
