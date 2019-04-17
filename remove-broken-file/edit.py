@@ -14,6 +14,7 @@ os.environ["TZ"] = "UTC"
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--category', type=str, default=None)
+parser.add_argument('--page', type=str, default=None)
 parser.add_argument('--confirm', type=bool, default=False)
 parser.add_argument('--limit', type=int, default=0)
 parser.add_argument('--skiplimit', type=int, default=100)
@@ -96,9 +97,13 @@ def checkReplace(oldText, newText):
     return newText
 
 
+pages = site.categorymembers(cat)
+if args.page:
+    pages = [pywikibot.Page(site, args.page)]
+
 limit = 1
 skiplimit = 0
-for page in site.categorymembers(cat):
+for page in pages:
     if args.limit > 0 and limit > args.limit:
         print('Reach the limit. Quitting.')
         break
