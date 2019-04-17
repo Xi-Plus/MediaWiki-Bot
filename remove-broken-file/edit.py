@@ -113,6 +113,11 @@ for page in pages:
 
     pagetitle = page.title()
     print(limit, pagetitle)
+
+    if page.namespace().id in [8]:
+        print('Skip page in specify namespace.')
+        continue
+
     is_skip = False
     for skip_regex in cfg['skip_title']:
         if re.search(skip_regex, pagetitle):
