@@ -1,5 +1,6 @@
 <?php
 require __DIR__ . "/../config/config.php";
+require __DIR__ . "/function.php";
 if (!in_array(PHP_SAPI, $C["allowsapi"])) {
 	exit("No permission");
 }
@@ -61,12 +62,9 @@ foreach ($res["query"]["abusefilters"] as $AF) {
 	$description = preg_replace("/\[\[([^}]+)\]\]/", "{{!((}}$1{{))!}}", $description);
 
 	$action = $AF["actions"];
-	$action = str_replace("warn", "{{int:abusefilter-action-warn}}", $action);
-	$action = str_replace("tag", "{{int:abusefilter-action-tag}}", $action);
-	$action = str_replace("disallow", "{{int:abusefilter-action-disallow}}", $action);
-	$action = str_replace("throttle", "{{int:abusefilter-action-throttle}}", $action);
-	$action = str_replace("blockautopromote", "{{int:abusefilter-action-blockautopromote}}", $action);
-	$action = str_replace(",", "、", $action);
+	$action = explode(',', $action);
+	array_walk($action, 'afactions');
+	$action = implode('、', $action);
 
 	if ($AF["hits"] > 1000) {
 		$AF["hits"] = (floor($AF["hits"] / 1000) * 1000);
