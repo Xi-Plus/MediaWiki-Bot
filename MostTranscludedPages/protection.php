@@ -58,6 +58,11 @@ foreach ($pagelist as $pagelist2) {
 		foreach ($result["protection"] as $protection) {
 			$protect[$protection["type"]] = $protection["level"];
 		}
+		if (isset($protect["create"])) {
+			$protect["edit"] = $protect["create"];
+			$protect["move"] = "create";
+			unset($protect["create"]);
+		}
 		if ($protect["edit"] != $pages[$title]["protectedit"] || $protect["move"] != $pages[$title]["protectmove"] || $redirect != $pages[$title]["redirect"]) {
 			$sth = $G["db"]->prepare("UPDATE `{$C['DBTBprefix']}page` SET `protectedit` = :protectedit, `protectmove` = :protectmove, `redirect` = :redirect, `time` = :time WHERE `title` = :title");
 			$sth->bindValue(":title", $title);
