@@ -2,8 +2,10 @@
 import argparse
 import json
 import os
+import time
 import re
 
+import pymysql
 os.environ["PYWIKIBOT2_DIR"] = os.path.dirname(os.path.realpath(__file__))
 import pywikibot
 
@@ -39,12 +41,34 @@ if args.category:
 else:
     cat = pywikibot.Page(site, cfg["category"])
 
-skippages = ""
-skippagespath = os.path.join(os.path.dirname(
-    os.path.realpath(__file__)), "skipedpage.txt")
-with open(skippagespath, "r") as f:
-    skippages = f.read()
-skipfile = open(skippagespath, "a")
+db = pymysql.connect(host=database['host'],
+                     user=database['user'],
+                     passwd=database['passwd'],
+                     db=database['db'],
+                     charset=database['charset'])
+cur = db.cursor()
+
+cur.execute("""SELECT `page` FROM `remove_broken_file_pages` WHERE `time` > FROM_UNIXTIME(%s)""",
+            (time.time() - skip_time))
+rows = cur.fetchall()
+skippages = []
+for row in rows:
+    skippages.append(row[0])
+
+
+def add_skip_page(skip_page, files):
+    cur.execute("""DELETE FROM `remove_broken_file_pages` WHERE `page` = %s""",
+                (skip_page))
+    cur.execute("""INSERT INTO `remove_broken_file_pages` (`page`) VALUES (%s)""",
+                (skip_page))
+
+    cur.execute("""DELETE FROM `remove_broken_file_files` WHERE `page` = %s""",
+                (skip_page))
+    for missing_file in files:
+        cur.execute("""INSERT INTO `remove_broken_file_files` (`page`, `file`) VALUES (%s, %s)""",
+                    (skip_page, missing_file))
+
+    db.commit()
 
 
 def checkImageExists(title):
@@ -135,6 +159,7 @@ for page in pages:
     summary_comment = []
     summary_moved = []
     summary_deleted = []
+    missing_files = []
     for image in page.imagelinks():
         if not image.exists():
             try:
@@ -144,6 +169,7 @@ for page in pages:
                 pass
 
             image_fullname = image.title()
+            missing_files.append(image_fullname)
             imagename = image.title(with_ns=False)
 
             imageregex = "[" + imagename[0].upper() + \
@@ -404,7 +430,7 @@ for page in pages:
         print("nothing changed")
         if args.confirm:
             input()
-        skipfile.write(pagetitle + "\n")
+        add_skip_page(pagetitle, missing_files)
         skiplimit += 1
         if args.skiplimit > 0 and skiplimit >= args.skiplimit:
             print('Reach the skiplimit. Quitting.')
@@ -443,8 +469,8 @@ for page in pages:
                 print(e)
                 if args.confirm:
                     input()
-                skipfile.write(pagetitle + "\n")
+                add_skip_page(pagetitle, missing_files)
                 skiplimit += 1
     else:
         print("skip")
-        skipfile.write(pagetitle + "\n")
+        add_skip_page(pagetitle, missing_files)
