@@ -91,7 +91,7 @@ for secid in range(1, len(text)):
 
                     if deleted == len(ids):
                         sectext = re.sub(
-                            r'(\|\s*status\s*=.*)', r'\1 +', sectext)
+                            r'(\|\s*status\s*=).*', r'\1 +', sectext)
 
                     print('deleted {}/{} in {}'.format(deleted, len(ids), admins))
 
