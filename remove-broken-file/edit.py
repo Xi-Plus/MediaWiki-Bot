@@ -433,8 +433,9 @@ for page in pages:
             limit += 1
         except pywikibot.exceptions.SpamfilterError as e:
             print(e)
-            summary = re.sub(r'https?:', '', summary)
+            summary = re.sub(r'https?://', '', summary)
             print('Trying to remove url in summary and save again.')
+            print("summary = {}".format(summary))
             try:
                 page.save(summary=summary, minor=False)
                 limit += 1
