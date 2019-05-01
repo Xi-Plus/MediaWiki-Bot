@@ -64,7 +64,6 @@ def converttitle(title):
 
 
 def appendComment(text, mode):
-    text = text.strip()
     if 'A2093064-bot' not in text:
         append_text = []
         if 'fix' in mode:
@@ -86,6 +85,7 @@ def appendComment(text, mode):
             append_text.append(cfg['comment_vfd'])
             print('\tcomment_vfd')
         if len(append_text) > 0:
+            text = text.strip()
             append_text = '\n'.join(append_text)
             hr = '\n----'
             if hr in text:
@@ -93,7 +93,7 @@ def appendComment(text, mode):
                 text = hr.join(temp[:-1]) + '\n' + append_text + hr + temp[-1]
             else:
                 text += '\n' + append_text
-    text += '\n\n'
+            text += '\n\n'
     return text
 
 
