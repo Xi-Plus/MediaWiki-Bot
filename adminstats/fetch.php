@@ -12,37 +12,43 @@ $starttime = microtime(true);
 $time = time();
 echo "The time now is " . date("Y-m-d H:i:s", $time) . " (UTC)\n";
 
-$dates = ["-1 month", "-3 months", "-6 months", "-1 year"];
+$dates = [
+	"-1 year",
+	"-6 months",
+	"-3 months",
+	"-1 month",
+];
 $counts = [10, 100, 500, 1000];
+$nonadmin = ['Jimmy-abot', '滥用过滤器'];
 $res = [];
+$today = date("Y-m-d");
 foreach ($dates as $date) {
 	$realdate = date("Y-m-d", strtotime($date));
 	echo $realdate . "\n";
-	$url = "https://xtools.wmflabs.org/adminstats/zh.wikipedia.org/" . $realdate . "?uselang=en";
+	$url = "https://xtools.wmflabs.org/adminstats/zh.wikipedia.org/$today/$realdate?uselang=en";
 	$html = file_get_contents($url);
 	if ($html === false) {
 		exit("fetch fail\n");
 	}
 	preg_match("/<a href='https:\/\/zh\.wikipedia\.org\/w\/index\.php\?title=Special:ListUsers&amp;creationSort=1&amp;group=sysop' target='_blank'>(\d+)<\/a>/", $html, $m);
 	$totaladmincount = $m[1] - $C["adminbot"];
-	preg_match_all('/<td class="sort-entry--user-groups" data-value="(.*?)">/', $html, $m);
-	$isadmin = [];
-	$admincount = 0;
-	foreach ($m[1] as $value) {
-		$isadmin[] = ($value != "");
-		$admincount += ($value != "");
-	}
-	preg_match_all('/<td class="sort-entry--total" data-value="(\d+)">/', $html, $m);
-	foreach ($m[1] as $key => $total) {
-		if ($isadmin[$key]) {
-			foreach ($counts as $count) {
-				if ((int) $total < $count) {
-					@$res[$count][$date]++;
-				}
+	echo "totaladmincount = $totaladmincount\n";
+	preg_match_all('/<td class="sort-entry--username" data-value="(.*?)">\s*<a.*<\/a>\s*<\/td>\s*<td class="sort-entry--user-groups".*>\s*(?:<img class="user-group-icon".*\n)*\s*<img class="user-group-icon.*alt="administrator".*\s*<\/td>\s*<td>\s*<a.*\s*&middot;\s*<a.*\s*&middot;\s*<a.*\s*<\/td>\s*<td class="sort-entry--total" data-value="(\d+)"/', $html, $m);
+	$admincount = count($m[1]);
+	echo "admincount = $admincount\n";
+	foreach ($m[2] as $key => $total) {
+		$admin = $m[1][$key];
+		if (in_array($admin, $nonadmin)) {
+			continue;
+		}
+		foreach ($counts as $count) {
+			if ((int) $total < $count) {
+				@$res[$count][$date]++;
 			}
 		}
 	}
 	$res[1][$date] = $totaladmincount - $admincount;
+	echo "\n";
 }
 
 $out = "==統計==
@@ -72,7 +78,7 @@ $out = "==統計==
 *半年：" . $res[500]["-6 months"] . "人（" . round(100 * $res[500]["-6 months"] / $totaladmincount, 1) . "%）
 *三個月：" . $res[500]["-3 months"] . "人（" . round(100 * $res[500]["-3 months"] / $totaladmincount, 1) . "%）";
 
-echo $out . "\n";
+echo $out . "\n\n";
 
 $spendtime = (microtime(true) - $starttime);
 echo "spend " . $spendtime . " s.\n";
