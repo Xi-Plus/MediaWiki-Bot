@@ -6,7 +6,7 @@ import re
 import time
 from datetime import datetime, timezone
 
-os.environ['PYWIKIBOT2_DIR'] = os.path.dirname(os.path.realpath(__file__))
+os.environ['PYWIKIBOT_DIR'] = os.path.dirname(os.path.realpath(__file__))
 import pywikibot
 
 from config import *

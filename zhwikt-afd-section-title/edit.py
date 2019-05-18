@@ -6,7 +6,7 @@ import sys
 from datetime import datetime, timedelta
 
 import mwparserfromhell
-os.environ['PYWIKIBOT2_DIR'] = os.path.dirname(os.path.realpath(__file__))
+os.environ['PYWIKIBOT_DIR'] = os.path.dirname(os.path.realpath(__file__))
 import pywikibot
 from pywikibot.data.api import Request
 
@@ -65,7 +65,7 @@ def fix(pagename):
 				print("  set new title = "+title)
 				section.get(0).title = title
 			continue
-		
+
 		m = re.search(r"^(\[\[[^\]]+\]\][、，])+\[\[[^\]]+\]\]$", title, re.IGNORECASE)
 		if m != None:
 			titlelist = m.group(0).replace("]]，[[", "]]、[[").split("、")

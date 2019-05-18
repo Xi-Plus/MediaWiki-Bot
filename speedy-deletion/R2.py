@@ -4,7 +4,7 @@ import sys
 import json
 from config import *
 
-os.environ['PYWIKIBOT2_DIR'] = os.path.dirname(os.path.realpath(__file__))
+os.environ['PYWIKIBOT_DIR'] = os.path.dirname(os.path.realpath(__file__))
 os.environ['TZ'] = 'UTC'
 import pywikibot
 
@@ -44,7 +44,7 @@ else:
 print(processPages)
 for page in processPages:
     print(page.title())
-    
+
     marked = False
     for template in page.templates():
         if template.title() in ["Template:Delete"]:
