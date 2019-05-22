@@ -37,9 +37,9 @@ if not cfg["enable"]:
     exit("disabled\n")
 
 if args.category:
-    cat = pywikibot.Page(site, args.category)
+    cats = [args.category]
 else:
-    cat = pywikibot.Page(site, cfg["category"])
+    cats = cfg["category"]
 
 db = pymysql.connect(host=database['host'],
                      user=database['user'],
@@ -121,9 +121,12 @@ def checkReplace(oldText, newText):
     return newText
 
 
-pages = site.categorymembers(cat)
 if args.page:
     pages = [pywikibot.Page(site, args.page)]
+else:
+    pages = []
+    for cat in cats:
+        pages.extend(list(site.categorymembers(pywikibot.Page(site, cat))))
 
 limit = 1
 skiplimit = 0
