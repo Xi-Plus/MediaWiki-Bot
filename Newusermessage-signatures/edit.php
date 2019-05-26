@@ -33,7 +33,7 @@ while (true) {
 	}
 	$res = json_decode($res, true);
 	foreach ($res["query"]["allusers"] as $user) {
-		$recenteditcount[$user["name"]] = $user["recenteditcount"];
+		$recenteditcount[$user["name"]] = $user["recentactions"];
 	}
 	if (!isset($res["continue"])) {
 		break;
@@ -68,7 +68,7 @@ for ($i = 0; $i < $C["fail_retry"]; $i++) {
 		}
 		$sign = $m[2][$key];
 		$user = "";
-		if (preg_match_all("/\[\[(?:U:|UT:|User:|用户:|User talk:|User_talk:|用户讨论:|Special:Contributions\/|Special:用户贡献\/|Special:用戶貢獻\/|特殊:用户贡献\/|特殊:用戶貢獻\/)([^|\/]+)/i", $sign, $m2)) {
+		if (preg_match_all("/\[\[(?:(?:User(?:[ _]talk)?|U|UT|用户|用戶|使用者|用戶對話|用戶討論|用户对话|用户讨论|使用者討論):|(?:Special|特殊):(?:(?:Contributions|Contribs)|(?:用户|用戶|使用者)?(?:贡献|貢獻))\/)([^|\/]+)/i", $sign, $m2)) {
 			$user = $m2[1][0];
 		}
 		$res = cURL($C["wikiapi"] . "?" . http_build_query(array(
