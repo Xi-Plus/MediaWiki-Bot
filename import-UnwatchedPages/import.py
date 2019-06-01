@@ -1,5 +1,5 @@
-from config import cfg
 import pymysql
+from config import cfg  # pylint: disable=E0611,W0614
 
 db = pymysql.connect(host=cfg['database']['host'],
                      user=cfg['database']['user'],

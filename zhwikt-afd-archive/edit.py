@@ -6,11 +6,10 @@ import re
 import time
 from datetime import datetime
 
-import mwparserfromhell
 os.environ['PYWIKIBOT_DIR'] = os.path.dirname(os.path.realpath(__file__))
 import pywikibot
 
-from config import *
+from config import config_page_name  # pylint: disable=E0611,W0614
 
 
 os.environ['TZ'] = 'UTC'
@@ -91,7 +90,7 @@ for target in archivelist:
         text = cfg["archive_page_preload"]
 
     text = text.strip()
-    text += "\n\n"+"\n\n".join(archivelist[target])
+    text += "\n\n" + "\n\n".join(archivelist[target])
 
     pywikibot.showDiff(archivePage.text, text)
     archivePage.text = text

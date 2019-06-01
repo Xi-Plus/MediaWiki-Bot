@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import argparse
-import json
 import os
 import re
 
@@ -8,7 +7,7 @@ os.environ['PYWIKIBOT_DIR'] = os.path.dirname(os.path.realpath(__file__))
 import pywikibot
 from pywikibot.data.api import Request
 
-from config import purge
+from config import purge  # pylint: disable=E0611,W0614
 
 
 def converttitle(title):

@@ -2,7 +2,7 @@
 import os
 import sys
 import json
-from config import *
+from config import config_page_name  # pylint: disable=E0611,W0614
 
 os.environ['PYWIKIBOT_DIR'] = os.path.dirname(os.path.realpath(__file__))
 os.environ['TZ'] = 'UTC'
@@ -28,7 +28,7 @@ pagename = sys.argv[1]
 mainpage = pywikibot.Page(site, pagename)
 
 if mainpage.exists():
-    exit("mainpage exist.\n");
+    exit("mainpage exist.\n")
 
 if mainpage.namespace().id in [2, 3]:
     exit("ignore namespace.\n")

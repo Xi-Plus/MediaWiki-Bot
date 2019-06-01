@@ -10,7 +10,7 @@ os.environ['PYWIKIBOT_DIR'] = os.path.dirname(os.path.realpath(__file__))
 import pywikibot
 from pywikibot.data.api import Request
 
-from config import *
+from config import config_page_name  # pylint: disable=E0611,W0614
 
 
 site = pywikibot.Site()
@@ -58,7 +58,7 @@ def converttitle(title):
         if page.exists() and (page.content_model != 'wikitext'
                               or re.search(r'{{\s*([vaictumr]fd|Copyvio)', page.text, flags=re.I)):
             mode.append('vfd_on_target')
-    if not 'vfd_on_source' in mode and not 'vfd_on_target' in mode:
+    if 'vfd_on_source' not in mode and 'vfd_on_target' not in mode:
         mode.append('no_vfd')
     return {'title': title, 'mode': mode}
 
@@ -115,12 +115,12 @@ def fix(pagename):
             continue
         title = str(section.get(0).title)
         print(secid, title)
-        if re.search(r'{{\s*(delh|TalkendH)\s*\|', str(section), re.IGNORECASE) != None:
+        if re.search(r'{{\s*(delh|TalkendH)\s*\|', str(section), re.IGNORECASE) is not None:
             print('  closed, skip')
             continue
 
         m = re.search(r'^\[\[([^\]]+)\]\]$', title, re.IGNORECASE)
-        if m != None:
+        if m is not None:
             title = m.group(1)
             start = ''
             if title[0] == ':':
@@ -131,7 +131,7 @@ def fix(pagename):
 
             convert = converttitle(title)
             if (('redirects' in convert['mode'] and 'vfd_on_target' in convert['mode'])
-                    or (not 'redirects' in convert['mode'])):
+                    or ('redirects' not in convert['mode'])):
                 title = convert['title']
                 mode.append('fix')
             mode += convert['mode']
@@ -143,7 +143,6 @@ def fix(pagename):
                 if str(section.get(0).title).replace('_', ' ') != title:
                     section.insert(
                         1, '\n{{formerly|' + str(section.get(0).title) + '}}')
-                    pass
                 print('  set new title = ' + title)
                 section.get(0).title = title
             newtext = appendComment(str(section), mode)
@@ -152,7 +151,7 @@ def fix(pagename):
 
         m = re.search(
             r'^(\[\[[^\]]+\]\][、，])+\[\[[^\]]+\]\]$', title, re.IGNORECASE)
-        if m != None:
+        if m is not None:
             titlelist = m.group(0).replace(']]，[[', ']]、[[').split('、')
             newtitlelist = []
             mode = []
@@ -165,7 +164,7 @@ def fix(pagename):
 
                     convert = converttitle(title)
                     if (('redirects' in convert['mode'] and 'vfd_on_target' in convert['mode'])
-                            or (not 'redirects' in convert['mode'])):
+                            or ('redirects' not in convert['mode'])):
                         title = convert['title']
                         mode.append('fix')
                     mode += convert['mode']
@@ -183,7 +182,7 @@ def fix(pagename):
             continue
 
         m = re.search(r'^{{al\|([^\]]+\|)+[^\]]+}}$', title, re.IGNORECASE)
-        if m != None:
+        if m is not None:
             titlelist = m.group(0)[5:-2].split('|')
             newtitlelist = []
             mode = []
@@ -193,7 +192,7 @@ def fix(pagename):
 
                 convert = converttitle(title)
                 if (('redirects' in convert['mode'] and 'vfd_on_target' in convert['mode'])
-                        or (not 'redirects' in convert['mode'])):
+                        or ('redirects'not in convert['mode'])):
                     title = convert['title']
                     mode.append('fix')
                 mode += convert['mode']

@@ -1,15 +1,16 @@
 # -*- coding: utf-8 -*-
-import os
-import pywikibot
-import mwparserfromhell
+import hashlib
 import json
+import os
 import re
 import time
-import hashlib
-from config import *
-from pywikibot.data.api import Request
 
+import mwparserfromhell
 os.environ['PYWIKIBOT_DIR'] = os.path.dirname(os.path.realpath(__file__))
+import pywikibot
+from pywikibot.data.api import Request
+from config import config_page_name  # pylint: disable=E0611,W0614
+
 os.environ['TZ'] = 'UTC'
 
 site = pywikibot.Site()
@@ -37,7 +38,7 @@ for section in wikicode.get_sections()[2:]:
     text = str(section)
 
     rndstr = hashlib.md5(str(time.time()).encode()).hexdigest()
-    text = re.sub(r"^(.*{{CopyvioEntry\|.+)$", rndstr+r"\1", text, flags=re.M)
+    text = re.sub(r"^(.*{{CopyvioEntry\|.+)$", rndstr + r"\1", text, flags=re.M)
 
     text = text.split(rndstr)
 
@@ -73,7 +74,7 @@ for section in wikicode.get_sections()[2:]:
                     "leprop": "comment",
                     "letype": "delete",
                     "lelimit": "1"
-                    }).submit()
+                }).submit()
                 print(data['query']['logevents'][0]['comment'])
                 remove = True
 

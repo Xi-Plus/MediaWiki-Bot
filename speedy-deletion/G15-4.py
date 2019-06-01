@@ -2,7 +2,7 @@
 import os
 import sys
 import json
-from config import *
+from config import config_page_name  # pylint: disable=E0611,W0614
 
 os.environ['PYWIKIBOT_DIR'] = os.path.dirname(os.path.realpath(__file__))
 os.environ['TZ'] = 'UTC'
@@ -34,7 +34,7 @@ else:
     talkpage = mainpage.toggleTalkPage()
 
 if mainpage.exists():
-    exit("mainpage exist.\n");
+    exit("mainpage exist.\n")
 
 if mainpage.namespace().id == 6:
     image = pywikibot.FilePage(site, mainpage.title())
@@ -45,7 +45,7 @@ if mainpage.namespace().id == 6:
         pass
 
 if not talkpage.exists():
-    exit("talkpage not exist.\n");
+    exit("talkpage not exist.\n")
 
 if talkpage.namespace().id in [3, 9]:
     exit("ignore namespace.\n")
