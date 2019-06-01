@@ -1,13 +1,14 @@
 # -*- coding: utf-8 -*-
+import json
 import os
+import re
+import time
+from datetime import datetime
+
+import mwparserfromhell
 os.environ['PYWIKIBOT_DIR'] = os.path.dirname(os.path.realpath(__file__))
 import pywikibot
-import mwparserfromhell
-import json
-import re
-from datetime import datetime
-import time
-from config import *
+from config import config_page_name  # pylint: disable=E0611,W0614
 
 os.environ['TZ'] = 'UTC'
 

@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
-import os
-import pywikibot
 import csv
+import os
 import traceback
-from pywikibot.data.api import Request
 
 os.environ['PYWIKIBOT_DIR'] = os.path.dirname(os.path.realpath(__file__))
+import pywikibot
+from pywikibot.data.api import Request
+
 os.environ['TZ'] = 'UTC'
 
 site = pywikibot.Site()

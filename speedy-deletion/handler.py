@@ -3,7 +3,7 @@ import json
 import subprocess
 import os
 import time
-from config import handler
+from config import handler  # pylint: disable=E0611,W0614
 
 
 basepath = os.path.dirname(os.path.realpath(__file__))

@@ -5,7 +5,7 @@ import re
 
 os.environ['PYWIKIBOT_DIR'] = os.path.dirname(os.path.realpath(__file__))
 import pywikibot
-from config import *
+from config import blacklists, targetSite # pylint: disable=E0611,W0614
 
 
 site = pywikibot.Site()

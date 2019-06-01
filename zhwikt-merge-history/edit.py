@@ -1,11 +1,10 @@
 # -*- coding: utf-8 -*-
 import os
-import pywikibot
-import json
 import re
 
-
 os.environ['PYWIKIBOT_DIR'] = os.path.dirname(os.path.realpath(__file__))
+import pywikibot
+
 os.environ['TZ'] = 'UTC'
 
 site = pywikibot.Site()

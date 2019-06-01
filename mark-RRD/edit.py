@@ -7,8 +7,8 @@ import time
 
 os.environ['PYWIKIBOT_DIR'] = os.path.dirname(os.path.realpath(__file__))
 import pywikibot
-from config import config_page_name
 from pywikibot.data.api import Request
+from config import config_page_name  # pylint: disable=E0611,W0614
 
 
 os.environ['TZ'] = 'UTC'
@@ -60,9 +60,9 @@ for secid in range(1, len(text)):
                         logid = str(logevent['logid'])
                         admin = logevent['user']
                         # print('\t', logevent)
-                        if (logevent['params']['type'] == 'revision' and
-                                'content' in logevent['params']['new'] and
-                                logevent['params']['new']['bitmask'] & 1 == 1):
+                        if (logevent['params']['type'] == 'revision'
+                                and 'content' in logevent['params']['new']
+                                and logevent['params']['new']['bitmask'] & 1 == 1):
                             for rvid in logevent['params']['ids']:
                                 if rvid in ids:
                                     deleted += 1

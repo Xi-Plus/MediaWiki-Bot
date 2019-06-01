@@ -1,9 +1,7 @@
 # -*- coding: utf-8 -*-
 import os
 import pywikibot
-import json
-import re
-from config import *
+# from config import config_page_name  # pylint: disable=E0611,W0614
 
 
 os.environ["PYWIKIBOT_DIR"] = os.path.dirname(os.path.realpath(__file__))

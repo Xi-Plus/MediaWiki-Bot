@@ -1,13 +1,7 @@
 # -*- coding: utf-8 -*-
 import os
-import pywikibot
-import mwparserfromhell
-import json
-import re
-import time
-import hashlib
-from pywikibot.data.api import Request
 
+import pywikibot
 
 os.environ['PYWIKIBOT_DIR'] = os.path.dirname(os.path.realpath(__file__))
 os.environ['TZ'] = 'UTC'

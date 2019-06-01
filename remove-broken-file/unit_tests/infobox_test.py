@@ -11,7 +11,7 @@ os.environ["PYWIKIBOT_DIR"] = BASE_DIR
 import pywikibot
 
 sys.path.append(BASE_DIR)
-from config import *
+from config import config_page_name  # pylint: disable=E0611,W0614
 
 
 os.environ["TZ"] = "UTC"
@@ -48,7 +48,7 @@ class TestInfoboxMethods(unittest.TestCase):
             print(fid)
             text = readfile('{0}_in'.format(fid))
 
-            existother = 'en'
+            # existother = 'en'
             existothername = '英文維基百科'
 
             # comment_other

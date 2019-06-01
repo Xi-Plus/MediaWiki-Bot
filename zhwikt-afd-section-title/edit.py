@@ -2,15 +2,13 @@
 import json
 import os
 import re
-import sys
-from datetime import datetime, timedelta
 
 import mwparserfromhell
 os.environ['PYWIKIBOT_DIR'] = os.path.dirname(os.path.realpath(__file__))
 import pywikibot
 from pywikibot.data.api import Request
 
-from config import *
+from config import config_page_name # pylint: disable=E0611,W0614
 
 
 site = pywikibot.Site()

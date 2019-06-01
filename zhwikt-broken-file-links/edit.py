@@ -1,12 +1,11 @@
 # -*- coding: utf-8 -*-
 import os
-import pywikibot
-import json
 import re
-from config import *
-
 
 os.environ["PYWIKIBOT_DIR"] = os.path.dirname(os.path.realpath(__file__))
+import pywikibot
+
+
 os.environ["TZ"] = "UTC"
 
 site = pywikibot.Site()
@@ -31,7 +30,8 @@ for page in site.categorymembers(cat):
     text = re.sub(r"\*\n", "", text)
     text = re.sub(r"====相关词组====\n+(\[\[Category)", r"\1", text)
     text = re.sub(r"====相关词汇====\n\*同音词：\n+(\[\[Category)", r"\1", text)
-    text = re.sub(r"{{(-(?:akin|anton|decl|deriv|etym|expr|link|pron|refer|synon|trans|usage)-)}}", r"{{subst:\1}}", text)
+    text = re.sub(r"{{(-(?:akin|anton|decl|deriv|etym|expr|link|pron|refer|synon|trans|usage)-)}}",
+                  r"{{subst:\1}}", text)
     text = re.sub(r"{{(-(?:v|n|adj|adv)-)}}", r"{{subst:\1}}", text)
     text = re.sub(r"{{(-(?:de)-)}}", r"{{subst:\1}}", text)
     text = re.sub(r"({{subst:-(?:v|n|adj|adv)-}})\n+", r"\1", text)

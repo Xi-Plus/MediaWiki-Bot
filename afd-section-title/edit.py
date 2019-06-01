@@ -10,7 +10,7 @@ os.environ['PYWIKIBOT_DIR'] = os.path.dirname(os.path.realpath(__file__))
 import pywikibot
 from pywikibot.data.api import Request
 
-from config import *
+from config import config_page_name # pylint: disable=E0611,W0614
 
 
 site = pywikibot.Site()
@@ -143,7 +143,6 @@ def fix(pagename):
                 if str(section.get(0).title).replace('_', ' ') != title:
                     section.insert(
                         1, '\n{{formerly|' + str(section.get(0).title) + '}}')
-                    pass
                 print('  set new title = ' + title)
                 section.get(0).title = title
             newtext = appendComment(str(section), mode)

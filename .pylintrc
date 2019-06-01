@@ -7,7 +7,9 @@ extension-pkg-whitelist=
 
 # Add files or directories to the blacklist. They should be base names, not
 # paths.
-ignore=CVS
+ignore=CVS,
+       user-config.py,
+       user-password.py,
 
 # Add files or directories matching the regex patterns to the blacklist. The
 # regex matches against base names, not paths.
@@ -160,7 +162,8 @@ disable=print-statement,
         too-many-lines,
         too-many-boolean-expressions,
         import-error,
-        wrong-import-position
+        wrong-import-position,
+        redefined-outer-name,
 
 # Enable the message, report, category or checker with the given id(s). You can
 # either give multiple identifier separated by comma (,) or put this option
@@ -462,7 +465,7 @@ missing-member-max-choices=1
 
 # List of additional names supposed to be defined in builtins. Remember that
 # you should avoid defining new builtins when possible.
-additional-builtins=
+additional-builtins=BotPassword
 
 # Tells whether unused global variables should be treated as a violation.
 allow-global-unused-variables=yes

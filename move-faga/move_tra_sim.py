@@ -6,7 +6,7 @@ import re
 os.environ['PYWIKIBOT_DIR'] = os.path.dirname(os.path.realpath(__file__))
 import pywikibot
 
-from config import purge
+from config import purge  # pylint: disable=E0611,W0614
 
 
 os.environ['TZ'] = 'UTC'
@@ -48,7 +48,7 @@ with open('list.txt', 'r') as f:
         cnt += 1
         cnt2 += 1
 
-        for backlink in (list(page.embeddedin()) + list(page.backlinks(filter_redirects=True))):
+        for backlink in list(page.embeddedin()) + list(page.backlinks(filter_redirects=True)):
             print('backlink: {}'.format(backlink.title()))
             if re.search(r'^Wikipedia:典范条目/\d+年\d+月\d+日$|^Portal:', backlink.title()):
                 print('{} Editing {}'.format(cnt2, backlink.title()))

@@ -6,7 +6,7 @@ import pymysql
 os.environ["PYWIKIBOT_DIR"] = os.path.dirname(os.path.realpath(__file__))
 import pywikibot
 
-from config import *
+from config import config_page_name, database  # pylint: disable=E0611,W0614
 
 
 os.environ["TZ"] = "UTC"

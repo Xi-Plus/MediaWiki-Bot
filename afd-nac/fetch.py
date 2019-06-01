@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-import json
 import os
 import re
 import sys
@@ -8,9 +7,8 @@ from datetime import datetime, timedelta
 import mwparserfromhell
 os.environ['PYWIKIBOT_DIR'] = os.path.dirname(os.path.realpath(__file__))
 import pywikibot
-from pywikibot.data.api import Request
 
-from config import *
+from config import cfg  # pylint: disable=E0611,W0614
 
 
 site = pywikibot.Site()
@@ -25,7 +23,7 @@ output = (
 
 
 def fix(pagename):
-    global output
+    global output  # pylint: disable=W0603
     if re.search(r'\d{4}/\d{2}/\d{2}', pagename):
         pagename = 'Wikipedia:頁面存廢討論/記錄/' + pagename
 
@@ -37,7 +35,6 @@ def fix(pagename):
 
     wikicode = mwparserfromhell.parse(text)
 
-    changes = []
     for secid, section in enumerate(list(wikicode.get_sections())):
         if secid == 0:
             continue
