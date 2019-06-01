@@ -54,7 +54,7 @@ foreach ($dates as $date) {
 $out = "==統計==
 *更新日期：" . date("Y年m月d日", $time) . " (" . $C["day"][date("w", $time)] . ") " . date("H:i", $time) . " (UTC)
 *中文維基管理員：" . $totaladmincount . "人
-*備註：由[https://xtools.wmflabs.org/adminstats/zh.wikipedia.org XTools]協助統計，只計算刪除、封禁、保護、匯入、權限，因此可能與實際情況有誤差。
+*備註：由[https://xtools.wmflabs.org/adminstats/zh.wikipedia.org XTools]協助統計，只計算刪除、封禁、保護、權限、合併、匯入、防濫用過濾器，因此可能與實際情況有誤差。
 
 ===沒有作出管理方面行為的管理員===
 *一年：" . $res[1]["-1 year"] . "人（" . round(100 * $res[1]["-1 year"] / $totaladmincount, 1) . "%）
