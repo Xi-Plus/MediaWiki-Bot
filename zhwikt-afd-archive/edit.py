@@ -91,7 +91,7 @@ for target in archivelist:
         text = cfg["archive_page_preload"]
 
     text = text.strip()
-    text += "\n\n"+"\n\n".join(archivelist[target])
+    text += "\n\n" + "\n\n".join(archivelist[target])
 
     pywikibot.showDiff(archivePage.text, text)
     archivePage.text = text

@@ -28,7 +28,7 @@ pagename = sys.argv[1]
 mainpage = pywikibot.Page(site, pagename)
 
 if mainpage.exists():
-    exit("mainpage exist.\n");
+    exit("mainpage exist.\n")
 
 if mainpage.namespace().id in [2, 3]:
     exit("ignore namespace.\n")

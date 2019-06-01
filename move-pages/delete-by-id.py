@@ -26,6 +26,6 @@ with open("list-delete.csv", "r") as f:
                 "pageid": pageid,
                 "reason": "[[:phab:T187783]]，刪除小寫重定向",
                 "token": token
-                }).submit()
+            }).submit()
         except Exception as e:
             traceback.print_exc()

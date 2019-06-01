@@ -38,7 +38,7 @@ for page in site.categorymembers(cat, namespaces="6"):
     #     print("skip")
     #     continue
     text = page.text
-    if not "Jimmy-bot|g15" in page.text:
+    if "Jimmy-bot|g15" not in page.text:
         print("no g15 skip")
         continue
 
@@ -66,7 +66,7 @@ for page in site.categorymembers(cat, namespaces="6"):
             "noredirect": "1",
             "ignorewarnings": "1",
             "token": token
-            }).submit()
+        }).submit()
         print(data)
 
         cnt += 1

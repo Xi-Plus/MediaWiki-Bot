@@ -1,0 +1,8 @@
+language: python
+python:
+  - "3.6"
+install:
+  - pip install pycodestyle
+script:
+  - pycodestyle --version
+  - pycodestyle . --ignore=E402,E501,W503,W504

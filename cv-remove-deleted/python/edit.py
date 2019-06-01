@@ -37,7 +37,7 @@ for section in wikicode.get_sections()[2:]:
     text = str(section)
 
     rndstr = hashlib.md5(str(time.time()).encode()).hexdigest()
-    text = re.sub(r"^(.*{{CopyvioEntry\|.+)$", rndstr+r"\1", text, flags=re.M)
+    text = re.sub(r"^(.*{{CopyvioEntry\|.+)$", rndstr + r"\1", text, flags=re.M)
 
     text = text.split(rndstr)
 
@@ -73,7 +73,7 @@ for section in wikicode.get_sections()[2:]:
                     "leprop": "comment",
                     "letype": "delete",
                     "lelimit": "1"
-                    }).submit()
+                }).submit()
                 print(data['query']['logevents'][0]['comment'])
                 remove = True
 

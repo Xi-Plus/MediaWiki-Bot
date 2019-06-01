@@ -14,7 +14,7 @@ with open("list.csv", "r") as f:
         page = pywikibot.Page(site, oldtitle)
         ns = page.namespace().custom_name
         title = page.titleWithoutNamespace()
-        title = title[0].upper()+title[1:]
-        newtitle = ns+":"+title
+        title = title[0].upper() + title[1:]
+        newtitle = ns + ":" + title
         print("move", oldtitle, "to", newtitle)
         page.move(newtitle, reason="[[:phab:T187783]]，移動到大寫開頭")

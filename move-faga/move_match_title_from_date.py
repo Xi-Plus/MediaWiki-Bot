@@ -28,7 +28,7 @@ for datetitle in runpages:
         continue
 
     datetext = datepage.text
-    print("-----\n"+datetext+"\n--------")
+    print("-----\n" + datetext + "\n--------")
 
     m = re.search(r"\{\{Wikipedia:优良条目/(?:s|摘要)\|(.+?)\}\}", datetext)
     if not m:
@@ -49,7 +49,7 @@ for datetitle in runpages:
         gapage = gapage.getRedirectTarget()
         print("follow redirect")
 
-    print("-----\n"+gapage.text+"\n--------")
+    print("-----\n" + gapage.text + "\n--------")
 
     m = re.search(r"'''《?\[\[(.+?)(\|.+?)?]]》?'''", gapage.text)
     if not m:
@@ -66,20 +66,20 @@ for datetitle in runpages:
 
     print(articlepage.title())
 
-    print("move {} to {}".format(gapage.title(), "Wikipedia:优良条目/"+articlepage.title())+" ?")
+    print("move {} to {}".format(gapage.title(), "Wikipedia:优良条目/" + articlepage.title()) + " ?")
     data = pywikibot.data.api.Request(site=site, parameters={
         "action": "move",
         "from": gapage.title(),
-        "to": "Wikipedia:优良条目/"+articlepage.title(),
+        "to": "Wikipedia:优良条目/" + articlepage.title(),
         "reason": "機器人：整理標題格式",
         "movetalk": "1",
         "noredirect": "1",
         "token": token
-        }).submit()
+    }).submit()
     print(data)
 
-    print("save {} as {}".format(datepage.title(), "Wikipedia:优良条目/"+articlepage.title())+" ?")
+    print("save {} as {}".format(datepage.title(), "Wikipedia:优良条目/" + articlepage.title()) + " ?")
     datepage = pywikibot.Page(site, datetitle)
-    datepage.text = "{{Wikipedia:优良条目/"+articlepage.title()+"}}"
+    datepage.text = "{{Wikipedia:优良条目/" + articlepage.title() + "}}"
     datepage.save(summary="機器人：整理標題格式")
     # input()

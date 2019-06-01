@@ -34,7 +34,7 @@ else:
     talkpage = mainpage.toggleTalkPage()
 
 if mainpage.exists():
-    exit("mainpage exist.\n");
+    exit("mainpage exist.\n")
 
 if mainpage.namespace().id == 6:
     image = pywikibot.FilePage(site, mainpage.title())
@@ -45,7 +45,7 @@ if mainpage.namespace().id == 6:
         pass
 
 if not talkpage.exists():
-    exit("talkpage not exist.\n");
+    exit("talkpage not exist.\n")
 
 if talkpage.namespace().id in [3, 9]:
     exit("ignore namespace.\n")
