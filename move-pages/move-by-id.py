@@ -12,7 +12,7 @@ os.environ['TZ'] = 'UTC'
 site = pywikibot.Site()
 site.login()
 
-token = site.getToken()
+token = site.tokens['csrf']
 
 with open("list.csv", "r") as f:
     r = csv.reader(f)

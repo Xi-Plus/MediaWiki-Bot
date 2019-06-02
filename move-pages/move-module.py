@@ -8,8 +8,6 @@ os.environ['TZ'] = 'UTC'
 site = pywikibot.Site()
 site.login()
 
-token = site.getToken()
-
 with open("list-module.csv", "r") as f:
     for title in f:
         oldtitle = title.strip()

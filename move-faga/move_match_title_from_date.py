@@ -10,7 +10,7 @@ os.environ["TZ"] = "UTC"
 site = pywikibot.Site()
 site.login()
 
-token = site.getToken()
+token = site.tokens['csrf']
 
 runpages = ""
 with open("page.txt", "r") as f:

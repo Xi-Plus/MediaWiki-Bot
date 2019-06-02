@@ -11,7 +11,7 @@ site = pywikibot.Site()
 site.login()
 sitecommons = pywikibot.Site("commons", "commons")
 
-token = site.getToken()
+token = site.tokens['csrf']
 
 # config_page = pywikibot.Page(site, config_page_name)
 # cfg = config_page.text

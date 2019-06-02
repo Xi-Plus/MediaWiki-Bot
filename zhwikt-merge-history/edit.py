@@ -10,8 +10,6 @@ os.environ['TZ'] = 'UTC'
 site = pywikibot.Site()
 site.login()
 
-token = site.getToken()
-
 cat = pywikibot.Page(site, 'Category:合併歷史候選')
 
 cnt = 1
