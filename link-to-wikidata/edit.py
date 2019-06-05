@@ -15,7 +15,10 @@ with open('list.csv') as csvfile:
     reader = csv.reader(csvfile)
     for row in reader:
         fromTitle = row[0]
-        toTitle = row[1]
+        if len(row) < 2:
+            toTitle = fromTitle
+        else:
+            toTitle = row[1]
         print('Import from {} to {}'.format(fromTitle, toTitle))
 
         inBlack = False
