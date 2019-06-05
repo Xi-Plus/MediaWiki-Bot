@@ -30,7 +30,10 @@ with open('list.csv') as csvfile:
             print('Skip')
             continue
 
-        page = pywikibot.Page(site, fromTitle)
-        item = pywikibot.ItemPage.fromPage(page)
+        try:
+            page = pywikibot.Page(site, fromTitle)
+            item = pywikibot.ItemPage.fromPage(page)
 
-        item.setSitelink(sitelink={'site': targetSite, 'title': toTitle}, summary='Add {}'.format(targetSite))
+            item.setSitelink(sitelink={'site': targetSite, 'title': toTitle}, summary='Add {}'.format(targetSite))
+        except Exception as e:
+            print(e)
