@@ -83,7 +83,7 @@ foreach ($row as $user) {
 			$basetimestamp = 0;
 			$contentmodel = "wikitext";
 		} else {
-			$text = $pages["revisions"][0]["*"];
+			$text = $pages["revisions"][0]["*"] . "\n\n";
 			$basetimestamp = $pages["revisions"][0]["timestamp"];
 			$contentmodel = $pages["revisions"][0]["contentmodel"];
 		}
@@ -113,7 +113,7 @@ foreach ($row as $user) {
 		}
 
 		if ($contentmodel == "wikitext") {
-			$text .= "\n" . $out;
+			$text .= $out;
 
 			$summary = $cfg["notice_summary"];
 			$post = array(
