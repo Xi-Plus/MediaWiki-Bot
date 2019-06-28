@@ -1,9 +1,5 @@
 # -*- coding: utf-8 -*-
-import hashlib
-import json
 import os
-import re
-import time
 
 from config import cfg  # pylint: disable=E0611,W0614
 from func import file_get_contents
