@@ -11,8 +11,8 @@ cfg['source'] = {
 }
 
 cfg['target'] = {
-    'sample' = > 'User:Example/sample/',
-    'gadget' = > 'User:Example/gadget/',
+    'sample': 'User:Example/sample/',
+    'gadget': 'User:Example/gadget/',
 }
 
 cfg['web'] = {
