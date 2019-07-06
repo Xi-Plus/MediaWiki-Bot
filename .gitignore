@@ -14,9 +14,10 @@ user-password.py
 # single
 AFD-stats/list/
 bad-image-list/remove.txt
-DRV-tag-talk/lasttime.txt
-RFA-stats/list/
 DRV-tag-talk/lastrevid.txt
-remove-broken-file/skipedpage.txt
+DRV-tag-talk/lasttime.txt
 move-faga/page.txt
 move-g15-file/skipedpage.txt
+remove-broken-file/skipedpage.txt
+RFA-stats/list/
+user-config/
