@@ -87,6 +87,9 @@ while len(files) == 0:
     except Exception as e:
         print(e)
         files = {}
+if len(files) == 0:
+    for fromname in project['files']:
+        files[fromname] = project['files'][fromname]
 print('files', files)
 print()
 
