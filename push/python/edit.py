@@ -117,7 +117,11 @@ for fromname in files:
     fromname = source + fromname
     toname = target + toname
     print(fromname, '->', toname)
-    text = file_get_contents(fromname)
+    try:
+        text = file_get_contents(fromname)
+    except Exception as e:
+        print(e)
+        continue
 
     page = pywikibot.Page(site, toname)
     pywikibot.showDiff(page.text, text)
