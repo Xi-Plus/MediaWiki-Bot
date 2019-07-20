@@ -43,7 +43,14 @@ for secid in range(1, len(text)):
         title = m.group(1)
         print(title)
         if re.search(r'\|\s*status\s*=\s*(新申請<!--不要修改本参数-->)?\s*\|', sectext):
+            flag = 0
             if re.search(r'\|\s*set\s*=\s*(編輯內容|编辑内容)\s*\|', sectext):
+                flag = 1
+                print('\tcontent')
+            elif re.search(r'\|\s*set\s*=\s*(編輯摘要|编辑摘要)\s*\|', sectext):
+                flag = 2
+                print('\tsummary')
+            if flag != 0:
                 ids = re.findall(r'\|id\d+\s*=\s*(\d+)', sectext)
                 if ids:
                     data = Request(site=site, parameters={
@@ -61,8 +68,7 @@ for secid in range(1, len(text)):
                         admin = logevent['user']
                         # print('\t', logevent)
                         if (logevent['params']['type'] == 'revision'
-                                and 'content' in logevent['params']['new']
-                                and logevent['params']['new']['bitmask'] & 1 == 1):
+                                and logevent['params']['new']['bitmask'] & flag == flag):
                             for rvid in logevent['params']['ids']:
                                 if rvid in ids:
                                     deleted += 1
@@ -93,12 +99,12 @@ for secid in range(1, len(text)):
                         sectext = re.sub(
                             r'(\|\s*status\s*=).*', r'\1 +', sectext)
 
-                    print('deleted {}/{} in {}'.format(deleted, len(ids), admins))
+                    print('\tdeleted {}/{} in {}'.format(deleted, len(ids), admins))
 
                 else:
                     print('\tcannot get ids')
             else:
-                print('\tnot content')
+                print('\tcannot detect type')
         else:
             print('\tdone')
     else:
