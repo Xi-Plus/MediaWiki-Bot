@@ -50,6 +50,9 @@ for secid in range(1, len(text)):
             elif re.search(r'\|\s*set\s*=\s*(編輯摘要|编辑摘要)\s*\|', sectext):
                 flag = 2
                 print('\tsummary')
+            elif re.search(r'\|\s*set\s*=\s*(編輯內容、編輯摘要|编辑内容、编辑摘要)\s*\|', sectext):
+                flag = 1 | 2
+                print('\tcontent & summary')
             if flag != 0:
                 ids = re.findall(r'\|id\d+\s*=\s*(\d+)', sectext)
                 if ids:
