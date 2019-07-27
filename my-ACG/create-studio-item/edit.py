@@ -1,12 +1,10 @@
 # -*- coding: utf-8 -*-
 import argparse
-import csv
 import os
-import re
-import urllib.parse
 
 os.environ['PYWIKIBOT_DIR'] = os.path.dirname(os.path.realpath(__file__))
 import pywikibot
+
 
 
 site = pywikibot.Site()

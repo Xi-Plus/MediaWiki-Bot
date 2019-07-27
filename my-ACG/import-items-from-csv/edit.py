@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 import argparse
 import csv
-import os
-import re
 import json
-import requests
+import re
 import urllib.parse
-from config import API, USER, PASSWORD  # pylint: disable=E0611
+
+import requests
+from config import API, PASSWORD, USER  # pylint: disable=E0611
 
 
 def parse_update(text):
@@ -129,7 +129,7 @@ def parse_linkP(link):
     return 'P32'
 
 
-def parse_studio(studio):
+def parse_studio(studiolist):
     studiomap = {
         'P.A. Works': 'Q59',
         'P.A.WORKS': 'Q59',
@@ -204,10 +204,10 @@ def parse_studio(studio):
         'Magia Doraglier': 'Q118',
         'NAZ': 'Q117',
     }
-    studio = studio.replace('／', '、')
-    studio = studio.replace(' × ', '、')
-    studio = studio.replace('×', '、')
-    studios = studio.split('、')
+    studiolist = studiolist.replace('／', '、')
+    studiolist = studiolist.replace(' × ', '、')
+    studiolist = studiolist.replace('×', '、')
+    studios = studiolist.split('、')
     result = []
     for studio in studios:
         if studio == '':
