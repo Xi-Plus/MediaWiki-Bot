@@ -6,7 +6,6 @@ os.environ['PYWIKIBOT_DIR'] = os.path.dirname(os.path.realpath(__file__))
 import pywikibot
 
 
-
 site = pywikibot.Site()
 site.login()
 datasite = site.data_repository()
