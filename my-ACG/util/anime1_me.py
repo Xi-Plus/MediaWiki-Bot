@@ -1,0 +1,40 @@
+import re
+
+import requests
+from bs4 import BeautifulSoup
+
+
+class Anime1Me:
+    def getData(self, url):
+        data = {
+            'episodes': 0
+        }
+        text = requests.get(url).text
+        soup = BeautifulSoup(text, 'html.parser')
+        title = soup.find('h1', {'class': 'page-title'}).text
+
+        # print('title', title)
+        text = requests.get('https://anime1.me').text
+        m = re.search(r'>{}</a></td><td class=\"column-2\">(.+?)</td>'.format(re.escape(title)), text)
+        if m:
+            episodes = m.group(1)
+            data['episodes'] = self._parse_episodes(episodes)
+        else:
+            # print('Not match')
+            pass
+
+        return data
+
+    def _parse_episodes(self, episodes):
+        if episodes == '劇場版':
+            return 1
+
+        m = re.match(r'^連載中\((\d+)\)$', episodes)
+        if m:
+            return int(m.group(1))
+
+        m = re.match(r'^1-(\d+)$', episodes)
+        if m:
+            return int(m.group(1))
+
+        raise Exception('Unknwon episodes format: {}'.format(episodes))
