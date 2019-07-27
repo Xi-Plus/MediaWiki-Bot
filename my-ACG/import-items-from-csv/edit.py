@@ -6,7 +6,7 @@ import re
 import json
 import requests
 import urllib.parse
-from config import API, USER, PASSWORD
+from config import API, USER, PASSWORD  # pylint: disable=E0611
 
 
 def parse_update(text):
@@ -272,9 +272,11 @@ def main(filename):
         reader = csv.reader(csvfile)
         for row in reader:
             (
+                Qid,
                 animetitle,
                 seenepisodes,
                 allepisodes,
+                _percent,
                 update,
                 comment,
                 length,
@@ -284,10 +286,14 @@ def main(filename):
                 link2,
                 link3,
                 link4,
+                _sort,
                 studio,
                 year,
                 rating,
             ) = row
+
+            if Qid != '':
+                continue
 
             # animetitle
             animetitle = animetitle.split(' / ')
@@ -301,12 +307,16 @@ def main(filename):
             # wikipedia = re.sub(r'^https?://zh.wikipedia.org/wiki/', '', wikipedia)
             wikipedia = urllib.parse.unquote(wikipedia)
             # wikipedia = wikipedia.replace('_', ' ')
+            if wikipedia in ['-']:
+                wikipedia = ''
 
             # moegirl
             # moegirl = re.sub(r'^https?://zh.moegirl.org/(zh-hant/)?', '', moegirl)
             moegirl = urllib.parse.unquote(moegirl)
             # moegirl = moegirl.replace('_', ' ')
             moegirl = re.sub(r'#.+?$', '', moegirl)
+            if moegirl in ['-']:
+                moegirl = ''
 
             # link
             link1 = parse_link(link1)
@@ -463,7 +473,6 @@ def main(filename):
                                 'amount': '+{}'.format(length),
                                 'unit': 'https://xiplus.ddns.net/entity/Q54',
                             },
-                            'value': length,
                             'type': 'quantity'
                         }
                     },
@@ -502,7 +511,7 @@ def main(filename):
                         'property': 'P66',
                         'datatype': 'string',
                         'datavalue': {
-                            'value': link1,
+                            'value': moegirl,
                             'type': 'string'
                         }
                     },
@@ -645,7 +654,7 @@ def main(filename):
                 }]
 
             print(data)
-            # input()
+            input()
             # item = datasite.editEntity({}, data, summary=u'匯入新動畫項目')
             result = session.post(API, data={
                 'action': 'wbeditentity',
