@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import argparse
-import csv
 import os
 
 os.environ['PYWIKIBOT_DIR'] = os.path.dirname(os.path.realpath(__file__))
@@ -18,7 +17,7 @@ wdsite.login()
 def getItem(site, title):
     if title[0] == 'Q':
         return pywikibot.ItemPage(site, title)
-    elif title[0] == 'P':
+    if title[0] == 'P':
         return pywikibot.PropertyPage(site, title)
     print('\t Not Wikibase page')
     return None
