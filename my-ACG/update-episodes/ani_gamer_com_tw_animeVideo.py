@@ -38,7 +38,6 @@ def updateEpisodes(title):
             if new_episodes > old_episodes:
                 episodesValue.amount = new_episodes
                 print('\t Update episodes from {} to {}'.format(old_episodes, new_episodes))
-                input()
                 claims['P27'][0].changeTarget(episodesValue, summary='更新總集數')
             else:
                 print('\t Not update')
@@ -46,7 +45,6 @@ def updateEpisodes(title):
             new_claim = pywikibot.page.Claim(datasite, 'P27')
             new_claim.setTarget(pywikibot.WbQuantity(new_episodes, site=datasite))
             print('\t Add new episodes {}'.format(new_episodes))
-            input()
             myitem.addClaim(new_claim, summary='新增總集數')
     else:
         print('\t Not gamer')

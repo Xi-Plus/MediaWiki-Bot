@@ -46,7 +46,7 @@ def updateEpisodes(title):
             print('\t Add new episodes {}'.format(new_episodes))
             myitem.addClaim(new_claim, summary='新增總集數')
     else:
-        print('\t Not gamer')
+        print('\t Not anime1')
 
 
 def main():
