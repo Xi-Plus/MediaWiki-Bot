@@ -18,9 +18,10 @@ datasite = site.data_repository()
 
 
 def updateEpisodes(title):
-    print(title)
-
     myitem = pywikibot.ItemPage(datasite, title)
+
+    print(title, myitem.get()['labels']['zh-tw'])
+
     claims = myitem.get()['claims']
     if 'P34' in claims:
         claim = claims['P34'][0]
