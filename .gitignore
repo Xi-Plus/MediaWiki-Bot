@@ -21,3 +21,5 @@ move-g15-file/skipedpage.txt
 remove-broken-file/skipedpage.txt
 RFA-stats/list/
 user-config/
+*.csv
+*.pyc
