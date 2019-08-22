@@ -11,20 +11,30 @@ os.environ['TZ'] = 'UTC'
 site = pywikibot.Site()
 site.login()
 
+branchs = {
+    'gadget': [],
+    'xiplus': [],
+}
+
 with open('list.txt', 'r') as f:
     for user in f:
         user = user.strip()
         page = pywikibot.Page(site, 'User:{}/common.js'.format(user))
         if not page.exists():
-            print('{}\t{}'.format(user, 'gadget'))
+            branchs['gadget'].append(user)
             continue
         text = page.text
         if 'Xiplus/Twinkle.js' in text:
-            print('{}\t{}'.format(user, 'Xiplus'))
+            branchs['xiplus'].append(user)
             continue
         m = re.search(r'User:(.+?)/Twinkle.js', text)
         if m:
-            print('{}\t{}'.format(user, m.group(1)))
+            if m.group(1) not in branchs:
+                branchs[m.group(1)] = []
+            branchs[m.group(1)].append(user)
             continue
-        print('{}\t{}'.format(user, 'gadget'))
+        branchs['gadget'].append(user)
         continue
+
+for branch in branchs:
+    print(branch, branchs[branch])
