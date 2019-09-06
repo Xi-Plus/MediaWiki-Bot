@@ -8,13 +8,20 @@ import pywikibot
 
 from config import config_page_name, database  # pylint: disable=E0611,W0614
 
+import argparse
+
+parser = argparse.ArgumentParser()
+parser.add_argument('lang', nargs='?', default='zh')
+parser.add_argument('wiki', nargs='?', default='wikipedia')
+parser.add_argument('dbwiki', nargs='?', default='zhwiki')
+args = parser.parse_args()
 
 os.environ['TZ'] = 'UTC'
 
-site = pywikibot.Site()
+site = pywikibot.Site(args.lang, args.wiki)
 site.login()
 
-config_page = pywikibot.Page(site, config_page_name)
+config_page = pywikibot.Page(site, config_page_name[args.lang][args.wiki])
 cfg = config_page.text
 cfg = json.loads(cfg)
 print(json.dumps(cfg, indent=4, ensure_ascii=False))
@@ -38,7 +45,7 @@ db = pymysql.connect(host=database['host'],
                      charset=database['charset'])
 cur = db.cursor()
 
-cur.execute("""SELECT `title`, `count`, `protectedit`, `protectmove`, `redirect` FROM `MostTranscludedPages_page` ORDER BY `count` DESC""")
+cur.execute("""SELECT `title`, `count`, `protectedit`, `protectmove`, `redirect` FROM `MostTranscludedPages_page` WHERE `wiki` = %s ORDER BY `count` DESC""", (args.dbwiki))
 rows = cur.fetchall()
 
 countsysop = 0

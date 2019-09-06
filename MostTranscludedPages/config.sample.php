@@ -7,6 +7,8 @@ $C["pass"] = "";
 $C["TIME_MIN"] = "1970-01-01 08:00:01";
 $C["protection_update"] = "-7 days";
 
+$C["min_usage"] = 100;
+
 $C["User-Agent"] = "User:A2093064-bot MostTranscludedPages";
 
 $C["DBTBprefix"] = "MostTranscludedPages_";

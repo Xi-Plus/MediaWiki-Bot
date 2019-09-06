@@ -1,4 +1,10 @@
 <?php
+if (count($argv) < 2) {
+	exit("Require 1 arg.\n");
+}
+
+$wiki = $argv[1];
+
 require __DIR__ . "/../config/config.php";
 if (!in_array(PHP_SAPI, $C["allowsapi"])) {
 	exit("No permission");
@@ -7,7 +13,7 @@ if (!in_array(PHP_SAPI, $C["allowsapi"])) {
 set_time_limit(600);
 date_default_timezone_set('UTC');
 $starttime = microtime(true);
-@include __DIR__ . "/config.php";
+@include __DIR__ . "/config.$wiki.php";
 require __DIR__ . "/../function/curl.php";
 require __DIR__ . "/../function/login.php";
 require __DIR__ . "/../function/edittoken.php";
@@ -17,7 +23,8 @@ echo "The time now is " . date("Y-m-d H:i:s") . " (UTC)\n";
 login("bot");
 $edittoken = edittoken();
 
-$sth = $G["db"]->prepare("SELECT * FROM `{$C['DBTBprefix']}page` WHERE `time` < :time");
+$sth = $G["db"]->prepare("SELECT * FROM `{$C['DBTBprefix']}page` WHERE `wiki` = :wiki AND `time` < :time");
+$sth->bindValue(":wiki", $wiki);
 $sth->bindValue(":time", date("Y-m-d H:i:s", strtotime($C["protection_update"])));
 $sth->execute();
 $pagelist = $sth->fetchAll(PDO::FETCH_ASSOC);
@@ -64,7 +71,8 @@ foreach ($pagelist as $pagelist2) {
 			unset($protect["create"]);
 		}
 		if ($protect["edit"] != $pages[$title]["protectedit"] || $protect["move"] != $pages[$title]["protectmove"] || $redirect != $pages[$title]["redirect"]) {
-			$sth = $G["db"]->prepare("UPDATE `{$C['DBTBprefix']}page` SET `protectedit` = :protectedit, `protectmove` = :protectmove, `redirect` = :redirect, `time` = :time WHERE `title` = :title");
+			$sth = $G["db"]->prepare("UPDATE `{$C['DBTBprefix']}page` SET `protectedit` = :protectedit, `protectmove` = :protectmove, `redirect` = :redirect, `time` = :time WHERE `wiki` = :wiki AND `title` = :title");
+			$sth->bindValue(":wiki", $wiki);
 			$sth->bindValue(":title", $title);
 			$sth->bindValue(":protectedit", $protect["edit"]);
 			$sth->bindValue(":protectmove", $protect["move"]);
@@ -76,7 +84,8 @@ foreach ($pagelist as $pagelist2) {
 				echo $sth->errorInfo()[2] . "\n";
 			}
 		} else {
-			$sth = $G["db"]->prepare("UPDATE `{$C['DBTBprefix']}page` SET `time` = :time WHERE `title` = :title");
+			$sth = $G["db"]->prepare("UPDATE `{$C['DBTBprefix']}page` SET `time` = :time WHERE `wiki` = :wiki AND `title` = :title");
+			$sth->bindValue(":wiki", $wiki);
 			$sth->bindValue(":title", $title);
 			$sth->bindValue(":time", date("Y-m-d H:i:s"));
 			$res = $sth->execute();
