@@ -124,7 +124,10 @@ for fromname in files:
         continue
 
     page = pywikibot.Page(site, toname)
-    pywikibot.showDiff(page.text, text)
+    if page.text == '':
+        print('New page')
+    else:
+        pywikibot.showDiff(page.text, text)
     save = input('Save?')
     if save.lower() in ['', 'y', 'yes']:
         page.text = text
