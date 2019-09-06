@@ -1,14 +1,13 @@
 # -*- coding: utf-8 -*-
+import argparse
 import json
 import os
-import pymysql
 
+import pymysql
 os.environ['PYWIKIBOT_DIR'] = os.path.dirname(os.path.realpath(__file__))
 import pywikibot
-
 from config import config_page_name, database  # pylint: disable=E0611,W0614
 
-import argparse
 
 parser = argparse.ArgumentParser()
 parser.add_argument('lang', nargs='?', default='zh')
