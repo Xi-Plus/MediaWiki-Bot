@@ -10,6 +10,7 @@ SET time_zone = "+00:00";
 
 
 CREATE TABLE `MostTranscludedPages_page` (
+  `wiki` varchar(20) NOT NULL,
   `title` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
   `count` int(11) NOT NULL,
   `protectedit` varchar(20) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
