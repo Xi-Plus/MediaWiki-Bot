@@ -19,7 +19,7 @@ with open('list.csv') as csvfile:
             toTitle = fromTitle
         else:
             toTitle = row[1]
-        print('Import from {} to {}'.format(fromTitle, toTitle))
+        print('Add {2} link {1} into item {0}'.format(fromTitle, toTitle, targetSite))
 
         inBlack = False
         for blacklist in blacklists:
