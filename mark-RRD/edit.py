@@ -115,7 +115,7 @@ for secid in range(1, len(text)):
     newtext += sectext + '\n\n'
 
 
-if rrdpage.text == newtext.strip():
+if re.sub(r'\s', '', rrdpage.text) == re.sub(r'\s', '', newtext):
     exit('nothing changed')
 
 pywikibot.showDiff(rrdpage.text, newtext)
