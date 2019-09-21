@@ -48,8 +48,16 @@ db = pymysql.connect(host=database['host'],
                      charset=database['charset'])
 cur = db.cursor()
 
-cur.execute("""SELECT `page` FROM `remove_broken_file_pages` WHERE `time` > FROM_UNIXTIME(%s)""",
+cnt = cur.execute("""DELETE FROM `remove_broken_file_pages` WHERE `time` < FROM_UNIXTIME(%s)""",
             (time.time() - skip_time))
+print('Deleted {} rows from remove_broken_file_pages'.format(cnt))
+
+cnt = cur.execute("""DELETE FROM `remove_broken_file_files` WHERE `page` NOT IN ( SELECT `page` FROM `remove_broken_file_pages` )""")
+print('Deleted {} rows from remove_broken_file_files'.format(cnt))
+
+db.commit()
+
+cur.execute("""SELECT `page` FROM `remove_broken_file_pages`""")
 rows = cur.fetchall()
 skippages = []
 for row in rows:
