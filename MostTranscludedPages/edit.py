@@ -13,6 +13,10 @@ parser = argparse.ArgumentParser()
 parser.add_argument('lang', nargs='?', default='zh')
 parser.add_argument('wiki', nargs='?', default='wikipedia')
 parser.add_argument('dbwiki', nargs='?', default='zhwiki')
+parser.add_argument('--full', type=int, default=5000)
+parser.add_argument('--semi', type=int, default=500)
+parser.add_argument('--modulefull', type=int, default=5000)
+parser.add_argument('--modulesemi', type=int, default=5000)
 args = parser.parse_args()
 
 os.environ['TZ'] = 'UTC'
@@ -57,13 +61,13 @@ for row in rows:
     redirect = row[4]
     comment = ''
 
-    if count >= 5000:
+    if (not title.startswith('模块:') and count >= args.full) or (title.startswith('模块:') and count >= args.modulefull):
         if protectedit != 'sysop':
             comment = '[{{{{fullurl:{0}|action=protect&mwProtect-level-edit=sysop&mwProtect-level-move=sysop&mwProtect-reason=高風險模板：{1}引用}}}} 需要全保護]'.format(
                 title, count)
             countsysop += 1
-    elif count >= 500:
-        if protectedit == '' and not title.startswith('模块:'):
+    elif (not title.startswith('模块:') and count >= args.semi) or (title.startswith('模块:') and count >= args.modulesemi):
+        if protectedit == '':
             comment = '[{{{{fullurl:{0}|action=protect&mwProtect-level-edit=autoconfirmed&mwProtect-level-move=autoconfirmed&mwProtect-reason=高風險模板：{1}引用}}}} 需要半保護]'.format(
                 title, count)
             countautoconfirmed += 1
