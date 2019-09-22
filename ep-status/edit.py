@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import argparse
 import hashlib
 import json
 import os
@@ -8,11 +9,16 @@ from datetime import datetime, timezone
 
 os.environ['PYWIKIBOT_DIR'] = os.path.dirname(os.path.realpath(__file__))
 import pywikibot
-
 from config import config_page_name  # pylint: disable=E0611,W0614
 
 
 os.environ['TZ'] = 'UTC'
+
+parser = argparse.ArgumentParser()
+parser.add_argument('-f', '--force', dest='force', action='store_true')
+parser.set_defaults(force=False)
+args = parser.parse_args()
+print(args)
 
 site = pywikibot.Site()
 site.login()
@@ -29,7 +35,7 @@ outputPage = pywikibot.Page(site, cfg['output_page_name'])
 lastEditTime = list(outputPage.revisions(total=1))[0]['timestamp']
 lastEditTimestamp = datetime(lastEditTime.year, lastEditTime.month, lastEditTime.day,
                              lastEditTime.hour, lastEditTime.minute, tzinfo=timezone.utc).timestamp()
-if time.time() - lastEditTimestamp < cfg['interval']:
+if time.time() - lastEditTimestamp < cfg['interval'] and not args.force:
     exit('Last edit on {0}\n'.format(lastEditTime))
 
 cat = pywikibot.Page(site, cfg['category'])
