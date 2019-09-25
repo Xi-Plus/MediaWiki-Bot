@@ -37,4 +37,9 @@ class Anime1Me:
         if m:
             return int(m.group(1))
 
+        m = re.match(r'^1-(\d+)\+(\d+)$', episodes)
+        if m:
+            if int(m.group(1)) + 1 == int(m.group(2)):
+                return int(m.group(2))
+
         raise Exception('Unknwon episodes format: {}'.format(episodes))
