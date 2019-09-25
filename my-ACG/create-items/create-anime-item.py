@@ -34,14 +34,16 @@ def main():
     parser.add_argument('title')
     parser.add_argument('--year')
     parser.add_argument('--episodes', type=int, default=12)
+    parser.add_argument('--wp')
+    parser.add_argument('--moe')
     args = parser.parse_args()
 
     title = args.title
     year = args.year
     episodes = args.episodes
 
-    zhtitle = converttitle(zhsite, title)
-    moetitle = converttitle(moesite, title)
+    zhtitle = converttitle(zhsite, args.wp or title)
+    moetitle = converttitle(moesite, args.moe or title)
 
     print('title', title)
     print('year', year)
@@ -55,7 +57,6 @@ def main():
     data = {
         'labels': {},
         'claims': [],
-        'sitelinks': [],
     }
 
     data['labels']['zh-tw'] = {
@@ -110,7 +111,11 @@ def main():
         new_claim.setTarget(moetitle)
         data['claims'].append(new_claim.toJSON())
 
-    print(json.dumps(data, indent=4, ensure_ascii=False))
+    print(json.dumps(data['labels'], indent=4, ensure_ascii=False))
+    for claim in data['claims']:
+        print(claim['mainsnak']['property'],
+              claim['mainsnak']['datatype'],
+              claim['mainsnak']['datavalue'])
 
     input('Create?')
 
