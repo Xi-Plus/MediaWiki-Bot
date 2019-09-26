@@ -123,11 +123,6 @@ for ($i = $C["fail_retry"]; $i > 0; $i--) {
 		$out .= "\n*:<small>如果該提報有錯誤（例如因最後編輯是結構式討論而導致時間不正確），請'''務必'''通知機器人操作者。</small>--~~~~\n\n";
 		echo "\n";
 
-		$sth = $G["db"]->prepare("UPDATE `{$C['DBTBprefix']}userlist` SET `noticetime` = :noticetime WHERE `name` = :name");
-		$sth->bindValue(":noticetime", date("Y-m-d H:i:s"));
-		$sth->bindValue(":name", $user["name"]);
-		$res = $sth->execute();
-
 		if ($count >= $cfg["other_report_limit"]) {
 			break;
 		}
