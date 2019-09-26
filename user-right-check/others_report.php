@@ -120,7 +120,7 @@ for ($i = $C["fail_retry"]; $i > 0; $i--) {
 			$time = strtotime($user["lastusergetrights"]);
 			$out .= "、[[Special:用户权限/" . $user["name"] . "|最後授權在" . date("Y年n月j日", $time) . " (" . $C["day"][date("w", $time)] . ") " . date("H:i", $time) . " (UTC)]]";
 		}
-		$out .= "\n*:~~~~\n\n";
+		$out .= "\n*:<small>如果該提報有錯誤（例如因最後編輯是結構式討論而導致時間不正確），請'''務必'''通知機器人操作者。</small>--~~~~\n\n";
 		echo "\n";
 
 		$sth = $G["db"]->prepare("UPDATE `{$C['DBTBprefix']}userlist` SET `noticetime` = :noticetime WHERE `name` = :name");
