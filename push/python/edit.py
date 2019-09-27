@@ -133,6 +133,9 @@ for fromname in files:
     page = pywikibot.Page(site, toname)
     if page.text == '':
         print('New page')
+    elif page.text == text.rstrip():
+        print('Nothing changed. Skipped.')
+        continue
     else:
         pywikibot.showDiff(page.text, text)
     if args.auto:
