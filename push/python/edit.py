@@ -1,10 +1,17 @@
 # -*- coding: utf-8 -*-
+import argparse
 import os
 
 from config import cfg  # pylint: disable=E0611,W0614
 from func import file_get_contents
 
 os.environ['TZ'] = 'UTC'
+
+parser = argparse.ArgumentParser()
+parser.add_argument('--auto', action='store_true')
+parser.set_defaults(auto=False)
+args = parser.parse_args()
+print(args)
 
 print('===== project =====')
 project = None
@@ -128,7 +135,10 @@ for fromname in files:
         print('New page')
     else:
         pywikibot.showDiff(page.text, text)
-    save = input('Save?')
+    if args.auto:
+        save = 'yes'
+    else:
+        save = input('Save?')
     if save.lower() in ['', 'y', 'yes']:
         page.text = text
         page.save(summary=summary, minor=web['minor'], botflag=web['bot'], nocreate=web['nocreate'])
