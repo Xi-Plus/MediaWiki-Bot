@@ -5,7 +5,6 @@ import os
 import re
 import time
 
-import mwparserfromhell
 os.environ['PYWIKIBOT_DIR'] = os.path.dirname(os.path.realpath(__file__))
 import pywikibot
 from pywikibot.data.api import Request
@@ -27,15 +26,16 @@ if not cfg["enable"]:
 cvpage = pywikibot.Page(site, cfg["page_name"])
 text = cvpage.text
 
-wikicode = mwparserfromhell.parse(text)
+rndstr = hashlib.md5(str(time.time()).encode()).hexdigest()
+text = re.sub(r'^(===.*=== *)$', rndstr + r'\1', text, flags=re.M)
+sections = text.split(rndstr)
 
 totalcnt = 0
 istimeout = False
-changes = []
-for section in wikicode.get_sections()[2:]:
-    title = str(section.get(0).title)
+for secid, section in enumerate(sections[1:], 1):
+    title = section[:section.index('\n')]
     print(title, end="\t")
-    text = str(section)
+    text = section[section.index('\n') + 1:]
 
     rndstr = hashlib.md5(str(time.time()).encode()).hexdigest()
     text = re.sub(r"^(.*{{CopyvioEntry\|.+)$", rndstr + r"\1", text, flags=re.M)
@@ -45,7 +45,7 @@ for section in wikicode.get_sections()[2:]:
     entrycnt = len(text[1:])
     print(entrycnt)
 
-    newtext = text[0]
+    newtext = title + '\n' + text[0]
     cnt = 0
     for entry in text[1:]:
         m = re.match(r"{{CopyvioEntry\|1=([^|]+)\|time=(\d+)\|", entry)
@@ -89,20 +89,17 @@ for section in wikicode.get_sections()[2:]:
 
     if cnt == entrycnt:
         print("\t*** remove {} entry and section".format(cnt))
-        changes.append([section, ""])
+        sections[secid] = ''
     elif cnt > 0:
         print("\t*** remove {} entry".format(cnt))
-        changes.append([section, newtext])
+        sections[secid] = newtext
 
     totalcnt += cnt
 
     if istimeout:
         break
 
-for change in changes:
-    wikicode.replace(change[0], change[1])
-
-text = str(wikicode)
+text = ''.join(sections)
 
 if cvpage.text == text:
     exit("nothing changed")
