@@ -47,6 +47,9 @@ if ($res === false) {
 }
 $res = json_decode($res, true);
 $results = $res["query"]["querypage"]["results"];
+if (count($results) === 0) {
+	exit("No result returned\n");
+}
 
 foreach ($results as $page) {
 	$title = $page["title"];
