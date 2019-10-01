@@ -14,6 +14,8 @@ datasite = site.data_repository()
 zhsite = pywikibot.Site('zh', 'wikipedia')
 moesite = pywikibot.Site('moegirl', 'moegirl')
 
+STATUS_QID = ['Q57', 'Q56', 'Q58']
+
 
 def converttitle(site, title):
     r = Request(site=site, parameters={
@@ -33,7 +35,8 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('title')
     parser.add_argument('--year')
-    parser.add_argument('--episodes', type=int, default=12)
+    parser.add_argument('--episodes', type=int, default=0)
+    parser.add_argument('--status', type=int, choices=[0, 1, 2], default=0)
     parser.add_argument('--wp')
     parser.add_argument('--moe')
     args = parser.parse_args()
@@ -41,6 +44,7 @@ def main():
     title = args.title
     year = args.year
     episodes = args.episodes
+    status = args.status
 
     zhtitle = converttitle(zhsite, args.wp or title)
     moetitle = converttitle(moesite, args.moe or title)
@@ -48,6 +52,7 @@ def main():
     print('title', title)
     print('year', year)
     print('episodes', episodes)
+    print('status', status)
     print('zhtitle', zhtitle)
     print('moetitle', moetitle)
 
@@ -81,7 +86,7 @@ def main():
 
     # 播放狀態
     new_claim = pywikibot.page.Claim(datasite, 'P31')
-    new_claim.setTarget(pywikibot.ItemPage(datasite, 'Q58'))  # 已完結
+    new_claim.setTarget(pywikibot.ItemPage(datasite, STATUS_QID[status]))  # 已完結
     data['claims'].append(new_claim.toJSON())
 
     # 年份
