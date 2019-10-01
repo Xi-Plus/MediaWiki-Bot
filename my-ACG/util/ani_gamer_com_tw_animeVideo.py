@@ -8,6 +8,10 @@ class AniGamerComTwAnimeVideo:
         soup = BeautifulSoup(text, 'html.parser')
         data = {}
 
-        data['episodes'] = len(soup.find('section', {'class': 'season'}).find('ul').findAll('li'))
+        season = soup.find('section', {'class': 'season'})
+        if season is None:
+            data['episodes'] = 1
+        else:
+            data['episodes'] = len(season.find('ul').findAll('li'))
 
         return data
