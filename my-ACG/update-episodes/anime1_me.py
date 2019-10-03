@@ -41,11 +41,6 @@ def updateEpisodes(title):
                 claims['P27'][0].changeTarget(episodesValue, summary='更新總集數')
             else:
                 print('\t Not update')
-
-            if 'P31' in claims and claims['P31'][0].getTarget().id == 'Q57':
-                print('\t Update status to playing')
-                statusValue = pywikibot.ItemPage(datasite, 'Q56')
-                claims['P31'][0].changeTarget(statusValue, summary='更新播放狀態')
         else:
             new_claim = pywikibot.page.Claim(datasite, 'P27')
             new_claim.setTarget(pywikibot.WbQuantity(new_episodes, site=datasite))
@@ -53,10 +48,22 @@ def updateEpisodes(title):
             myitem.addClaim(new_claim, summary='新增總集數')
 
         if 'P31' in claims:
-            if data['end']:
-                print('\t Update status to end')
-                statusValue = pywikibot.ItemPage(datasite, 'Q58')
+            if claims['P31'][0].getTarget().id == 'Q57':
+                print('\t Update status to playing')
+                statusValue = pywikibot.ItemPage(datasite, 'Q56')  # 放送中
                 claims['P31'][0].changeTarget(statusValue, summary='更新播放狀態')
+            elif data['end']:
+                print('\t Update status to end')
+                statusValue = pywikibot.ItemPage(datasite, 'Q58')  # 已完結
+                claims['P31'][0].changeTarget(statusValue, summary='更新播放狀態')
+        else:
+            itemid = 'Q56'
+            if data['end']:
+                itemid = 'Q58'
+            new_claim = pywikibot.page.Claim(datasite, 'P31')
+            new_claim.setTarget(pywikibot.ItemPage(datasite, itemid))
+            print('\t Add new status')
+            myitem.addClaim(new_claim, summary='新增播放狀態')
     else:
         print('\t Not anime1')
 
