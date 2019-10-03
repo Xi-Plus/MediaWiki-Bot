@@ -42,6 +42,11 @@ def updateEpisodes(title):
                 claims['P27'][0].changeTarget(episodesValue, summary='更新總集數')
             else:
                 print('\t Not update')
+
+            if 'P31' in claims and claims['P31'][0].getTarget().id == 'Q57':
+                print('\t Update status to playing')
+                statusValue = pywikibot.ItemPage(datasite, 'Q56')
+                claims['P31'][0].changeTarget(statusValue, summary='更新播放狀態')
         else:
             new_claim = pywikibot.page.Claim(datasite, 'P27')
             new_claim.setTarget(pywikibot.WbQuantity(new_episodes, site=datasite))
