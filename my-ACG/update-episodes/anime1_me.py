@@ -48,13 +48,14 @@ def updateEpisodes(title):
             myitem.addClaim(new_claim, summary='新增總集數')
 
         if 'P31' in claims:
-            if claims['P31'][0].getTarget().id == 'Q57':
+            if data['end']:
+                if claims['P31'][0].getTarget().id != 'Q58':
+                    print('\t Update status to end')
+                    statusValue = pywikibot.ItemPage(datasite, 'Q58')  # 已完結
+                    claims['P31'][0].changeTarget(statusValue, summary='更新播放狀態')
+            elif claims['P31'][0].getTarget().id == 'Q57':
                 print('\t Update status to playing')
                 statusValue = pywikibot.ItemPage(datasite, 'Q56')  # 放送中
-                claims['P31'][0].changeTarget(statusValue, summary='更新播放狀態')
-            elif data['end']:
-                print('\t Update status to end')
-                statusValue = pywikibot.ItemPage(datasite, 'Q58')  # 已完結
                 claims['P31'][0].changeTarget(statusValue, summary='更新播放狀態')
         else:
             itemid = 'Q56'
