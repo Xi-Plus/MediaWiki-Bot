@@ -107,7 +107,7 @@ for ($i = $C["fail_retry"]; $i > 0; $i--) {
 				exit("fetch page fail\n");
 			}
 			$res = json_decode($res, true);
-			if (isset($res["query"]["users"][0]["blockexpiry"]) && $res["query"]["users"][0]["blockexpiry"] === "infinity") {
+			if (isset($res["query"]["users"][0]["blockexpiry"]) && in_array($res["query"]["users"][0]["blockexpiry"], $C['blocked_expiry'])) {
 				$blocked = true;
 				$lasttime = strtotime($res["query"]["users"][0]["blockedtimestamp"]);
 			}

@@ -10,4 +10,11 @@ $C["fail_retry"] = 5;
 
 $C["User-Agent"] = "User:A2093064-bot UUA-archive";
 
+$C['blocked_expiry'] = [
+	'infinity',
+	'infinite',
+	'indefinite',
+	'never',
+];
+
 $C["cookiefile"] = __DIR__ . "/../tmp/UUA-archive-cookie.txt";
