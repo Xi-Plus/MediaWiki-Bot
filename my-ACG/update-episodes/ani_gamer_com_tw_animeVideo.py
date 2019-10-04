@@ -60,7 +60,7 @@ def updateEpisodes(title):
             # 台灣分級
             if 'rating' in data:
                 if 'P23' in claims:
-                    if claims['P31'][0].getTarget().id != RATING_ITEM[data['rating']]:
+                    if claims['P23'][0].getTarget().id != RATING_ITEM[data['rating']]:
                         print('\t Update rating to {}'.format(data['rating']))
                         ratingValue = pywikibot.ItemPage(datasite, RATING_ITEM[data['rating']])
                         claims['P23'][0].changeTarget(ratingValue, summary='更新台灣分級')
