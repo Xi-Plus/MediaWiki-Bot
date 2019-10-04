@@ -69,9 +69,9 @@ def updateEpisodes(title):
 
 
 def main():
-    moegirlitem = pywikibot.ItemPage(datasite, 'Q56')
-
-    for backlink in moegirlitem.backlinks(namespaces=[120]):
+    for backlink in pywikibot.ItemPage(datasite, 'Q56').backlinks(namespaces=[120]):  # 放送中
+        updateEpisodes(backlink.title())
+    for backlink in pywikibot.ItemPage(datasite, 'Q57').backlinks(namespaces=[120]):  # 尚未放送
         updateEpisodes(backlink.title())
 
 
