@@ -1,3 +1,5 @@
+import argparse
+import html
 import re
 
 import requests
@@ -16,6 +18,7 @@ class Anime1Me:
 
         # print('title', title)
         text = requests.get('https://anime1.me').text
+        text = html.unescape(text)
         m = re.search(r'>{}</a></td><td class=\"column-2\">(.+?)</td>'.format(re.escape(title)), text)
         if m:
             episodes = m.group(1)
@@ -44,3 +47,10 @@ class Anime1Me:
                 return int(m.group(2)), True
 
         raise Exception('Unknwon episodes format: {}'.format(episodes))
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument('url')
+    args = parser.parse_args()
+    print(Anime1Me().getData(args.url))
