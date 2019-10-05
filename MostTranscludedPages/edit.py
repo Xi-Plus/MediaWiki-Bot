@@ -83,5 +83,8 @@ output = """* {0}個頁面需要全保護
 {2}
 """.format(countsysop, countautoconfirmed, table)
 
+if len(output) / len(outputPage.text) < 0.5:
+    exit('Something went wrong!\n')
+
 outputPage.text = output
 outputPage.save(summary=cfg['summary'])
