@@ -91,8 +91,8 @@ function lastusergetrights($username) {
 		"action" => "query",
 		"format" => "json",
 		"list" => "logevents",
-		"leprop" => "timestamp|user",
-		"letype" => "rights",
+		"leprop" => "timestamp|user|details",
+		"leaction" => "rights/rights",
 		"letitle" => "User:" . $username,
 		"lelimit" => "10",
 	)));
@@ -101,9 +101,10 @@ function lastusergetrights($username) {
 	}
 	$res = json_decode($res, true);
 	foreach ($res["query"]["logevents"] as $logevent) {
-		if ($logevent["user"] !== "Jimmy-abot") {
-			return date("Y-m-d H:i:s", strtotime($logevent["timestamp"]));
+		if (array_diff($logevent['params']['newgroups'], $logevent['params']['oldgroups']) === []) {
+			continue;
 		}
+		return date("Y-m-d H:i:s", strtotime($logevent["timestamp"]));
 	}
 	return $C['TIME_MIN'];
 }
