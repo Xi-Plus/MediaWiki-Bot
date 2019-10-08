@@ -20,7 +20,7 @@ require __DIR__ . "/../function/edittoken.php";
 
 echo "The time now is " . date("Y-m-d H:i:s") . " (UTC)\n";
 
-login("bot");
+login("user");
 $edittoken = edittoken();
 
 $sth = $G["db"]->prepare("SELECT * FROM `{$C['DBTBprefix']}page` WHERE `wiki` = :wiki AND `time` < :time");
