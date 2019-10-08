@@ -20,17 +20,19 @@ with open('list.csv', 'r') as f:
         create = row[3]
         reason = row[4]
 
-        print(title, edit, move, create, reason)
-
         page = pywikibot.Page(site, title)
         args = {
             'reason': reason,
             'prompt': False,
         }
+        protections = {}
         if page.exists():
-            args['edit'] = edit
-            args['move'] = move
+            protections['edit'] = edit
+            protections['move'] = move
         else:
-            args['create'] = create
+            protections['create'] = create
+        args['protections'] = protections
+
+        print(title, args)
 
         page.protect(**args)
