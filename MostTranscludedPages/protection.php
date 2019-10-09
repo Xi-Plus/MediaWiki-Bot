@@ -23,9 +23,14 @@ echo "The time now is " . date("Y-m-d H:i:s") . " (UTC)\n";
 login("user");
 $edittoken = edittoken();
 
+$protection_update = $C["protection_update"];
+if (isset($argv[2])) {
+	$protection_update = $argv[2];
+}
+
 $sth = $G["db"]->prepare("SELECT * FROM `{$C['DBTBprefix']}page` WHERE `wiki` = :wiki AND `time` < :time");
 $sth->bindValue(":wiki", $wiki);
-$sth->bindValue(":time", date("Y-m-d H:i:s", strtotime($C["protection_update"])));
+$sth->bindValue(":time", date("Y-m-d H:i:s", strtotime($protection_update)));
 $sth->execute();
 $pagelist = $sth->fetchAll(PDO::FETCH_ASSOC);
 $pages = [];
