@@ -15,8 +15,13 @@ class AniGamerComTwAnimeVideo:
 
     def getData(self, url):
         text = requests.get(url).text
-        soup = BeautifulSoup(text, 'html.parser')
         data = {}
+
+        if '目前無此動畫或動畫授權已到期！' in text:
+            data['removed'] = True
+            return data
+
+        soup = BeautifulSoup(text, 'html.parser')
 
         season = soup.find('section', {'class': 'season'})
         if season is None:
@@ -30,6 +35,16 @@ class AniGamerComTwAnimeVideo:
             m = re.search(r'TW-(.+?)\.gif', src)
             if m:
                 data['rating'] = self.RATING_IMG[m.group(1)]
+
+        data_intro = soup.find('div', {'class': 'data_intro'})
+        if data_intro:
+            linkdiv = data_intro.find('div', {'class': 'link'})
+            if linkdiv:
+                for link in linkdiv.findAll('a'):
+                    if link.text == '作品資料':
+                        data['acg_link'] = link.get('href')
+                        if data['acg_link'].startswith('//'):
+                            data['acg_link'] = 'https:' + data['acg_link']
 
         return data
 
