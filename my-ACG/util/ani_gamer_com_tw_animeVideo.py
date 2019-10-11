@@ -1,6 +1,10 @@
 import argparse
+import logging
 import re
+
 import requests
+
+import pywikibot
 from bs4 import BeautifulSoup
 
 
@@ -47,6 +51,26 @@ class AniGamerComTwAnimeVideo:
                             data['acg_link'] = 'https:' + data['acg_link']
 
         return data
+
+    def updateItem(self, datasite, item):
+        itemlabel = item.get()['labels']['zh-tw']
+        logging.info('%s %s', item.id, itemlabel)
+
+        claims = item.get()['claims']
+
+        if 'P34' not in claims:
+            logging.error('No anime gamer claims')
+            return
+
+        url = claims['P34'][0].getTarget()
+        data = self.getData(url)
+
+        # 從巴哈姆特動畫瘋匯入巴哈姆特作品資料
+        if 'acg_link' in data and 'P1' not in claims:
+            new_claim = pywikibot.page.Claim(datasite, 'P1')
+            new_claim.setTarget(data['acg_link'])
+            logging.info('\tAdd acg gamer link %s', data['acg_link'])
+            item.addClaim(new_claim)
 
 
 if __name__ == "__main__":
