@@ -33,7 +33,7 @@ class Anime1Me:
         if episodes == '劇場版':
             return 1, True
 
-        m = re.match(r'^連載中\((\d+)\)$', episodes)
+        m = re.match(r'^連載中\((\d+)(?:正式版|AT-X)?\)$', episodes)
         if m:
             return int(m.group(1)), False
 
