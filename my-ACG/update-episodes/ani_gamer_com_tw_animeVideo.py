@@ -16,14 +16,6 @@ site = pywikibot.Site()
 site.login()
 datasite = site.data_repository()
 
-RATING_ITEM = {
-    0: 'Q46',
-    6: 'Q47',
-    12: 'Q48',
-    15: 'Q49',
-    18: 'Q50',
-}
-
 
 def updateEpisodes(title):
     myitem = pywikibot.ItemPage(datasite, title)
@@ -56,19 +48,6 @@ def updateEpisodes(title):
                 print('\t Update status to playing')
                 statusValue = pywikibot.ItemPage(datasite, 'Q56')
                 claims['P31'][0].changeTarget(statusValue, summary='更新播放狀態')
-
-            # 台灣分級
-            if 'rating' in data:
-                if 'P23' in claims:
-                    if claims['P23'][0].getTarget().id != RATING_ITEM[data['rating']]:
-                        print('\t Update rating to {}'.format(data['rating']))
-                        ratingValue = pywikibot.ItemPage(datasite, RATING_ITEM[data['rating']])
-                        claims['P23'][0].changeTarget(ratingValue, summary='更新台灣分級')
-                else:
-                    new_claim = pywikibot.page.Claim(datasite, 'P23')
-                    new_claim.setTarget(pywikibot.ItemPage(datasite, RATING_ITEM[data['rating']]))
-                    print('\t Add new rating {}'.format(data['rating']))
-                    myitem.addClaim(new_claim, summary='新增台灣分級')
         else:
             new_claim = pywikibot.page.Claim(datasite, 'P27')
             new_claim.setTarget(pywikibot.WbQuantity(new_episodes, site=datasite))
