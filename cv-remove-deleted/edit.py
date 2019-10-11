@@ -59,8 +59,8 @@ for secid, section in enumerate(sections[1:], 1):
             page = pywikibot.Page(site, pagename)
             remove = False
             if page.exists():
-                for reversion in page.getVersionHistory():
-                    if reversion.timestamp.astimezone().timestamp() < entrytime:
+                for reversion in page.revisions():
+                    if reversion.timestamp.astimezone().timestamp() < entrytime - 86400:
                         break
                     if re.search(r"替换为未侵权版本|清理\[\[Category:已完成侵權驗證的頁面]]", reversion.comment):
                         print(reversion.comment)
