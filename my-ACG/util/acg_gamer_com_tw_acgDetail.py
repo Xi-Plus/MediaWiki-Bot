@@ -51,9 +51,9 @@ class AcgGamerComTwAcgDetail:
     def _get_wbtime(self, year):
         if len(year) == 4:
             return pywikibot.WbTime(year=int(year), calendarmodel='http://www.wikidata.org/entity/Q1985727')
-        elif len(year) == 6:
+        if len(year) == 6:
             return pywikibot.WbTime(year=int(year[0:4]), month=int(year[4:6]), calendarmodel='http://www.wikidata.org/entity/Q1985727')
-        elif len(year) == 8:
+        if len(year) == 8:
             return pywikibot.WbTime(year=int(year[0:4]), month=int(year[4:6]), day=int(year[6:8]), calendarmodel='http://www.wikidata.org/entity/Q1985727')
         return None
 
@@ -64,7 +64,7 @@ class AcgGamerComTwAcgDetail:
         claims = item.get()['claims']
 
         if 'P1' not in claims:
-            logging.error('No acg gamer claims')
+            logging.error('\t No acg gamer claims')
             return
 
         url = claims['P1'][0].getTarget()
@@ -98,6 +98,29 @@ class AcgGamerComTwAcgDetail:
                     new_claim.setTarget(wbtime)
                     logging.info('\t Add new year %s', data['year'])
                     item.addClaim(new_claim, summary='新增年份')
+
+        # 總集數
+        if 'episodes' in data:
+            # 已看集數
+            if 'P28' not in claims:
+                new_claim = pywikibot.page.Claim(datasite, 'P28')
+                new_claim.setTarget(pywikibot.WbQuantity(0, site=datasite))
+                logging.info('\t Add seen episodes')
+                item.addClaim(new_claim, summary='新增已看集數')
+
+            if 'P27' in claims:
+                episodesValue = claims['P27'][0].getTarget()
+                old_episodes = episodesValue.amount
+                new_episodes = data['episodes']
+                if new_episodes > old_episodes:
+                    episodesValue.amount = new_episodes
+                    logging.info('\t Update episodes from %s to %s', old_episodes, new_episodes)
+                    claims['P27'][0].changeTarget(episodesValue, summary='更新總集數')
+            else:
+                new_claim = pywikibot.page.Claim(datasite, 'P27')
+                new_claim.setTarget(pywikibot.WbQuantity(new_episodes, site=datasite))
+                logging.info('\t Add new episodes %s', new_episodes)
+                item.addClaim(new_claim, summary='新增總集數')
 
 
 if __name__ == "__main__":
