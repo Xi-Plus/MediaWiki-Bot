@@ -35,6 +35,7 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('title')
     parser.add_argument('--year')
+    parser.add_argument('--seen', type=int, default=0)
     parser.add_argument('--episodes', type=int, default=0)
     parser.add_argument('--status', type=int, choices=[0, 1, 2], default=0)
     parser.add_argument('--wp')
@@ -43,6 +44,7 @@ def main():
 
     title = args.title
     year = args.year
+    seen = args.seen
     episodes = args.episodes
     status = args.status
 
@@ -51,7 +53,7 @@ def main():
 
     print('title', title)
     print('year', year)
-    print('episodes', episodes)
+    print('episodes', seen, episodes)
     print('status', status)
     print('zhtitle', zhtitle)
     print('moetitle', moetitle)
@@ -76,7 +78,7 @@ def main():
 
     # 已看集數
     new_claim = pywikibot.page.Claim(datasite, 'P28')
-    new_claim.setTarget(pywikibot.WbQuantity(0, site=datasite))
+    new_claim.setTarget(pywikibot.WbQuantity(seen, site=datasite))
     data['claims'].append(new_claim.toJSON())
 
     # 總集數
