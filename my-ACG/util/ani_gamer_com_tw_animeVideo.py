@@ -67,7 +67,7 @@ class AniGamerComTwAnimeVideo:
 
         # 移除巴哈姆特動畫瘋連結
         if 'removed' in data and data['removed']:
-            logging.info('Remove anime gamer link')
+            logging.info('\tRemove anime gamer link')
             item.removeClaims(claims['P34'], summary='影片已移除')
             return
 
