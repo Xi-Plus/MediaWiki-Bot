@@ -72,14 +72,27 @@ class AcgGamerComTwAcgDetail:
 
         # 台灣分級
         if 'rating' in data:
+            rating_exists = False
             if 'P23' in claims:
-                if claims['P23'][0].getTarget().id != self.RATING_ITEM[data['rating']]:
-                    logging.info('\t Update rating to %s', data['rating'])
-                    ratingValue = pywikibot.ItemPage(datasite, self.RATING_ITEM[data['rating']])
-                    claims['P23'][0].changeTarget(ratingValue, summary='更新台灣分級')
-            else:
+                for claim in claims['P23']:
+                    if claim.getTarget().id == self.RATING_ITEM[data['rating']]:
+                        rating_exists = True
+                        print('rating_exists')
+
+                        if len(claim.sources) == 0:
+                            rating_source = pywikibot.page.Claim(datasite, 'P1')
+                            rating_source.setTarget(url)
+                            logging.info('\t Add source to rating')
+                            claim.addSource(rating_source)
+
+            if not rating_exists:
                 new_claim = pywikibot.page.Claim(datasite, 'P23')
                 new_claim.setTarget(pywikibot.ItemPage(datasite, self.RATING_ITEM[data['rating']]))
+
+                rating_source = pywikibot.page.Claim(datasite, 'P1')
+                rating_source.setTarget(url)
+                new_claim.addSource(rating_source)
+
                 logging.info('\t Add new rating %s', data['rating'])
                 item.addClaim(new_claim, summary='新增台灣分級')
 
