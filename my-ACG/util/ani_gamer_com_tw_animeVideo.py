@@ -65,6 +65,12 @@ class AniGamerComTwAnimeVideo:
         url = claims['P34'][0].getTarget()
         data = self.getData(url)
 
+        # 移除巴哈姆特動畫瘋連結
+        if 'removed' in data and data['removed']:
+            logging.info('Remove anime gamer link')
+            item.removeClaims(claims['P34'], summary='影片已移除')
+            return
+
         # 從巴哈姆特動畫瘋匯入巴哈姆特作品資料
         if 'acg_link' in data and 'P1' not in claims:
             new_claim = pywikibot.page.Claim(datasite, 'P1')
