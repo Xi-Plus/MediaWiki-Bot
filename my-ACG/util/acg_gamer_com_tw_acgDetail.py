@@ -34,6 +34,10 @@ class AcgGamerComTwAcgDetail:
         if episodes:
             data['episodes'] = int(episodes.group(1))
 
+        year = re.search(r'當地(?:首播|發售)：(\d{4})-(\d{2})-(\d{2})', box1listA.text)
+        if year:
+            data['year'] = year.group(1) + year.group(2) + year.group(3)
+
         box1mark = soup.find('p', {'id': 'ACG-box1mark'})
 
         for img in box1mark.findAll('img'):
@@ -43,6 +47,15 @@ class AcgGamerComTwAcgDetail:
                 break
 
         return data
+
+    def _get_wbtime(self, year):
+        if len(year) == 4:
+            return pywikibot.WbTime(year=int(year), calendarmodel='http://www.wikidata.org/entity/Q1985727')
+        elif len(year) == 6:
+            return pywikibot.WbTime(year=int(year[0:4]), month=int(year[4:6]), calendarmodel='http://www.wikidata.org/entity/Q1985727')
+        elif len(year) == 8:
+            return pywikibot.WbTime(year=int(year[0:4]), month=int(year[4:6]), day=int(year[6:8]), calendarmodel='http://www.wikidata.org/entity/Q1985727')
+        return None
 
     def updateItem(self, datasite, item):
         itemlabel = item.get()['labels']['zh-tw']
@@ -69,6 +82,22 @@ class AcgGamerComTwAcgDetail:
                 new_claim.setTarget(pywikibot.ItemPage(datasite, self.RATING_ITEM[data['rating']]))
                 logging.info('\t Add new rating %s', data['rating'])
                 item.addClaim(new_claim, summary='新增台灣分級')
+
+        # 年份
+        if 'year' in data:
+            if 'P29' in claims:
+                if claims['P29'][0].getTarget().precision < 11:
+                    wbtime = self._get_wbtime(data['year'])
+                    if wbtime:
+                        logging.info('\t Update year to %s', data['year'])
+                        claims['P29'][0].changeTarget(wbtime, summary='更新年份')
+            else:
+                wbtime = self._get_wbtime(data['year'])
+                if wbtime:
+                    new_claim = pywikibot.page.Claim(datasite, 'P29')
+                    new_claim.setTarget(wbtime)
+                    logging.info('\t Add new year %s', data['year'])
+                    item.addClaim(new_claim, summary='新增年份')
 
 
 if __name__ == "__main__":
