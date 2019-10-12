@@ -77,7 +77,6 @@ class AcgGamerComTwAcgDetail:
                 for claim in claims['P23']:
                     if claim.getTarget().id == self.RATING_ITEM[data['rating']]:
                         rating_exists = True
-                        print('rating_exists')
 
                         if len(claim.sources) == 0:
                             rating_source = pywikibot.page.Claim(datasite, 'P1')
@@ -121,10 +120,10 @@ class AcgGamerComTwAcgDetail:
                 logging.info('\t Add seen episodes')
                 item.addClaim(new_claim, summary='新增已看集數')
 
+            new_episodes = data['episodes']
             if 'P27' in claims:
                 episodesValue = claims['P27'][0].getTarget()
                 old_episodes = episodesValue.amount
-                new_episodes = data['episodes']
                 if new_episodes > old_episodes:
                     episodesValue.amount = new_episodes
                     logging.info('\t Update episodes from %s to %s', old_episodes, new_episodes)

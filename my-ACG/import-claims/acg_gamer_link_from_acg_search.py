@@ -1,9 +1,7 @@
 # -*- coding: utf-8 -*-
 import argparse
-import importlib
 import logging
 import os
-import sys
 
 import requests
 
