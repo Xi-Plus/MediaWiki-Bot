@@ -18,8 +18,8 @@ for backlink in pywikibot.ItemPage(datasite, 'Q58').backlinks(namespaces=[120]):
     item = pywikibot.ItemPage(datasite, backlink.title())
     claims = item.get()['claims']
     if 'P28' in claims and 'P27' in claims:
-        seen = claims['P28'][0].getTarget()
-        episodes = claims['P27'][0].getTarget()
+        seen = claims['P28'][0].getTarget().amount
+        episodes = claims['P27'][0].getTarget().amount
         if seen > 0 and seen != episodes:
             text += '{{{{動畫表格列|{}}}}}\n'.format(backlink.title().replace('Item:', ''))
 
