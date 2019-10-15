@@ -43,6 +43,10 @@ class Anime1Me:
         if m:
             return int(m.group(1)), True
 
+        m = re.match(r'^1-(\d+)\+SP$', episodes)
+        if m:
+            return int(m.group(1)) + 1, True
+
         m = re.match(r'^1-(\d+)\+(\d+)$', episodes)
         if m:
             if int(m.group(1)) + 1 == int(m.group(2)):
