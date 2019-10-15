@@ -1,12 +1,18 @@
 # -*- coding: utf-8 -*-
 import argparse
 import importlib
+import logging
 import os
 import sys
 
 os.environ['PYWIKIBOT_DIR'] = os.path.dirname(os.path.realpath(__file__))
 import pywikibot
 
+
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s %(levelname)-8s %(message)s',
+)
 
 sys.path.append('..')
 animeSite = (importlib.import_module('util.ani_gamer_com_tw_animeVideo', 'AniGamerComTwAnimeVideo')
@@ -20,41 +26,7 @@ datasite = site.data_repository()
 def updateEpisodes(title):
     myitem = pywikibot.ItemPage(datasite, title)
 
-    print(title, myitem.get()['labels']['zh-tw'])
-
-    claims = myitem.get()['claims']
-    if 'P34' in claims:
-        claim = claims['P34'][0]
-        url = claim.getTarget()
-        data = animeSite.getData(url)
-
-        new_episodes = data['episodes']
-
-        print('\t url', url)
-        print('\t new_episodes', new_episodes)
-        if 'P27' in claims:
-            episodesValue = claims['P27'][0].getTarget()
-            old_episodes = episodesValue.amount
-            print('\t old_episodes', old_episodes)
-            if new_episodes > old_episodes:
-                episodesValue.amount = new_episodes
-                print('\t Update episodes from {} to {}'.format(old_episodes, new_episodes))
-                claims['P27'][0].changeTarget(episodesValue, summary='更新總集數')
-            else:
-                print('\t Not update')
-
-            # 播放狀態
-            if 'P31' in claims and claims['P31'][0].getTarget().id == 'Q57':
-                print('\t Update status to playing')
-                statusValue = pywikibot.ItemPage(datasite, 'Q56')
-                claims['P31'][0].changeTarget(statusValue, summary='更新播放狀態')
-        else:
-            new_claim = pywikibot.page.Claim(datasite, 'P27')
-            new_claim.setTarget(pywikibot.WbQuantity(new_episodes, site=datasite))
-            print('\t Add new episodes {}'.format(new_episodes))
-            myitem.addClaim(new_claim, summary='新增總集數')
-    else:
-        print('\t Not gamer')
+    animeSite.updateItem(datasite, myitem)
 
 
 def main():

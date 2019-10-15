@@ -2,9 +2,8 @@ import argparse
 import logging
 import re
 
-import requests
-
 import pywikibot
+import requests
 from bs4 import BeautifulSoup
 
 
@@ -109,6 +108,28 @@ class AniGamerComTwAnimeVideo:
 
                 logging.info('\t Add new rating %s', data['rating'])
                 item.addClaim(new_claim, summary='新增台灣分級')
+
+        # 總集數
+        if 'episodes' in data:
+            if 'P27' in claims:
+                new_episodes = data['episodes']
+                episodesValue = claims['P27'][0].getTarget()
+                old_episodes = episodesValue.amount
+                if new_episodes > old_episodes:
+                    episodesValue.amount = new_episodes
+                    logging.info('\t Update episodes from %s to %s', old_episodes, new_episodes)
+                    claims['P27'][0].changeTarget(episodesValue, summary='更新總集數')
+            else:
+                new_claim = pywikibot.page.Claim(datasite, 'P27')
+                new_claim.setTarget(pywikibot.WbQuantity(new_episodes, site=datasite))
+                logging.info('\t Add new episodes %s', new_episodes)
+                item.addClaim(new_claim, summary='新增總集數')
+
+        # 播放狀態
+        if 'P31' in claims and claims['P31'][0].getTarget().id == 'Q57':
+            logging.info('\t Update status to playing')
+            statusValue = pywikibot.ItemPage(datasite, 'Q56')
+            claims['P31'][0].changeTarget(statusValue, summary='更新播放狀態')
 
 
 if __name__ == "__main__":
