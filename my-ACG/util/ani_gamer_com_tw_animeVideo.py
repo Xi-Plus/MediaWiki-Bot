@@ -65,7 +65,7 @@ class AniGamerComTwAnimeVideo:
         claims = item.get()['claims']
 
         if 'P34' not in claims:
-            logging.error('No anime gamer claims')
+            logging.error('\t No anime gamer claims')
             return
 
         url = claims['P34'][0].getTarget()
@@ -111,8 +111,8 @@ class AniGamerComTwAnimeVideo:
 
         # 總集數
         if 'episodes' in data:
+            new_episodes = data['episodes']
             if 'P27' in claims:
-                new_episodes = data['episodes']
                 episodesValue = claims['P27'][0].getTarget()
                 old_episodes = episodesValue.amount
                 if new_episodes > old_episodes:
