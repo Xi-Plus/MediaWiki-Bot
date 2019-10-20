@@ -33,7 +33,9 @@ cur.execute(
     """SELECT `page`, `file` FROM `remove_broken_file_files` ORDER BY `page` ASC, `file` ASC""")
 rows = cur.fetchall()
 
-text = """{| class="wikitable sortable"
+text = """* 本頁列出缺少檔案的條目，請檢查檔案的日誌並從條目中更換或移除檔案
+* 產生時間：<onlyinclude>~~~~~</onlyinclude>
+{| class="wikitable sortable"
 |-
 ! 頁面 !! 檔案 !! 備註"""
 
