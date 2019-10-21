@@ -47,15 +47,18 @@ def converttitle(title):
         if not page.exists():
             mode.append('vfd_on_source')
         if page.exists() and (page.content_model != 'wikitext'
+                              or page.namespace().id == 8
                               or re.search(r'{{\s*([vaictumr]fd|Copyvio)', page.text, flags=re.I)):
             mode.append('vfd_on_source')
     else:
         page = pywikibot.Page(site, oldtitle)
         if page.exists() and (page.content_model != 'wikitext'
+                              or page.namespace().id == 8
                               or re.search(r'{{\s*([vaictumr]fd|Copyvio)', page.text, flags=re.I)):
             mode.append('vfd_on_source')
         page = pywikibot.Page(site, title)
         if page.exists() and (page.content_model != 'wikitext'
+                              or page.namespace().id == 8
                               or re.search(r'{{\s*([vaictumr]fd|Copyvio)', page.text, flags=re.I)):
             mode.append('vfd_on_target')
     if 'vfd_on_source' not in mode and 'vfd_on_target' not in mode:
