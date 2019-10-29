@@ -7,6 +7,7 @@ $C["user"] = "";
 $C["pass"] = "";
 
 $C["fail_retry"] = 5;
+$C["max_edits_one_time"] = 10;
 
 $C["User-Agent"] = "User:A2093064-bot fix-non-free-files-backlink";
 
