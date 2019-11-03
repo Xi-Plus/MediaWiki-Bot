@@ -38,6 +38,7 @@ def main():
     parser.add_argument('--seen', type=int, default=0)
     parser.add_argument('--episodes', type=int, default=0)
     parser.add_argument('--status', type=int, choices=[0, 1, 2], default=0)
+    parser.add_argument('--length', type=int, default=24)
     parser.add_argument('--wp')
     parser.add_argument('--moe')
     args = parser.parse_args()
@@ -47,6 +48,7 @@ def main():
     seen = args.seen
     episodes = args.episodes
     status = args.status
+    length = args.length
 
     zhtitle = converttitle(zhsite, args.wp or title)
     moetitle = converttitle(moesite, args.moe or title)
@@ -55,6 +57,7 @@ def main():
     print('year', year)
     print('episodes', seen, episodes)
     print('status', status)
+    print('length', length)
     print('zhtitle', zhtitle)
     print('moetitle', moetitle)
 
@@ -105,6 +108,11 @@ def main():
         new_claim = pywikibot.page.Claim(datasite, 'P29')
         new_claim.setTarget(wbtime)
         data['claims'].append(new_claim.toJSON())
+
+    # 長度
+    new_claim = pywikibot.page.Claim(datasite, 'P25')
+    new_claim.setTarget(pywikibot.WbQuantity(length, site=datasite, unit='https://xiplus.ddns.net/entity/Q54'))
+    data['claims'].append(new_claim.toJSON())
 
     # 中文維基百科
     if zhtitle:
