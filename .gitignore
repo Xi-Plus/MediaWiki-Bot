@@ -1,5 +1,6 @@
 # global
 .vscode/
+apicache-py3/
 tmp/
 config.php
 config.py
@@ -8,6 +9,8 @@ list*.csv
 list*.txt
 out*.csv
 out*.txt
+pywikibot.lwp
+throttle.ctrl
 user-config.py
 user-password.py
 
