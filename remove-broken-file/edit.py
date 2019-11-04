@@ -332,7 +332,7 @@ for page in pages:
                             if save in ["Yes", "yes", "Y", "y", ""]:
                                 drv_page.text = drv_page_text
                                 drv_page.save(summary=summary,
-                                            minor=False, botflag=False)
+                                              minor=False, botflag=False)
                         else:
                             print('Already reported to DRV.')
 
@@ -361,7 +361,7 @@ for page in pages:
 
                     if deleted_commons:
                         comment = re.sub(r"\[\[:?([^\[\]]+?)]]",
-                                        r"[[:c:\1]]", deletelog["comment"])
+                                         r"[[:c:\1]]", deletelog["comment"])
                         summary_deleted.append(cfg["summary"]["deleted"]["commons"].format(
                             imagename, deletelog["user"], deletelog["logid"], comment))
                     elif deleted_local:
