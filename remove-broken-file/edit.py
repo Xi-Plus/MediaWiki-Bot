@@ -163,7 +163,7 @@ for page in pages:
         is_skip = True
     if is_skip:
         continue
-    if pagetitle in skippages:
+    if pagetitle in skippages and not args.page:
         print("skip")
         continue
     text = page.text
