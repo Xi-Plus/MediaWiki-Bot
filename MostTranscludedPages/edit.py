@@ -63,12 +63,12 @@ for row in rows:
 
     if (not title.startswith('模块:') and count >= args.full) or (title.startswith('模块:') and count >= args.modulefull):
         if protectedit != 'sysop':
-            comment = '[{{{{fullurl:{0}|action=protect&mwProtect-level-edit=sysop&mwProtect-level-move=sysop&mwProtect-reason=高風險模板：{1}引用}}}} 需要全保護]'.format(
+            comment = '[{{{{fullurl:{0}|action=protect&mwProtect-level-edit=sysop&mwProtect-level-move=sysop&mwProtect-level-create=sysop&mwProtect-reason=高風險模板：{1}引用}}}} 需要全保護]'.format(
                 title, count)
             countsysop += 1
     elif (not title.startswith('模块:') and count >= args.semi) or (title.startswith('模块:') and count >= args.modulesemi):
         if protectedit == '':
-            comment = '[{{{{fullurl:{0}|action=protect&mwProtect-level-edit=autoconfirmed&mwProtect-level-move=autoconfirmed&mwProtect-reason=高風險模板：{1}引用}}}} 需要半保護]'.format(
+            comment = '[{{{{fullurl:{0}|action=protect&mwProtect-level-edit=autoconfirmed&mwProtect-level-move=autoconfirmed&mwProtect-level-create=autoconfirmed&mwProtect-reason=高風險模板：{1}引用}}}} 需要半保護]'.format(
                 title, count)
             countautoconfirmed += 1
 
