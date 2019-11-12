@@ -1,9 +1,5 @@
 # -*- coding: utf-8 -*-
-import hashlib
-import json
 import os
-import re
-import time
 
 os.environ['PYWIKIBOT_DIR'] = os.path.dirname(os.path.realpath(__file__))
 import pywikibot
@@ -11,7 +7,7 @@ import pywikibot.flow
 import requests
 from pywikibot.data.api import Request
 
-from config import API
+from config import API  # pylint: disable=E0611
 
 
 os.environ['TZ'] = 'UTC'
