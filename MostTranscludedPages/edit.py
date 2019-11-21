@@ -78,7 +78,8 @@ for row in rows:
 
 table += '\n|}'
 
-output = """* {0}個頁面需要全保護
+output = """* 參見[[Special:MostTranscludedPages]]
+* {0}個頁面需要全保護
 * {1}個頁面需要半保護
 {2}
 """.format(countsysop, countautoconfirmed, table)
