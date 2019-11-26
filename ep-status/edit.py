@@ -98,7 +98,7 @@ for page in site.categorymembers(cat):
                 lastvalue = 0
             else:
                 lastvalue = int(lasttime.timestamp())
-            output += '\n{{{{/item|[[{0}{1}|{0}]]|{2}|{3}}}}}'.format(
+            output += '\n{{{{/item|1={0}{1}|2={0}|3={2}|4={3}}}}}'.format(
                 title, sechash, firstvalue, lastvalue)
 
 output += '\n|}'
