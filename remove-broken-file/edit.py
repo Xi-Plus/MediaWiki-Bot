@@ -173,6 +173,10 @@ for page in pages:
     missing_files = []
     try:
         for image in page.imagelinks():
+            if cfg['removal_limit_one_edit'] > 0 and len(summary_comment) + len(summary_moved) + len(summary_deleted) >= cfg['removal_limit_one_edit']:
+                print('Reach removal limit in one edit')
+                break
+
             if not image.exists():
                 try:
                     if image.fileIsShared():
