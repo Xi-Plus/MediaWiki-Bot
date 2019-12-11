@@ -48,7 +48,7 @@ db = pymysql.connect(host=database['host'],
                      charset=database['charset'])
 cur = db.cursor()
 
-cur.execute("""SELECT `title`, `count`, `protectedit`, `protectmove`, `redirect` FROM `MostTranscludedPages_page` WHERE `wiki` = %s ORDER BY `count` DESC""", (args.dbwiki))
+cur.execute("""SELECT `title`, `count`, `protectedit`, `protectmove`, `redirect` FROM `MostTranscludedPages_page` WHERE `wiki` = %s ORDER BY `title` ASC""", (args.dbwiki))
 rows = cur.fetchall()
 
 countsysop = 0
