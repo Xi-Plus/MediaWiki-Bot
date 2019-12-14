@@ -1,5 +1,6 @@
 import json
 import os
+import re
 
 os.environ['PYWIKIBOT_DIR'] = os.path.dirname(os.path.realpath(__file__))
 import pywikibot
