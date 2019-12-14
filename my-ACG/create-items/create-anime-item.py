@@ -110,9 +110,10 @@ def main():
         data['claims'].append(new_claim.toJSON())
 
     # 長度
-    new_claim = pywikibot.page.Claim(datasite, 'P25')
-    new_claim.setTarget(pywikibot.WbQuantity(length, site=datasite, unit='https://xiplus.ddns.net/entity/Q54'))
-    data['claims'].append(new_claim.toJSON())
+    if length > 0:
+        new_claim = pywikibot.page.Claim(datasite, 'P25')
+        new_claim.setTarget(pywikibot.WbQuantity(length, site=datasite, unit='https://xiplus.ddns.net/entity/Q54'))
+        data['claims'].append(new_claim.toJSON())
 
     # 中文維基百科
     if zhtitle:
