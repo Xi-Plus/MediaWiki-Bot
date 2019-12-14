@@ -10,6 +10,7 @@ list*.txt
 out*.csv
 out*.txt
 pywikibot.lwp
+temp*.txt
 throttle.ctrl
 user-config.py
 user-password.py

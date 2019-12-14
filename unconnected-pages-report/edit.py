@@ -1,3 +1,4 @@
+import argparse
 import json
 import os
 import re
@@ -9,10 +10,18 @@ from pywikibot.data.api import Request
 from config import config_page_name  # pylint: disable=E0611,W0614
 
 
-site = pywikibot.Site()
+parser = argparse.ArgumentParser()
+parser.add_argument('lang', nargs='?', default='zh')
+parser.add_argument('wiki', nargs='?', default='wikipedia')
+parser.add_argument('--dry-run', action='store_true')
+parser.set_defaults(dry_run=False)
+args = parser.parse_args()
+print(args)
+
+site = pywikibot.Site(args.lang, args.wiki)
 site.login()
 
-config_page = pywikibot.Page(site, config_page_name)
+config_page = pywikibot.Page(site, config_page_name[args.lang][args.wiki])
 cfg = config_page.text
 cfg = json.loads(cfg)
 print(json.dumps(cfg, indent=4, ensure_ascii=False))
@@ -22,20 +31,11 @@ if not cfg['enable']:
 
 
 skip_pages = set()
+for title in cfg['skip_templates']:
+    for page in pywikibot.Page(site, title).getReferences(only_template_inclusion=True):
+        print(page.title())
+        skip_pages.add(page.title())
 
-for page in pywikibot.Page(site, "Template:Merge from").getReferences(only_template_inclusion=True):
-    print(page.title())
-    skip_pages.add(page.title())
-
-for page in pywikibot.Page(site, "Template:Merge to").getReferences(only_template_inclusion=True):
-    print(page.title())
-    skip_pages.add(page.title())
-
-for page in pywikibot.Page(site, "Template:Merge").getReferences(only_template_inclusion=True):
-    print(page.title())
-    skip_pages.add(page.title())
-
-# print(len(skip_pages), skip_pages)
 
 parameters = {
     "action": "query",
@@ -50,10 +50,7 @@ while True:
     r = Request(site=site, parameters=parameters)
     data = r.submit()
     for row in data['query']['querypage']['results']:
-        #         if row['ns'] != 0:
-        #             continue
         allpages.append(row)
-#         print(row)
     del data['query']
     print(data)
     if 'query-continue' not in data:
@@ -63,56 +60,40 @@ while True:
 print('allpages', len(allpages))
 
 
-text_temp = {
-    0: '',
-    4: '',
-    10: '',
-    14: '',
-    100: '',
-    828: '',
-}
+text_temp = {}
+for ns in cfg['namespaces']:
+    text_temp[int(ns)] = ''
+print('text_temp', text_temp)
+
 for row in allpages:
     title = row['title']
     if title in skip_pages:
         continue
-    if re.search(r'^(Template|模块):.*\/doc', title):
+
+    skiped = False
+    for skip_title in cfg['skip_titles']:
+        if re.search(skip_title, title):
+            skiped = True
+            break
+
+    if skiped:
         continue
-    if re.search(r'模块:(沙盒|CGroup)\/', title):
-        continue
-    if re.search(r'\.css$', title):
-        continue
-    if re.search(r'^Wikipedia:(頁面|檔案)存廢討論', title):
-        continue
-    if re.search(r'^Wikipedia:(資料庫報告|中国大陆维基人用户组|条目请求|投票|《新手》|机器人\/申请|香港維基人佈告板|臺灣教育專案|聚會|持续出没的破坏者|邊緣人小組|坏笑话和删除的胡话|中文维基政治编辑战|维基奖励|管理員解任投票|修订版本删除请求|元維基用戶查核請求|特色圖片評選|申请成为管理员|維基獎勵|存廢覆核請求|特色列表|動員令|《求闻》|管理员通告板|新闻动态候选|《育知》|新手會|互助客栈|优良条目|典范条目|每日图片|已删除内容查询|新条目推荐|聚会|維基學生會)\/', title):
-        continue
-    if re.search(r'^Wikipedia:.+\/header$', title):
-        continue
-    if re.search(r'^Wikipedia:.+(存档|存檔|沙盒)', title):
-        continue
-    if re.search(r'^Wikipedia:.+(專題|专题)\/', title):
-        continue
-    if re.search(r'^Category:自\d+年', title):
-        continue
-#     if re.search(r'^Wikipedia:', title):
+
     print(title)
     text_temp[row['ns']] += '# [[:{}]]\n'.format(title)
 
 
 text = cfg['header_text']
 
-ns_text = {
-    0: '條目',
-    4: '維基百科',
-    10: '模板',
-    14: '分類',
-    100: '主題',
-    828: '模組',
-}
 for ns in text_temp:
-    text += '== {} ==\n'.format(ns_text[ns])
+    text += '== {} ==\n'.format(cfg['namespaces'][str(ns)])
     text += text_temp[ns]
 
 
-page = pywikibot.Page(site, cfg['output_page'])
-page.text = text
-page.save(summary=cfg['summary'], minor=False)
+if args.dry_run:
+    with open('temp.txt', 'w', encoding='utf8') as f:
+        f.write(text)
+else:
+    page = pywikibot.Page(site, cfg['output_page'])
+    page.text = text
+    page.save(summary=cfg['summary'], minor=False)
