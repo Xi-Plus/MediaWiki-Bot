@@ -18,6 +18,7 @@ parser.add_argument('--semi', type=int, default=500)
 parser.add_argument('--modulefull', type=int, default=5000)
 parser.add_argument('--modulesemi', type=int, default=5000)
 args = parser.parse_args()
+print(args)
 
 os.environ['TZ'] = 'UTC'
 
