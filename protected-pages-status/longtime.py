@@ -1,6 +1,7 @@
 import json
 from datetime import datetime, timedelta
 
+os.environ['PYWIKIBOT_DIR'] = os.path.dirname(os.path.realpath(__file__))
 import pywikibot
 
 import toolforge

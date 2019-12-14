@@ -1,5 +1,6 @@
 import json
 
+os.environ['PYWIKIBOT_DIR'] = os.path.dirname(os.path.realpath(__file__))
 import pywikibot
 
 import toolforge
@@ -21,7 +22,6 @@ conn = toolforge.connect('zhwiki')
 
 
 with conn.cursor() as cur:
-    cur.execute('use zhwiki_p')
     cur.execute("""
         SELECT pr_page, page_namespace, page_title
         FROM page_restrictions
