@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import argparse
 import hashlib
 import json
 import os
@@ -9,6 +10,12 @@ os.environ['PYWIKIBOT_DIR'] = os.path.dirname(os.path.realpath(__file__))
 import pywikibot
 from pywikibot.data.api import Request
 from config import config_page_name  # pylint: disable=E0611,W0614
+
+parser = argparse.ArgumentParser()
+parser.add_argument('--confirm', action='store_true')
+parser.set_defaults(confirm=False)
+args = parser.parse_args()
+print(args)
 
 os.environ['TZ'] = 'UTC'
 
@@ -108,5 +115,9 @@ pywikibot.showDiff(cvpage.text, text)
 cvpage.text = text
 summary = cfg["page_summary"].format(totalcnt)
 print(summary)
-input("Save?")
-cvpage.save(summary=summary, minor=False)
+if args.confirm:
+    save = input('Save?').lower()
+else:
+    save = 'yes'
+if save in ['yes', 'y', '']:
+    cvpage.save(summary=summary, minor=False)
