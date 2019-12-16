@@ -43,7 +43,7 @@ with conn.cursor() as cur:
 
 text = cfg['longtime_header_text'].format(d.strftime('%-m月%-d日'))
 
-text += """{{| class="wikitable sortable"
+text += """{| class="wikitable sortable"
 !頁面!!保護日誌!!期限"""
 
 for row in res:
