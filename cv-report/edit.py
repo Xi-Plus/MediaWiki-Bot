@@ -52,5 +52,4 @@ pywikibot.showDiff(cvpage.text, text)
 cvpage.text = text
 summary = cfg['summary']
 print(summary)
-input("Save?")
 cvpage.save(summary=summary, minor=False)
