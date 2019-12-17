@@ -56,6 +56,12 @@ def fix(pagename):
     afdpage = pywikibot.Page(site, pagename)
     text = afdpage.text
 
+    temptext = re.sub(r'\n===.+=== *\n', '', text)
+    for titlelist in re.findall(r'{{al\|((?:[^\]]+\|)+[^\]]+)}}', temptext):
+        titlelist = titlelist.split('|')
+        for title in titlelist:
+            checkAfdTemplate(title)
+
     wikicode = mwparserfromhell.parse(text)
 
     for section in wikicode.get_sections()[2:]:
