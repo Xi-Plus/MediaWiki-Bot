@@ -31,7 +31,25 @@ def converttitle(title):
         "converttitles": 1
     })
     data = r.submit()
-    return list(data['query']['pages'].values())[0]['title']
+
+    newtitle = list(data['query']['pages'].values())[0]['title']
+
+    checkAfdTemplate(newtitle)
+
+    return newtitle
+
+
+def checkAfdTemplate(title):
+    page = pywikibot.Page(site, title)
+    if (page.exists()
+            and page.content_model == 'wikitext'
+            and page.namespace().id != 8
+            and not re.search(r'{{\s*(Vfd|Afd|Rfd)\s*(\||}})', page.text, flags=re.I)):
+        text = '{{Afd}}\n' + page.text
+        print(title, cfg['summary_afd'])
+        pywikibot.showDiff(page.text, text)
+        page.text = text
+        page.save(summary=cfg['summary_afd'], minor=False)
 
 
 def fix(pagename):
