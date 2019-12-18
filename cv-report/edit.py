@@ -39,11 +39,15 @@ if len(notreportedpage) == 0:
 
 text = cvpage.text
 
-appendtext = '=== 未知日期 ===\n\n'
+appendtext = ''
 for pagetitle in notreportedpage:
     appendtext += '{{{{CopyvioEntry|1={0}|time={{{{subst:#time:U}}}}|sign=~~~~}}}}\n\n'.format(pagetitle)
 
-text = re.sub(r'(^==當前的疑似侵權條目==.*\n[\s\S]*?\n)(===)', r'\1{}\2'.format(appendtext), text, flags=re.M)
+if '=== 未知日期 ===' in text:
+    text = re.sub(r'(^=== 未知日期 ===.*\n[\s\S]*?\n)(===)', r'\1{}\2'.format(appendtext), text, flags=re.M)
+else:
+    appendtext = '=== 未知日期 ===\n\n' + appendtext
+    text = re.sub(r'(^==當前的疑似侵權條目==.*\n[\s\S]*?\n)(===)', r'\1{}\2'.format(appendtext), text, flags=re.M)
 
 if cvpage.text == text:
     exit('Nothing changed')
