@@ -101,7 +101,7 @@ function lastusergetrights($username) {
 	}
 	$res = json_decode($res, true);
 	foreach ($res["query"]["logevents"] as $logevent) {
-		if (array_diff($logevent['params']['newgroups'], $logevent['params']['oldgroups']) === []) {
+		if (isset($logevent['params']) && array_diff($logevent['params']['newgroups'], $logevent['params']['oldgroups']) === []) {
 			continue;
 		}
 		return date("Y-m-d H:i:s", strtotime($logevent["timestamp"]));
