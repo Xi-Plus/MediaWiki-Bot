@@ -55,10 +55,11 @@ if othertext != '':
 
 text_dict = sorted(text_dict.items())
 for _, temp_text in text_dict:
+    if re.search(r'^===.+===\n$', temp_text):
+        continue
     text += temp_text + '\n'
 
-print(text)
-
 page = pywikibot.Page(site, cfg['output_page'])
+pywikibot.showDiff(page.text, text)
 page.text = text
 page.save(summary=cfg['summary'], minor=False)
