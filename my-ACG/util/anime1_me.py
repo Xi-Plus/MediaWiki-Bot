@@ -43,6 +43,10 @@ class Anime1Me:
         if m:
             return int(m.group(1)) + 1, False
 
+        m = re.match(r'^連載中\((\d+)/\d+\)$', episodes)
+        if m:
+            return int(m.group(1)), False
+
         m = re.match(r'^1-(\d+)$', episodes)
         if m:
             return int(m.group(1)), True
