@@ -2,9 +2,8 @@ import argparse
 import logging
 import re
 
-import requests
-
 import pywikibot
+import requests
 from bs4 import BeautifulSoup
 
 
