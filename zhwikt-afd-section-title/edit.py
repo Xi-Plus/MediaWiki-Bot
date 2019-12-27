@@ -44,7 +44,7 @@ def checkAfdTemplate(title):
     if (page.exists()
             and page.content_model == 'wikitext'
             and page.namespace().id != 8
-            and not re.search(r'{{\s*(Vfd|Afd|Rfd)\s*(\||}})', page.text, flags=re.I)):
+            and not re.search(r'{{\s*((Vfd|Afd|Rfd)|(Copyvio))\s*(\||}})', page.text, flags=re.I)):
         text = '{{Afd}}\n' + page.text
         print(title, cfg['summary_afd'])
         pywikibot.showDiff(page.text, text)
