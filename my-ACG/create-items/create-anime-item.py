@@ -25,6 +25,8 @@ def converttitle(site, title):
         'converttitles': 1
     })
     data = r.submit()
+    if 'pages' not in data['query']:
+        return None
     page = list(data['query']['pages'].values())[0]
     if 'missing' in page:
         return None
@@ -41,6 +43,7 @@ def main():
     parser.add_argument('--length', type=int, default=24)
     parser.add_argument('--wp')
     parser.add_argument('--moe')
+    parser.add_argument('--gamer')
     args = parser.parse_args()
 
     title = args.title
@@ -49,6 +52,7 @@ def main():
     episodes = args.episodes
     status = args.status
     length = args.length
+    gamer = args.gamer
 
     zhtitle = converttitle(zhsite, args.wp or title)
     moetitle = converttitle(moesite, args.moe or title)
@@ -60,6 +64,7 @@ def main():
     print('length', length)
     print('zhtitle', zhtitle)
     print('moetitle', moetitle)
+    print('gamer', gamer)
 
     new_item = pywikibot.ItemPage(datasite)
     print(new_item)
@@ -125,6 +130,12 @@ def main():
     if moetitle:
         new_claim = pywikibot.page.Claim(datasite, 'P70')
         new_claim.setTarget(moetitle)
+        data['claims'].append(new_claim.toJSON())
+
+    # 巴哈姆特作品資料
+    if gamer:
+        new_claim = pywikibot.page.Claim(datasite, 'P1')
+        new_claim.setTarget(gamer)
         data['claims'].append(new_claim.toJSON())
 
     print(json.dumps(data['labels'], indent=4, ensure_ascii=False))
