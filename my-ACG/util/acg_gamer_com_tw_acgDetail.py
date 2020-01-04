@@ -82,6 +82,11 @@ class AcgGamerComTwAcgDetail:
                             rating_source.setTarget(url)
                             logging.info('\t Add source to rating')
                             claim.addSource(rating_source)
+                    else:
+                        if len(claim.sources) > 0 and claim.sources[0]['P1'][0].getTarget() == url:
+                            rating_exists = True
+                            logging.info('\t Update ranking to %s', data['rating'])
+                            claim.changeTarget(pywikibot.ItemPage(datasite, self.RATING_ITEM[data['rating']]), summary='更新台灣分級')
 
             if not rating_exists:
                 new_claim = pywikibot.page.Claim(datasite, 'P23')
