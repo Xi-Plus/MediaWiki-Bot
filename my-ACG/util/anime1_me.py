@@ -59,7 +59,7 @@ class Anime1Me:
         if m:
             return int(m.group(1)) + 1, True
 
-        m = re.match(r'^1-(\d+)\+(\d+)$', episodes)
+        m = re.match(r'^1-(\d+)\+(\d+)(\(全集BD\))?$', episodes)
         if m:
             if int(m.group(1)) + 1 == int(m.group(2)):
                 return int(m.group(2)), True
