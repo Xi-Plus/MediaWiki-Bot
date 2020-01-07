@@ -2,6 +2,7 @@ import argparse
 import html
 import logging
 import re
+from functools import lru_cache
 
 import pywikibot
 import requests
@@ -14,12 +15,12 @@ class Anime1Me:
             'episodes': 0,
             'end': False,
         }
-        text = requests.get(url).text
+        text = self._request(url)
         soup = BeautifulSoup(text, 'html.parser')
         title = soup.find('h1', {'class': 'page-title'}).text
 
         # print('title', title)
-        text = requests.get('https://anime1.me').text
+        text = self._request('https://anime1.me')
         text = html.unescape(text)
         m = re.search(r'>{}</a></td><td class=\"column-2\">(.+?)</td>'.format(re.escape(title)), text)
         if m:
@@ -30,6 +31,10 @@ class Anime1Me:
             pass
 
         return data
+
+    @lru_cache(maxsize=32)
+    def _request(self, url):
+        return requests.get(url).text
 
     def _parse_episodes(self, episodes):
         if episodes == '劇場版':
