@@ -129,9 +129,7 @@ class AcgGamerComTwAcgDetail:
                 episodesValue = claims['P27'][0].getTarget()
                 old_episodes = episodesValue.amount
                 if new_episodes > old_episodes:
-                    episodesValue.amount = new_episodes
-                    logging.info('\t Update episodes from %s to %s', old_episodes, new_episodes)
-                    claims['P27'][0].changeTarget(episodesValue, summary='更新總集數')
+                    logging.info('\t Episodes should be updated from %s to %s', old_episodes, new_episodes)
             else:
                 new_claim = pywikibot.page.Claim(datasite, 'P27')
                 new_claim.setTarget(pywikibot.WbQuantity(new_episodes, site=datasite))
