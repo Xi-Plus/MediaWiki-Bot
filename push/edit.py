@@ -86,10 +86,24 @@ while len(files) == 0:
         cnt += 1
         print('\t', cnt, '\t', fromname, '\t', project['files'][fromname])
     temp = input('select a files:')
+    idxs = []
     try:
         for idx in temp.split():
             idx = int(idx)
-            files[list(project['files'].keys())[idx - 1]] = list(project['files'].values())[idx - 1]
+            idxs.append(idx)
+    except Exception as e:
+        print(e)
+        continue
+    if any([idx < 0 for idx in idxs]):
+        for fromname in project['files']:
+            files[fromname] = project['files'][fromname]
+    try:
+        for idx in temp.split():
+            idx = int(idx)
+            if idx > 0:
+                files[list(project['files'].keys())[idx - 1]] = list(project['files'].values())[idx - 1]
+            else:
+                del files[list(project['files'].keys())[(-idx) - 1]]
         break
     except Exception as e:
         print(e)
