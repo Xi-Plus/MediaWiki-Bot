@@ -98,8 +98,14 @@ for page in site.categorymembers(cat):
                 lastvalue = 0
             else:
                 lastvalue = int(lasttime.timestamp())
-            output += '\n{{{{/item|1={0}{1}|2={0}|3={2}|4={3}}}}}'.format(
-                title, sechash, firstvalue, lastvalue)
+
+            requester = ''
+            m = re.search(r'\[\[(?:(?:User|User[ _]talk|U|UT|用户|用戶|使用者|用戶對話|用戶討論|用户对话|用户讨论|使用者討論):|(?:Special|特殊):(?:(?:Contributions|Contribs)|(?:用户|用戶|使用者)?(?:贡献|貢獻))/)([^|\]]+)', section)
+            if m:
+                requester = m.group(1)
+
+            output += '\n{{{{/item|1={0}{1}|requester={4}|2={0}|3={2}|4={3}}}}}'.format(
+                title, sechash, firstvalue, lastvalue, requester)
 
 output += '\n|}'
 
