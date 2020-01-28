@@ -43,7 +43,7 @@ cat = pywikibot.Page(site, cfg['category'])
 output = (
     '{| class="wikitable sortable"'
     '\n|-'
-    '\n! 頁面 !! 提出日 !! 最後編輯'
+    '\n! 頁面 !! 提請者 !! 提出日 !! 最後編輯'
 )
 for page in site.categorymembers(cat):
     title = page.title()
