@@ -2,6 +2,7 @@
 import json
 import os
 import re
+from datetime import datetime
 
 os.environ['PYWIKIBOT_DIR'] = os.path.dirname(os.path.realpath(__file__))
 import pywikibot
@@ -24,12 +25,14 @@ if not cfg["enable"]:
 cvpage = pywikibot.Page(site, cfg['cvpage_name'])
 
 linksoncvpage = []
-for page in cvpage.linkedPages(namespaces=[0, 118]):
+for page in cvpage.linkedPages():
     linksoncvpage.append(page.title())
 
-cvtem = pywikibot.Page(site, cfg['cvtemplate_name'])
+linksoncvpage += cfg['whitelist']
+
+cvtem = pywikibot.Category(site, cfg['cvcategory_name'])
 notreportedpage = []
-for page in cvtem.embeddedin(namespaces=[0, 118]):
+for page in cvtem.members():
     pagetitle = page.title()
     if pagetitle not in linksoncvpage:
         notreportedpage.append(pagetitle)
@@ -41,13 +44,14 @@ text = cvpage.text
 
 appendtext = ''
 for pagetitle in notreportedpage:
-    appendtext += '{{{{CopyvioEntry|1={0}|time={{{{subst:#time:U}}}}|sign=~~~~}}}}\n\n'.format(pagetitle)
+    appendtext += '\n\n{{{{CopyvioEntry|1={0}|time={{{{subst:#time:U}}}}|sign=~~~~}}}}'.format(pagetitle)
 
-if '=== 未知日期 ===' in text:
-    text = re.sub(r'(^=== 未知日期 ===.*\n[\s\S]*?\n)(===)', r'\1{}\2'.format(appendtext), text, flags=re.M)
-else:
-    appendtext = '=== 未知日期 ===\n\n' + appendtext
-    text = re.sub(r'(^==當前的疑似侵權條目==.*\n[\s\S]*?\n)(===)', r'\1{}\2'.format(appendtext), text, flags=re.M)
+if appendtext:
+    d = datetime.today()
+    datestr = d.strftime('%-m月%-d日')
+    if not re.search(r'===\s*{}\s*==='.format(datestr), text):
+        text += '\n\n==={}==='.format(datestr)
+    text += appendtext
 
 if cvpage.text == text:
     exit('Nothing changed')
