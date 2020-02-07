@@ -14,7 +14,7 @@ site = pywikibot.Site()
 site.login()
 datasite = site.data_repository()
 zhsite = pywikibot.Site('zh', 'wikipedia')
-moesite = pywikibot.Site('moegirl', 'moegirl')
+moesite = pywikibot.Site('zh', 'moegirl')
 
 
 session = requests.Session()

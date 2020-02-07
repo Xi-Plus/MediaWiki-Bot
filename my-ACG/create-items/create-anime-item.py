@@ -12,7 +12,7 @@ site = pywikibot.Site()
 site.login()
 datasite = site.data_repository()
 zhsite = pywikibot.Site('zh', 'wikipedia')
-moesite = pywikibot.Site('moegirl', 'moegirl')
+moesite = pywikibot.Site('zh', 'moegirl')
 
 STATUS_QID = ['Q57', 'Q56', 'Q58']
 
