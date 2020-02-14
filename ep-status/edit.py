@@ -40,11 +40,7 @@ if time.time() - lastEditTimestamp < cfg['interval'] and not args.force:
 
 cat = pywikibot.Page(site, cfg['category'])
 
-output = (
-    '{| class="wikitable sortable"'
-    '\n|-'
-    '\n! 頁面 !! 提請者 !! 提出日 !! 最後編輯'
-)
+output = '{{/header}}'
 for page in site.categorymembers(cat):
     title = page.title()
     in_whitelist = False
@@ -83,13 +79,25 @@ for page in site.categorymembers(cat):
                 and not re.search(r'{{(Editprotected|Editprotect|Sudo|EP|请求编辑|编辑请求|請求編輯受保護的頁面|Editsemiprotected|FPER|Fper|Edit[ _]fully-protected|SPER|Edit[ _]semi-protected|Edit[ _]protected|Ep).*?\|(ok|no)=', section, flags=re.I)):
 
             firsttime = datetime(9999, 12, 31, tzinfo=timezone.utc)
+            firstuser = ''
             lasttime = datetime(1, 1, 1, tzinfo=timezone.utc)
-            for m in re.findall(r'(\d{4})年(\d{1,2})月(\d{1,2})日 \(.\) (\d{2}):(\d{2}) \(UTC\)', str(section)):
-                d = datetime(int(m[0]), int(m[1]), int(m[2]),
-                             int(m[3]), int(m[4]), tzinfo=timezone.utc)
-                lasttime = max(lasttime, d)
-                firsttime = min(firsttime, d)
-            print(firsttime, lasttime)
+            lastuser = ''
+            for m in re.findall(r'(.+)(\d{4})年(\d{1,2})月(\d{1,2})日 \(.\) (\d{2}):(\d{2}) \(UTC\)', str(section)):
+                d = datetime(int(m[1]), int(m[2]), int(m[3]),
+                             int(m[4]), int(m[5]), tzinfo=timezone.utc)
+
+                username = ''
+                m2 = re.search(r'\[\[(?:(?:User|User[ _]talk|U|UT|用户|用戶|使用者|用戶對話|用戶討論|用户对话|用户讨论|使用者討論):|(?:Special|特殊):(?:(?:Contributions|Contribs)|(?:用户|用戶|使用者)?(?:贡献|貢獻))/)([^|\]]+)', m[0])
+                if m2:
+                    username = m2.group(1)
+
+                if d < firsttime:
+                    firsttime = d
+                    firstuser = username
+                if d > lasttime:
+                    lasttime = d
+                    lastuser = username
+            print(firsttime, firstuser, lasttime, lastuser)
             if firsttime == datetime(9999, 12, 31, tzinfo=timezone.utc):
                 firstvalue = 0
             else:
@@ -100,14 +108,11 @@ for page in site.categorymembers(cat):
                 lastvalue = int(lasttime.timestamp())
 
             requester = ''
-            m = re.search(r'\[\[(?:(?:User|User[ _]talk|U|UT|用户|用戶|使用者|用戶對話|用戶討論|用户对话|用户讨论|使用者討論):|(?:Special|特殊):(?:(?:Contributions|Contribs)|(?:用户|用戶|使用者)?(?:贡献|貢獻))/)([^|\]]+)', section)
-            if m:
-                requester = m.group(1)
 
-            output += '\n{{{{/item|1={0}{1}|requester={4}|2={0}|3={2}|4={3}}}}}'.format(
-                title, sechash, firstvalue, lastvalue, requester)
+            output += '\n{{{{/item|link={0}{1}|title={0}|firstuser={2}|firsttime={3}|lastuser={4}|lasttime={5}}}}}'.format(
+                title, sechash, firstuser, firstvalue, lastuser, lastvalue)
 
-output += '\n|}'
+output += '\n{{/footer}}'
 
 print(output)
 outputPage.text = output
