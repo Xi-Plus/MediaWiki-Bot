@@ -118,7 +118,7 @@ def fix(pagename):
             continue
         title = str(section.get(0).title)
         print(secid, title)
-        if re.search(r'{{\s*(delh|TalkendH)\s*\|', str(section), re.IGNORECASE) is not None:
+        if re.search(r'{{\s*(delh|TalkendH)\s*(\||}})', str(section), re.IGNORECASE) is not None:
             print('  closed, skip')
             continue
 
