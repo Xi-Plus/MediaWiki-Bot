@@ -39,6 +39,11 @@ def get_new_usage(templatename):
     return row[0]
 
 
+def maintain_doc(text):
+    text = re.sub(r'<includeonly><!-- 在這裡加入模板的保護標識 --></includeonly>', '', text)
+    return text
+
+
 def update(templatename, dry_run, add_template=False):
     templatename = pywikibot.Page(site, templatename).title()
     print('Checking {}'.format(templatename))
@@ -69,6 +74,8 @@ def update(templatename, dry_run, add_template=False):
         if abs(diff) > cfg['diff_limit']:
             print('\tUpdate template usage to {}'.format(new_usage))
             text = re.sub(r'({{\s*(?:High-use|High-risk|高風險模板|高风险模板|U!|High[ _]use)\s*\|)\s*(?:[0-9,+]+)\s*(\||}})', r'\g<1>{}\g<2>'.format(new_usage), text, flags=re.I)
+            text = maintain_doc(text)
+
             summary = cfg['summary'].format(new_usage)
 
             pywikibot.showDiff(templatedoc.text, text)
@@ -89,6 +96,7 @@ def update(templatename, dry_run, add_template=False):
             )
         else:
             text = templatetext + text
+        text = maintain_doc(text)
 
         summary = cfg['summary_insert'].format(new_usage)
 
