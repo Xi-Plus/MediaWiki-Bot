@@ -39,7 +39,7 @@ def get_new_usage(templatename):
     return row[0]
 
 
-def update(templatename, dry_run):
+def update(templatename, dry_run, add_template=False):
     templatename = pywikibot.Page(site, templatename).title()
     print('Checking {}'.format(templatename))
 
@@ -53,17 +53,17 @@ def update(templatename, dry_run):
         print('\tTemplate in whitelist, Skip')
         return
 
+    new_usage = get_new_usage(templatename)
+    if new_usage is None:
+        print('Cannot get new usage')
+        return
+
     text = templatedoc.text
     m = re.search(r'{{\s*(?:High-use|High-risk|高風險模板|高风险模板|U!|High[ _]use)\s*\|\s*([0-9,+]+)\s*(?:\||}})', text, flags=re.I)
     if m:
         old_usage = m.group(1)
         old_usage = re.sub(r'[,+]', '', old_usage)
         old_usage = int(old_usage)
-        new_usage = get_new_usage(templatename)
-        if new_usage is None:
-            print('Cannot get new usage')
-            return
-
         diff = (new_usage - old_usage) / old_usage
         print('\tUsage: Old: {}, New: {}, Diff: {:+.1f}%'.format(old_usage, new_usage, diff * 100))
         if abs(diff) > cfg['diff_limit']:
@@ -78,6 +78,25 @@ def update(templatename, dry_run):
                 templatedoc.save(summary=summary, minor=False)
         else:
             print('\tNot reach diff_limit')
+    elif add_template:
+        m2 = re.search(r'{{\s*(Template[ _]doc page viewed directly|內聯模板文件|内联模板文件|Template[ _]doc inline|内联模板文档|內聯模板文檔|Documentation[ _]subpage)\s*(\||}})', text)
+        templatetext = '{{{{High-use|{}}}}}\n'.format(new_usage)
+        if m2:
+            text = re.sub(
+                r'({{\s*(?:Template[ _]doc page viewed directly|內聯模板文件|内联模板文件|Template[ _]doc inline|内联模板文档|內聯模板文檔|Documentation[ _]subpage)\s*(?:\||}}).*\n)',
+                r'\1{}'.format(templatetext),
+                text
+            )
+        else:
+            text = templatetext + text
+
+        summary = cfg['summary_insert'].format(new_usage)
+
+        pywikibot.showDiff(templatedoc.text, text)
+        templatedoc.text = text
+        print('\t', summary)
+        if not dry_run:
+            templatedoc.save(summary=summary, minor=False)
     else:
         print('\tCaanot get old usage')
 
@@ -86,12 +105,13 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('template', nargs='?')
     parser.add_argument('--dry-run', action='store_true', dest='dry_run')
-    parser.set_defaults(dry_run=False)
+    parser.add_argument('--add', action='store_true', dest='add')
+    parser.set_defaults(dry_run=False, add=False)
     args = parser.parse_args()
     print(args)
 
     if args.template:
-        update(args.template, args.dry_run)
+        update(args.template, args.dry_run, args.add)
     else:
         highusetem = pywikibot.Page(site, cfg['highuse_template'])
         for page in highusetem.embeddedin(namespaces=[10, 828]):
