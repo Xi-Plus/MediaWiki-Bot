@@ -44,7 +44,7 @@ def maintain_doc(text):
     return text
 
 
-def update(templatename, dry_run, add_template=False):
+def update(templatename, dry_run=False, add_template=False, check=False):
     templatename = pywikibot.Page(site, templatename).title()
     print('Checking {}'.format(templatename))
 
@@ -82,17 +82,20 @@ def update(templatename, dry_run, add_template=False):
             templatedoc.text = text
             print('\t', summary)
             if not dry_run:
+                if check and input('Save?').lower() not in ['', 'y', 'yes']:
+                    return
                 templatedoc.save(summary=summary, minor=False)
         else:
             print('\tNot reach diff_limit')
     elif add_template:
-        m2 = re.search(r'{{\s*(Template[ _]doc page viewed directly|內聯模板文件|内联模板文件|Template[ _]doc inline|内联模板文档|內聯模板文檔|Documentation[ _]subpage)\s*(\||}})', text)
+        m2 = re.search(r'{{\s*(Template[ _]doc page viewed directly|內聯模板文件|内联模板文件|Template[ _]doc inline|内联模板文档|內聯模板文檔|Documentation[ _]subpage)\s*(\||}})', text, flags=re.I)
         templatetext = '{{{{High-use|{}}}}}\n'.format(new_usage)
         if m2:
             text = re.sub(
                 r'({{\s*(?:Template[ _]doc page viewed directly|內聯模板文件|内联模板文件|Template[ _]doc inline|内联模板文档|內聯模板文檔|Documentation[ _]subpage)\s*(?:\||}}).*\n)',
                 r'\1{}'.format(templatetext),
-                text
+                text,
+                flags=re.I,
             )
         else:
             text = templatetext + text
@@ -104,6 +107,8 @@ def update(templatename, dry_run, add_template=False):
         templatedoc.text = text
         print('\t', summary)
         if not dry_run:
+            if check and input('Save?').lower() not in ['', 'y', 'yes']:
+                return
             templatedoc.save(summary=summary, minor=False)
     else:
         print('\tCaanot get old usage')
@@ -113,13 +118,14 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('template', nargs='?')
     parser.add_argument('--dry-run', action='store_true', dest='dry_run')
-    parser.add_argument('--add', action='store_true', dest='add')
-    parser.set_defaults(dry_run=False, add=False)
+    parser.add_argument('-a', '--add', action='store_true', dest='add')
+    parser.add_argument('-c', '--check', action='store_true', dest='check')
+    parser.set_defaults(dry_run=False, add=False, check=False)
     args = parser.parse_args()
     print(args)
 
     if args.template:
-        update(args.template, args.dry_run, args.add)
+        update(args.template, dry_run=args.dry_run, add_template=args.add, check=args.check)
     else:
         highusetem = pywikibot.Page(site, cfg['highuse_template'])
         for page in highusetem.embeddedin(namespaces=[10, 828]):
@@ -127,4 +133,4 @@ if __name__ == "__main__":
             if re.search(cfg['skip_titles'], title):
                 continue
 
-            update(title, args.dry_run)
+            update(title, dry_run=args.dry_run)
