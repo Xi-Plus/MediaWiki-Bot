@@ -64,16 +64,19 @@ def update(templatename, dry_run=False, add_template=False, check=False):
         return
 
     text = templatedoc.text
-    m = re.search(r'{{\s*(?:High-use|High-risk|高風險模板|高风险模板|U!|High[ _]use)\s*\|\s*([0-9,+]+)\s*(?:\||}})', text, flags=re.I)
+    m = re.search(r'{{\s*(?:High-use|High-risk|高風險模板|高风险模板|U!|High[ _]use)\s*\|\s*([0-9,+]+|)\s*(?:\||}})', text, flags=re.I)
     if m:
         old_usage = m.group(1)
         old_usage = re.sub(r'[,+]', '', old_usage)
-        old_usage = int(old_usage)
+        try:
+            old_usage = int(old_usage)
+        except ValueError:
+            old_usage = 1
         diff = (new_usage - old_usage) / old_usage
         print('\tUsage: Old: {}, New: {}, Diff: {:+.1f}%'.format(old_usage, new_usage, diff * 100))
         if abs(diff) > cfg['diff_limit']:
             print('\tUpdate template usage to {}'.format(new_usage))
-            text = re.sub(r'({{\s*(?:High-use|High-risk|高風險模板|高风险模板|U!|High[ _]use)\s*\|)\s*(?:[0-9,+]+)\s*(\||}})', r'\g<1>{}\g<2>'.format(new_usage), text, flags=re.I)
+            text = re.sub(r'({{\s*(?:High-use|High-risk|高風險模板|高风险模板|U!|High[ _]use)\s*\|)\s*(?:[0-9,+]+|)\s*(\||}})', r'\g<1>{}\g<2>'.format(new_usage), text, flags=re.I)
             text = maintain_doc(text)
 
             summary = cfg['summary'].format(new_usage)
