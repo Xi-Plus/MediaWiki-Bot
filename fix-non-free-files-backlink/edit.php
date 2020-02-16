@@ -138,5 +138,7 @@ foreach ($cfg["category"] as $category) {
 	}
 }
 
+ClearLog();
+
 $spendtime = (microtime(true) - $starttime);
 echo "spend " . $spendtime . " s.\n";
