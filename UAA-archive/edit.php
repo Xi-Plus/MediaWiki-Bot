@@ -86,6 +86,7 @@ for ($i = $C["fail_retry"]; $i > 0; $i--) {
 		"blocked" => 0,
 		"tagged" => 0,
 		"timeout" => 0,
+		"remain" => 0,
 	];
 	foreach ($text as $temp) {
 		$temp = trim($temp);
@@ -169,6 +170,7 @@ for ($i = $C["fail_retry"]; $i > 0; $i--) {
 		} else {
 			echo "not archive\n";
 			$oldpagetext .= "\n\n" . $temp;
+			$archive_count["remain"]++;
 		}
 	}
 
@@ -185,7 +187,7 @@ for ($i = $C["fail_retry"]; $i > 0; $i--) {
 			$summary_append[] = sprintf($cfg["summary_append"][$type], $archive_count[$type]);
 		}
 	}
-	$summary = sprintf($cfg["main_page_summary"], $archive_count["sum"], implode("、", $summary_append));
+	$summary = sprintf($cfg["main_page_summary"], $archive_count["sum"], implode("、", $summary_append), $archive_count["remain"]);
 	$post = array(
 		"action" => "edit",
 		"format" => "json",
