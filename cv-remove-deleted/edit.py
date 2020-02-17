@@ -37,7 +37,8 @@ rndstr = hashlib.md5(str(time.time()).encode()).hexdigest()
 text = re.sub(r'^(===.*=== *)$', rndstr + r'\1', text, flags=re.M)
 sections = text.split(rndstr)
 
-totalcnt = 0
+removedcnt = 0
+remaincnt = 0
 istimeout = False
 for secid, section in enumerate(sections[1:], 1):
     title = section[:section.index('\n')]
@@ -88,6 +89,8 @@ for secid, section in enumerate(sections[1:], 1):
             if remove:
                 cnt += 1
             else:
+                if not istimeout:
+                    remaincnt += 1
                 print("not remove")
                 newtext += entry
         else:
@@ -101,7 +104,7 @@ for secid, section in enumerate(sections[1:], 1):
         print("\t*** remove {} entry".format(cnt))
         sections[secid] = newtext
 
-    totalcnt += cnt
+    removedcnt += cnt
 
     if istimeout:
         break
@@ -113,7 +116,7 @@ if cvpage.text == text:
 
 pywikibot.showDiff(cvpage.text, text)
 cvpage.text = text
-summary = cfg["page_summary"].format(totalcnt)
+summary = cfg["page_summary"].format(removedcnt, remaincnt)
 print(summary)
 if args.confirm:
     save = input('Save?').lower()
