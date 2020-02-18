@@ -34,6 +34,7 @@ text = text.split(rndstr)
 print(len(text))
 
 newtext = text[0]
+remaincnt = 0
 
 for secid in range(1, len(text)):
     sectext = text[secid].strip()
@@ -101,13 +102,17 @@ for secid in range(1, len(text)):
                     if deleted == len(ids):
                         sectext = re.sub(
                             r'(\|\s*status\s*=).*', r'\1 +', sectext)
+                    else:
+                        remaincnt += 1
 
                     print('\tdeleted {}/{} in {}'.format(deleted, len(ids), admins))
 
                 else:
                     print('\tcannot get ids')
+                    remaincnt += 1
             else:
                 print('\tcannot detect type')
+                remaincnt += 1
         else:
             print('\tdone')
     else:
@@ -120,5 +125,6 @@ if re.sub(r'\s', '', rrdpage.text) == re.sub(r'\s', '', newtext):
 
 pywikibot.showDiff(rrdpage.text, newtext)
 rrdpage.text = newtext
-summary = cfg['summary']
+summary = cfg['summary'].format(remaincnt)
+print(summary)
 rrdpage.save(summary=summary, minor=True)
