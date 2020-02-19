@@ -1,10 +1,8 @@
 # -*- coding: utf-8 -*-
 import argparse
-import json
 import os
-import re
+from urllib.parse import unquote
 
-import pymysql
 os.environ['PYWIKIBOT_DIR'] = os.path.dirname(os.path.realpath(__file__))
 import pywikibot
 
@@ -32,7 +30,7 @@ target_page = pywikibot.Page(target_site, args.target_title)
 pywikibot.showDiff(target_page.text, source_page.text)
 
 print('Copying from {} to {}'.format(source_page, target_page))
-summary = 'Copied from {}'.format(source_page.full_url())
+summary = 'Copied from {}'.format(unquote(source_page.full_url()))
 print(summary)
 
 if input('Save?').lower() in ['', 'y', 'yes']:
