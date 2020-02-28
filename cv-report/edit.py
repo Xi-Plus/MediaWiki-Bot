@@ -44,6 +44,8 @@ text = cvpage.text
 
 appendtext = ''
 for pagetitle in notreportedpage:
+    if '{{{{CopyvioEntry|1={0}|'.format(pagetitle) in text:
+        continue
     appendtext += '\n\n{{{{CopyvioEntry|1={0}|time={{{{subst:#time:U|+7 days}}}}|sign=~~~~}}}}'.format(pagetitle)
 
 if appendtext:
