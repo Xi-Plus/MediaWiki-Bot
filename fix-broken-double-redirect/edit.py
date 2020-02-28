@@ -1,10 +1,17 @@
 # -*- coding: utf-8 -*-
+import argparse
 import os
 import re
 
 os.environ['PYWIKIBOT_DIR'] = os.path.dirname(os.path.realpath(__file__))
 import pywikibot
 
+
+parser = argparse.ArgumentParser()
+parser.add_argument('-c', '--check', action='store_true', dest='check')
+parser.set_defaults(check=False)
+args = parser.parse_args()
+print(args)
 
 os.environ['TZ'] = 'UTC'
 
@@ -34,8 +41,9 @@ for sourcePage in site.categorymembers(cat):
         pywikibot.showDiff(sourcePage.text, text)
         summary = '-delete並修復損壞的雙重重定向，[[Special:Redirect/logid/{}|目標頁已被不留重定向移動]]，若認為重定向不合適請提交存廢討論'.format(log.logid())
         print(summary)
-        if input('Save?').lower() in ['', 'y', 'yes']:
-            sourcePage.text = text
-            sourcePage.save(summary=summary, minor=False, asynchronous=True)
+        if args.check and input('Save?').lower() not in ['', 'y', 'yes']:
+            continue
+        sourcePage.text = text
+        sourcePage.save(summary=summary, minor=False, asynchronous=True)
     else:
         print('\tcannot get redirect target')
