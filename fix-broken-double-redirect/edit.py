@@ -37,7 +37,7 @@ for sourcePage in site.categorymembers(cat):
         targetPage = log.target_page
         print('\ttarget', targetPage.title())
         text = re.sub(r'^{{d\|bot=Jimmy-bot\|g15\|.+\n', '', text)
-        text = re.sub(r'(#(?:重定向|REDIRECT) ?\[\[).+?(]])', r'\1{}\2'.format(targetPage.title()), text)
+        text = re.sub(r'(#(?:重定向|REDIRECT) ?\[\[).+?(]])', r'\g<1>{}\g<2>'.format(targetPage.title()), text)
         pywikibot.showDiff(sourcePage.text, text)
         summary = '-delete並修復損壞的雙重重定向，[[Special:Redirect/logid/{}|目標頁已被不留重定向移動]]，若認為重定向不合適請提交存廢討論'.format(log.logid())
         print(summary)
