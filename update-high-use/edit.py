@@ -41,6 +41,7 @@ def get_new_usage(templatename):
 
 def maintain_doc(text):
     text = re.sub(r'<includeonly><!-- 在這裡加入模板的保護標識 --></includeonly>', '', text)
+    text = re.sub(r'<includeonly>\s*</includeonly>', '', text)
     return text
 
 
