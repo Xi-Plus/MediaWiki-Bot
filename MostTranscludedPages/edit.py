@@ -52,6 +52,26 @@ cur = db.cursor()
 cur.execute("""SELECT `title`, `count`, `protectedit`, `protectmove`, `redirect` FROM `MostTranscludedPages_page` WHERE `wiki` = %s ORDER BY `title` ASC""", (args.dbwiki))
 rows = cur.fetchall()
 
+
+def check_required_protection(title, count):
+    if title.startswith('模块:'):
+        if count >= args.modulefull:
+            return 2
+        if count >= args.modulesemi:
+            return 1
+        return 0
+    if title.startswith('MediaWiki:'):
+        return 0
+    if title.startswith('User:'):
+        if title.endswith('.js') or title.endswith('.css') or title.endswith('.json'):
+            return 0
+    if count >= args.full:
+        return 2
+    if count >= args.semi:
+        return 1
+    return 0
+
+
 countsysop = 0
 countautoconfirmed = 0
 for row in rows:
@@ -62,12 +82,13 @@ for row in rows:
     redirect = row[4]
     comment = ''
 
-    if (not title.startswith('模块:') and count >= args.full) or (title.startswith('模块:') and count >= args.modulefull):
+    required_protection = check_required_protection(title, count)
+    if required_protection == 2:
         if protectedit != 'sysop':
             comment = '[{{{{fullurl:{0}|action=protect&mwProtect-level-edit=sysop&mwProtect-level-move=sysop&mwProtect-level-create=sysop&mwProtect-reason=高風險模板：{1}引用}}}} 需要全保護]'.format(
                 title, count)
             countsysop += 1
-    elif (not title.startswith('模块:') and count >= args.semi) or (title.startswith('模块:') and count >= args.modulesemi):
+    if required_protection == 1:
         if protectedit == '':
             comment = '[{{{{fullurl:{0}|action=protect&mwProtect-level-edit=autoconfirmed&mwProtect-level-move=autoconfirmed&mwProtect-level-create=autoconfirmed&mwProtect-reason=高風險模板：{1}引用}}}} 需要半保護]'.format(
                 title, count)
