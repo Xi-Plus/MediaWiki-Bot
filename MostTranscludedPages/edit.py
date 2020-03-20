@@ -82,6 +82,7 @@ table += '\n|}'
 output = """* 參見[[Special:MostTranscludedPages]]
 * {0}個頁面需要全保護
 * {1}個頁面需要半保護
+* 產生時間：<onlyinclude>~~~~~</onlyinclude>
 {2}
 """.format(countsysop, countautoconfirmed, table)
 
