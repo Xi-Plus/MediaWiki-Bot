@@ -41,8 +41,10 @@ def do_block(username, flag, summary):
         noemail = bool(flag & Action.BLOCK_NOMAIL)
         allowusertalk = not bool(flag & Action.BLOCK_NOTALK)
 
+        user = pywikibot.User(site, username)
+
         result = site.blockuser(
-            user=username,
+            user=user,
             expiry='infinite',
             reason=summary,
             nocreate=True,
