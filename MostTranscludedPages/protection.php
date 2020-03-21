@@ -65,6 +65,10 @@ foreach ($pagelist as $pagelist2) {
 
 	foreach ($results as $result) {
 		$title = $result["title"];
+		if (!isset($pages[$title])) {
+			echo "skip {$title}\n";
+			continue;
+		}
 		$protect = ["edit" => "", "move" => ""];
 		$redirect = (isset($result["redirect"]) ? 1 : 0);
 		foreach ($result["protection"] as $protection) {
