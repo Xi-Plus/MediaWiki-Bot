@@ -52,11 +52,11 @@ def do_block(username, flag, summary):
             noemail=noemail,
             allowusertalk=allowusertalk,
         )
-        msg = 'block result: {}'.format(result)
+        msg = 'block {} result: {}'.format(username, result)
         logging.info(msg)
         insert_log(msg)
     except Exception as e:
-        msg = 'error when block: {}'.format(e)
+        msg = 'error when block {}: {}'.format(username, e)
         logging.error(msg)
         insert_log(msg)
 
