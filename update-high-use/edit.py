@@ -45,7 +45,7 @@ def maintain_doc(text):
     return text
 
 
-def update(templatename, dry_run=False, add_template=False, check=False):
+def update(templatename, dry_run=False, add_template=False, check=False, diff_limit=0.02):
     templatename = pywikibot.Page(site, templatename).title()
     print('Checking {}'.format(templatename))
 
@@ -75,7 +75,7 @@ def update(templatename, dry_run=False, add_template=False, check=False):
             old_usage = 1
         diff = (new_usage - old_usage) / old_usage
         print('\tUsage: Old: {}, New: {}, Diff: {:+.1f}%'.format(old_usage, new_usage, diff * 100))
-        if abs(diff) > cfg['diff_limit']:
+        if abs(diff) > diff_limit:
             print('\tUpdate template usage to {}'.format(new_usage))
             text = re.sub(r'({{\s*(?:High-use|High-risk|高風險模板|高风险模板|U!|High[ _]use)\s*\|)\s*(?:[0-9,+]+|)\s*(\||}})', r'\g<1>{}\g<2>'.format(new_usage), text, flags=re.I)
             text = maintain_doc(text)
@@ -90,7 +90,7 @@ def update(templatename, dry_run=False, add_template=False, check=False):
                     return
                 templatedoc.save(summary=summary, minor=False)
         else:
-            print('\tNot reach diff_limit')
+            print('\tNot reach diff_limit {}'.format(diff_limit))
     elif add_template:
         m2 = re.search(r'{{\s*(Template[ _]doc page viewed directly|內聯模板文件|内联模板文件|Template[ _]doc inline|内联模板文档|內聯模板文檔|Documentation[ _]subpage)\s*(\||}})', text, flags=re.I)
         templatetext = '{{{{High-use|{}}}}}\n'.format(new_usage)
@@ -121,15 +121,16 @@ def update(templatename, dry_run=False, add_template=False, check=False):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('template', nargs='?')
-    parser.add_argument('--dry-run', action='store_true', dest='dry_run')
+    parser.add_argument('-d', '--dry-run', action='store_true', dest='dry_run')
     parser.add_argument('-a', '--noadd', action='store_false', dest='add')
     parser.add_argument('-c', '--check', action='store_true', dest='check')
+    parser.add_argument('-l', '--diff-limit', type=float, default=cfg['diff_limit'])
     parser.set_defaults(dry_run=False, add=True, check=False)
     args = parser.parse_args()
     print(args)
 
     if args.template:
-        update(args.template, dry_run=args.dry_run, add_template=args.add, check=args.check)
+        update(args.template, dry_run=args.dry_run, add_template=args.add, check=args.check, diff_limit=args.diff_limit)
     else:
         highusetem = pywikibot.Page(site, cfg['highuse_template'])
         for page in highusetem.embeddedin(namespaces=[10, 828]):
@@ -137,4 +138,4 @@ if __name__ == "__main__":
             if re.search(cfg['skip_titles'], title):
                 continue
 
-            update(title, dry_run=args.dry_run)
+            update(title, dry_run=args.dry_run, diff_limit=args.diff_limit)
