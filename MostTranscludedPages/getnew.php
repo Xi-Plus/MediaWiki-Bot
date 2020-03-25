@@ -13,6 +13,7 @@ if (!in_array(PHP_SAPI, $C["allowsapi"])) {
 set_time_limit(600);
 date_default_timezone_set('UTC');
 $starttime = microtime(true);
+require __DIR__ . "/config.default.php";
 @include __DIR__ . "/config.$wiki.php";
 require __DIR__ . "/../function/curl.php";
 require __DIR__ . "/../function/login.php";
