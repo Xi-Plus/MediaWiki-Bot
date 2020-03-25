@@ -17,4 +17,6 @@ $C["cookiefile"] = __DIR__ . "/../tmp/MostTranscludedPages-cookie.txt";
 
 $C["fail_retry"] = 5;
 
+$C["deleteold"] = false;
+
 $G["db"] = new PDO('mysql:host=' . $C["DBhost"] . ';dbname=' . $C["DBname"] . ';charset=utf8mb4', $C["DBuser"], $C["DBpass"]);

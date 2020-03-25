@@ -87,12 +87,14 @@ foreach ($results as $page) {
 	}
 }
 
-foreach ($pagelist as $page) {
-	$sth = $G["db"]->prepare("DELETE FROM `{$C['DBTBprefix']}page` WHERE `wiki` = :wiki AND `title` = :title");
-	$sth->bindValue(":wiki", $wiki);
-	$sth->bindValue(":title", $page["title"]);
-	$res = $sth->execute();
-	echo "remove " . $page["title"] . " (" . $page["count"] . ")\n";
+if ($C["deleteold"]) {
+	foreach ($pagelist as $page) {
+		$sth = $G["db"]->prepare("DELETE FROM `{$C['DBTBprefix']}page` WHERE `wiki` = :wiki AND `title` = :title");
+		$sth->bindValue(":wiki", $wiki);
+		$sth->bindValue(":title", $page["title"]);
+		$res = $sth->execute();
+		echo "remove " . $page["title"] . " (" . $page["count"] . ")\n";
+	}
 }
 
 $spendtime = (microtime(true) - $starttime);
