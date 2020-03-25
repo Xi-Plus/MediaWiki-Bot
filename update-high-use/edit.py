@@ -122,9 +122,9 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('template', nargs='?')
     parser.add_argument('--dry-run', action='store_true', dest='dry_run')
-    parser.add_argument('-a', '--add', action='store_true', dest='add')
+    parser.add_argument('-a', '--noadd', action='store_false', dest='add')
     parser.add_argument('-c', '--check', action='store_true', dest='check')
-    parser.set_defaults(dry_run=False, add=False, check=False)
+    parser.set_defaults(dry_run=False, add=True, check=False)
     args = parser.parse_args()
     print(args)
 
