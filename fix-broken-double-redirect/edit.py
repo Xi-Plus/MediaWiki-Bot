@@ -30,7 +30,11 @@ for sourcePage in site.categorymembers(cat):
     m = re.search(r'#(?:重定向|REDIRECT) ?\[\[(.+?)]]', text, flags=re.I)
     if m:
         middlePage = pywikibot.Page(site, m.group(1))
-        log = list(site.logevents(page=middlePage, total=1))[0]
+        logs = list(site.logevents(page=middlePage, total=1))
+        if len(logs) == 0:
+            print('\tno logs')
+            continue
+        log = logs[0]
         if log.type() != 'move':
             print('\trecent log not move')
             continue
