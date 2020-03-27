@@ -37,7 +37,9 @@ class AniGamerComTwAnimeVideo:
         if season is None:
             data['episodes'] = 1
         else:
-            data['episodes'] = len(season.find('ul').findAll('li'))
+            data['episodes'] = 0
+            for ul in season.findAll('ul'):
+                data['episodes'] += len(ul.findAll('li'))
 
         rating = soup.find('div', {'class': 'rating'})
         if rating:
