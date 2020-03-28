@@ -1,12 +1,18 @@
 # -*- coding: utf-8 -*-
 import argparse
+import importlib
 import json
 import os
+import sys
 
 os.environ['PYWIKIBOT_DIR'] = os.path.dirname(os.path.realpath(__file__))
 import pywikibot
 from pywikibot.data.api import Request
 
+
+sys.path.append('..')
+animeSite = (importlib.import_module('util.acg_gamer_com_tw_acgDetail', 'AcgGamerComTwAcgDetail')
+             .AcgGamerComTwAcgDetail())
 
 site = pywikibot.Site()
 site.login()
@@ -55,7 +61,7 @@ def main():
     gamer = args.gamer
 
     zhtitle = converttitle(zhsite, args.wp or title)
-    moetitle = converttitle(moesite, args.moe or title)
+    moetitle = converttitle(moesite, args.moe or args.wp or title)
 
     print('title', title)
     print('year', year)
@@ -148,6 +154,11 @@ def main():
 
     item = datasite.editEntity({}, data, summary=u'建立新動畫')
     print(item['entity']['id'])
+
+    # 巴哈姆特作品資料
+    if gamer:
+        myitem = pywikibot.ItemPage(datasite, item['entity']['id'])
+        animeSite.updateItem(datasite, myitem)
 
 
 if __name__ == "__main__":
