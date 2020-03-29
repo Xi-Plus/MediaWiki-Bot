@@ -83,17 +83,6 @@ conn = pymysql.connect(
 # In[ ]:
 
 
-def clearSummary(summary):
-    summary = re.sub(r'/\*.+?\*/', '', summary)
-    summary = summary.replace('// Edit via Wikiplus', '')
-    summary = summary.replace('VIA [[U:镜音铃/Wikiplus|W+]]', '')
-    summary = summary.strip()
-    return summary
-
-
-# In[ ]:
-
-
 # https://quarry.wmflabs.org/query/33421
 with conn.cursor() as cur:
     cur.execute('use zhwiki_p')
@@ -298,10 +287,18 @@ chineseNumber = ['一', '二', '三', '四', '五']
 # In[ ]:
 
 
+def formatTitle(title):
+    title = re.sub(r'^(.+)/(.+)$', r'\g<1>（\g<2>）', title)
+    title = re.sub(r'^(.+)_\((.+)\)$', r'\g<1>（\g<2>）', title)
+    return title
+
+
+# In[ ]:
+
+
 policyTextList = []
 for change in minorPolicyChanges:
-    title = change['page_title']
-    title = re.sub(r'^(.+)/(.+)$', '$1（$2）', title)
+    title = formatTitle(change['page_title'])
     if len(change['changes']) == 1:
         policyTextList.append('《[[Special:Diff/{}/{}|{}]]》'.format(
             change['changes'][0][0],
@@ -328,8 +325,7 @@ print(policyTextList)
 
 guidelineTextList = []
 for change in minorGuidelineChanges:
-    title = change['page_title']
-    title = re.sub(r'^(.+)/(.+)$', r'\g<1>（\g<2>）', title)
+    title = formatTitle(change['page_title'])
     if len(change['changes']) == 1:
         guidelineTextList.append('《[[Special:Diff/{}/{}|{}]]》'.format(
             change['changes'][0][0],
