@@ -129,7 +129,6 @@ for row in res:
     rev_timestamp = row[2].decode()
     page_id = row[3]
     page_title = row[4].decode()
-    comment_text = row[5].decode()
     
     revid2page_id[rev_id] = page_id
     revid2page_id[rev_parent_id] = page_id
@@ -143,7 +142,6 @@ for row in res:
         'revid': rev_id,
         'rev_parent_id': rev_parent_id,
         'rev_timestamp': rev_timestamp,
-        'comment_text': comment_text,
         'minor': True
     })
 
