@@ -4,11 +4,12 @@
 # In[ ]:
 
 
-import pymysql
+import json
 import os
 import re
-import pywikibot
 
+import pymysql
+import pywikibot
 
 # In[ ]:
 
@@ -154,7 +155,6 @@ for revids in policyRevids:
 # In[ ]:
 
 
-import json
 print(json.dumps(record, indent=4, ensure_ascii=False))
 
 
