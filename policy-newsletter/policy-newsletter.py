@@ -118,7 +118,7 @@ for row in res:
     rev_timestamp = row[2].decode()
     page_id = row[3]
     page_title = row[4].decode()
-    
+
     revid2page_id[rev_id] = page_id
     revid2page_id[rev_parent_id] = page_id
 
@@ -146,8 +146,8 @@ for revids in policyRevids:
     idx2 = 0
     while record[page_id]['history'][idx2]['revid'] != revids[1]:
         idx2 += 1
-    
-    for i in range(idx1, idx2+1):
+
+    for i in range(idx1, idx2 + 1):
         record[page_id]['history'][i]['minor'] = False
 
 
@@ -248,7 +248,7 @@ for page_id in record:
                     }
                 minorPolicyChanges[page_id]['changes'].append((
                     record[page_id]['history'][idx1]['rev_parent_id'],
-                    record[page_id]['history'][idx2-1]['revid'],
+                    record[page_id]['history'][idx2 - 1]['revid'],
                 ))
             else:
                 if page_id not in minorGuidelineChanges:
@@ -259,7 +259,7 @@ for page_id in record:
                     }
                 minorGuidelineChanges[page_id]['changes'].append((
                     record[page_id]['history'][idx1]['rev_parent_id'],
-                    record[page_id]['history'][idx2-1]['revid'],
+                    record[page_id]['history'][idx2 - 1]['revid'],
                 ))
             idx1 = idx2
         idx1 += 1
@@ -271,9 +271,9 @@ print(minorGuidelineChanges)
 
 
 minorPolicyChanges = list(minorPolicyChanges.values())
-minorPolicyChanges.sort(key=lambda v:v['first_time'])
+minorPolicyChanges.sort(key=lambda v: v['first_time'])
 minorGuidelineChanges = list(minorGuidelineChanges.values())
-minorGuidelineChanges.sort(key=lambda v:v['first_time'])
+minorGuidelineChanges.sort(key=lambda v: v['first_time'])
 print(minorPolicyChanges)
 print(minorGuidelineChanges)
 
@@ -350,8 +350,8 @@ print(guidelineTextList)
 # In[ ]:
 
 
-text = re.sub(r'(\[\[Special:链出更改/Category:维基百科方针\|方針]]：).*', r'\1'+'、'.join(policyTextList) + '。', text)
-text = re.sub(r'(\[\[Special:链出更改/Category:维基百科指引\|指引]]：).*', r'\1'+'、'.join(guidelineTextList) + '。', text)
+text = re.sub(r'(\[\[Special:链出更改/Category:维基百科方针\|方針]]：).*', r'\1' + '、'.join(policyTextList) + '。', text)
+text = re.sub(r'(\[\[Special:链出更改/Category:维基百科指引\|指引]]：).*', r'\1' + '、'.join(guidelineTextList) + '。', text)
 
 
 # In[ ]:
@@ -372,4 +372,3 @@ pywikibot.showDiff(page.text, text)
 if input('Save?').lower() in ['y', 'yes']:
     page.text = text
     page.save(summary='[[User:A2093064-bot/task/36|機器人36]]：自動更新雜項修訂', minor=False)
-
