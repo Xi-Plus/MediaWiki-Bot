@@ -256,6 +256,7 @@ for page_id in record:
                 if page_id not in minorPolicyChanges:
                     minorPolicyChanges[page_id] = {
                         'page_title': record[page_id]['page_title'],
+                        'first_time': int(record[page_id]['history'][idx1]['rev_timestamp']),
                         'changes': [],
                     }
                 minorPolicyChanges[page_id]['changes'].append((
@@ -266,6 +267,7 @@ for page_id in record:
                 if page_id not in minorGuidelineChanges:
                     minorGuidelineChanges[page_id] = {
                         'page_title': record[page_id]['page_title'],
+                        'first_time': int(record[page_id]['history'][idx1]['rev_timestamp']),
                         'changes': [],
                     }
                 minorGuidelineChanges[page_id]['changes'].append((
@@ -281,6 +283,17 @@ print(minorGuidelineChanges)
 # In[ ]:
 
 
+minorPolicyChanges = list(minorPolicyChanges.values())
+minorPolicyChanges.sort(key=lambda v:v['first_time'])
+minorGuidelineChanges = list(minorGuidelineChanges.values())
+minorGuidelineChanges.sort(key=lambda v:v['first_time'])
+print(minorPolicyChanges)
+print(minorGuidelineChanges)
+
+
+# In[ ]:
+
+
 chineseNumber = ['一', '二', '三', '四', '五']
 
 
@@ -288,18 +301,18 @@ chineseNumber = ['一', '二', '三', '四', '五']
 
 
 policyTextList = []
-for page_id in minorPolicyChanges:
-    title = minorPolicyChanges[page_id]['page_title']
+for change in minorPolicyChanges:
+    title = change['page_title']
     title = re.sub(r'^(.+)/(.+)$', '$1（$2）', title)
-    if len(minorPolicyChanges[page_id]['changes']) == 1:
+    if len(change['changes']) == 1:
         policyTextList.append('《[[Special:Diff/{}/{}|{}]]》'.format(
-            minorPolicyChanges[page_id]['changes'][0][0],
-            minorPolicyChanges[page_id]['changes'][0][1],
+            change['changes'][0][0],
+            change['changes'][0][1],
             title,
         ))
     else:
         diffList = []
-        for i, revids in enumerate(minorPolicyChanges[page_id]['changes']):
+        for i, revids in enumerate(change['changes']):
             diffList.append('[[Special:Diff/{}/{}|{}]]'.format(
                 revids[0],
                 revids[1],
@@ -316,18 +329,18 @@ print(policyTextList)
 
 
 guidelineTextList = []
-for page_id in minorGuidelineChanges:
-    title = minorGuidelineChanges[page_id]['page_title']
+for change in minorGuidelineChanges:
+    title = change['page_title']
     title = re.sub(r'^(.+)/(.+)$', r'\g<1>（\g<2>）', title)
-    if len(minorGuidelineChanges[page_id]['changes']) == 1:
+    if len(change['changes']) == 1:
         guidelineTextList.append('《[[Special:Diff/{}/{}|{}]]》'.format(
-            minorGuidelineChanges[page_id]['changes'][0][0],
-            minorGuidelineChanges[page_id]['changes'][0][1],
+            change['changes'][0][0],
+            change['changes'][0][1],
             title,
         ))
     else:
         diffList = []
-        for i, revids in enumerate(minorGuidelineChanges[page_id]['changes']):
+        for i, revids in enumerate(change['changes']):
             diffList.append('[[Special:Diff/{}/{}|{}]]'.format(
                 revids[0],
                 revids[1],
