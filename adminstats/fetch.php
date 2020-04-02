@@ -121,9 +121,6 @@ $post = array(
 );
 echo "edit " . $C["page"] . " summary=" . $summary . "\n";
 
-echo "Press any key to continue . . .";
-fgets(STDIN);
-
 if (!$C["test"]) {
 	$res = cURL($C["wikiapi"], $post);
 } else {
