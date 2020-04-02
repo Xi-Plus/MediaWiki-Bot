@@ -74,7 +74,7 @@ foreach ($dates as $date) {
 }
 
 $out = "==統計==
-*更新日期：" . date("Y年m月d日", $time) . " (" . $C["day"][date("w", $time)] . ") " . date("H:i", $time) . " (UTC)
+*更新日期：<onlyinclude>" . date("Y年m月d日", $time) . " (" . $C["day"][date("w", $time)] . ") " . date("H:i", $time) . " (UTC)</onlyinclude>
 *中文維基管理員：" . $totaladmincount . "人
 *備註：由[https://xtools.wmflabs.org/adminstats/zh.wikipedia.org XTools]協助統計，只計算刪除、封禁、保護、權限、合併、匯入、防濫用過濾器，因此可能與實際情況有誤差。
 
