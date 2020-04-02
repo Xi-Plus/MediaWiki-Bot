@@ -8,9 +8,31 @@ set_time_limit(600);
 date_default_timezone_set('UTC');
 $starttime = microtime(true);
 @include __DIR__ . "/config.php";
+require __DIR__ . "/../function/curl.php";
+require __DIR__ . "/../function/login.php";
+require __DIR__ . "/../function/edittoken.php";
 
 $time = time();
 echo "The time now is " . date("Y-m-d H:i:s", $time) . " (UTC)\n";
+
+login();
+$edittoken = edittoken();
+
+$starttimestamp = time();
+$res = cURL($C["wikiapi"] . "?" . http_build_query(array(
+	"action" => "query",
+	"prop" => "revisions",
+	"format" => "json",
+	"rvprop" => "content|timestamp",
+	"titles" => $C["page"],
+)));
+if ($res === false) {
+	exit("fetch page fail\n");
+}
+$res = json_decode($res, true);
+$pages = current($res["query"]["pages"]);
+$text = $pages["revisions"][0]["*"];
+$basetimestamp = $pages["revisions"][0]["timestamp"];
 
 $dates = [
 	"-1 year",
@@ -78,7 +100,41 @@ $out = "==統計==
 *半年：" . $res[500]["-6 months"] . "人（" . round(100 * $res[500]["-6 months"] / $totaladmincount, 1) . "%）
 *三個月：" . $res[500]["-3 months"] . "人（" . round(100 * $res[500]["-3 months"] / $totaladmincount, 1) . "%）";
 
-echo $out . "\n\n";
+$start = strpos($text, $C["text1"]);
+$end = strpos($text, $C["text2"]);
+$newtext = substr($text, 0, $start) . $out . "\n\n" . substr($text, $end);
+
+echo "---------------\n";
+echo $newtext . "\n";
+echo "---------------\n";
+
+$summary = $C["summary"];
+$post = array(
+	"action" => "edit",
+	"format" => "json",
+	"title" => $C["page"],
+	"summary" => $summary,
+	"text" => $newtext,
+	"token" => $edittoken,
+	"starttimestamp" => $starttimestamp,
+	"basetimestamp" => $basetimestamp,
+);
+echo "edit " . $C["page"] . " summary=" . $summary . "\n";
+
+echo "Press any key to continue . . .";
+fgets(STDIN);
+
+if (!$C["test"]) {
+	$res = cURL($C["wikiapi"], $post);
+} else {
+	$res = false;
+	file_put_contents(__DIR__ . "/out.txt", $text);
+}
+$res = json_decode($res, true);
+if (isset($res["error"])) {
+	echo "edit fail\n";
+	var_dump($res["error"]);
+}
 
 $spendtime = (microtime(true) - $starttime);
 echo "spend " . $spendtime . " s.\n";
