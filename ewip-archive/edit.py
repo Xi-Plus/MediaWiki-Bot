@@ -31,8 +31,11 @@ wikicode = mwparserfromhell.parse(text)
 archivelist = {}
 count = 0
 for section in wikicode.get_sections()[1:]:
-    title = str(section.get(0).title)
-    print(title, end="\t")
+    if section == '':
+        continue
+    else:
+        title = str(section.get(0).title)
+        print(title, end="\t")
 
     lasttime = datetime(1, 1, 1)
     for m in re.findall(r"(\d{4})年(\d{1,2})月(\d{1,2})日 \(.\) (\d{2}):(\d{2}) \(UTC\)", str(section)):
