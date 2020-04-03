@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
 import argparse
+import json
 import os
 import re
 
 os.environ['PYWIKIBOT_DIR'] = os.path.dirname(os.path.realpath(__file__))
 import pywikibot
+from config import config_page_name  # pylint: disable=E0611,W0614
 
 
 parser = argparse.ArgumentParser()
@@ -18,7 +20,15 @@ os.environ['TZ'] = 'UTC'
 site = pywikibot.Site()
 site.login()
 
-cat = pywikibot.Page(site, 'Category:快速删除候选')
+config_page = pywikibot.Page(site, config_page_name)
+cfg = config_page.text
+cfg = json.loads(cfg)
+print(json.dumps(cfg, indent=4, ensure_ascii=False))
+
+if not cfg['enable']:
+    exit('disabled\n')
+
+cat = pywikibot.Page(site, cfg['csd_category'])
 
 for sourcePage in site.categorymembers(cat):
     print(sourcePage.title())
@@ -43,7 +53,7 @@ for sourcePage in site.categorymembers(cat):
         text = re.sub(r'^{{d\|bot=Jimmy-bot\|g15\|.+\n', '', text)
         text = re.sub(r'(#(?:重定向|REDIRECT) ?\[\[).+?(]])', r'\g<1>{}\g<2>'.format(targetPage.title()), text)
         pywikibot.showDiff(sourcePage.text, text)
-        summary = '-delete並修復損壞的雙重重定向，[[Special:Redirect/logid/{}|目標頁已被不留重定向移動]]，若認為重定向不合適請提交存廢討論'.format(log.logid())
+        summary = cfg['summary'].format(log.logid())
         print(summary)
         if args.check and input('Save?').lower() not in ['', 'y', 'yes']:
             continue
