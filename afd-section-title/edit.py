@@ -116,7 +116,7 @@ def fix(pagename):
     for secid, section in enumerate(list(wikicode.get_sections())):
         if secid == 0:
             continue
-        title = str(section.get(0).title)
+        title = str(section.get(0).title).strip()
         print(secid, title)
         if re.search(r'{{\s*(delh|TalkendH)\s*(\||}})', str(section), re.IGNORECASE) is not None:
             print('  closed, skip')
@@ -153,9 +153,9 @@ def fix(pagename):
             continue
 
         m = re.search(
-            r'^(\[\[[^\]]+\]\][、，])+\[\[[^\]]+\]\]$', title, re.IGNORECASE)
+            r'^(\[\[[^\]]+\]\][、， ])+\[\[[^\]]+\]\]$', title, re.IGNORECASE)
         if m is not None:
-            titlelist = m.group(0).replace(']]，[[', ']]、[[').split('、')
+            titlelist = re.sub(r'\]\][， ]\[\[', ']]、[[', m.group(0)).split('、')
             newtitlelist = []
             mode = []
             for title in titlelist:
