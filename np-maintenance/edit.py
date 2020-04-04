@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import argparse
+import json
 import os
 import re
 import urllib.parse
@@ -8,6 +9,7 @@ os.environ['PYWIKIBOT_DIR'] = os.path.dirname(os.path.realpath(__file__))
 import pywikibot
 import requests
 from bs4 import BeautifulSoup
+from config import config_page_name  # pylint: disable=E0611,W0614
 
 
 parser = argparse.ArgumentParser()
@@ -19,7 +21,15 @@ print(args)
 site = pywikibot.Site()
 site.login()
 
-url = 'https://zh.wikipedia.org/wiki/Wikipedia:关注度/提报?action=render'
+config_page = pywikibot.Page(site, config_page_name)
+cfg = config_page.text
+cfg = json.loads(cfg)
+print(json.dumps(cfg, indent=4, ensure_ascii=False))
+
+if not cfg['enable']:
+    exit('disabled\n')
+
+url = 'https://zh.wikipedia.org/wiki/{}?action=render'.format(cfg['np_page'])
 try:
     req = requests.get(url)
 except Exception as e:
@@ -29,7 +39,7 @@ page_html = req.text
 soup = BeautifulSoup(page_html, 'html.parser')
 root = soup.find('div', {'class': 'mw-parser-output'})
 cnt = 0
-npPage = pywikibot.Page(site, 'Wikipedia:关注度/提报')
+npPage = pywikibot.Page(site, cfg['np_page'])
 text = npPage.text
 for ul in root.find_all('ul', recursive=False):
     for li in ul.find_all('li', recursive=False):
@@ -59,9 +69,11 @@ for ul in root.find_all('ul', recursive=False):
             )
             cnt += 1
 
-print(cnt)
+if cnt == 0:
+    exit('Nothing to do\n')
+
 pywikibot.showDiff(npPage.text, text)
-summary = '修正{}個因移動產生的重定向'.format(cnt)
+summary = cfg['summary'].format(cnt)
 print(summary)
 if args.check and input('Save?').lower() not in ['', 'y', 'yes']:
     exit()
