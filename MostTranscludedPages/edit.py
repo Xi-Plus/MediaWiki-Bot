@@ -13,10 +13,6 @@ parser = argparse.ArgumentParser()
 parser.add_argument('lang', nargs='?', default='zh')
 parser.add_argument('wiki', nargs='?', default='wikipedia')
 parser.add_argument('dbwiki', nargs='?', default='zhwiki')
-parser.add_argument('--full', type=int, default=5000)
-parser.add_argument('--semi', type=int, default=500)
-parser.add_argument('--modulefull', type=int, default=5000)
-parser.add_argument('--modulesemi', type=int, default=5000)
 args = parser.parse_args()
 print(args)
 
@@ -55,9 +51,9 @@ rows = cur.fetchall()
 
 def check_required_protection(title, count):
     if title.startswith('模块:'):
-        if count >= args.modulefull:
+        if count >= cfg['module_full'] and cfg['module_full'] > 0:
             return 2
-        if count >= args.modulesemi:
+        if count >= cfg['module_semi'] and cfg['module_semi'] > 0:
             return 1
         return 0
     if title.startswith('MediaWiki:'):
@@ -65,9 +61,9 @@ def check_required_protection(title, count):
     if title.startswith('User:'):
         if title.endswith('.js') or title.endswith('.css') or title.endswith('.json'):
             return 0
-    if count >= args.full:
+    if count >= cfg['template_full'] and cfg['template_full'] > 0:
         return 2
-    if count >= args.semi:
+    if count >= cfg['template_semi'] and cfg['template_semi'] > 0:
         return 1
     return 0
 
