@@ -65,9 +65,12 @@ def update(templatename, dry_run=False, add_template=False, check=False, diff_li
         return
 
     text = templatedoc.text
-    m = re.search(r'{{\s*(?:High-use|High-risk|高風險模板|高风险模板|U!|High[ _]use)\s*\|\s*([0-9,+]+|)\s*(?:\||}})', text, flags=re.I)
-    if m:
-        old_usage = m.group(1)
+    m = re.findall(r'{{\s*(?:High-use|High-risk|高風險模板|高风险模板|U!|High[ _]use)\s*\|\s*([0-9,+]+|)\s*(?:\||}})', text, flags=re.I)
+    if len(m) >= 2:
+        print('Found multiple templates')
+        return
+    elif len(m) == 1:
+        old_usage = m[0]
         old_usage = re.sub(r'[,+]', '', old_usage)
         try:
             old_usage = int(old_usage)
