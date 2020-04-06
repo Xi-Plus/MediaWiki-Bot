@@ -69,7 +69,7 @@ def update(templatename, dry_run=False, add_template=False, check=False, diff_li
     if len(m) >= 2:
         print('Found multiple templates')
         return
-    elif len(m) == 1:
+    if len(m) == 1:
         old_usage = m[0]
         old_usage = re.sub(r'[,+]', '', old_usage)
         try:
