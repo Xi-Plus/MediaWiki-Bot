@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import argparse
-import re
 import os
 
 os.environ['PYWIKIBOT_DIR'] = os.path.dirname(os.path.realpath(__file__))
