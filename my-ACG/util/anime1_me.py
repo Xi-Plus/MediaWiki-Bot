@@ -17,7 +17,11 @@ class Anime1Me:
         }
         text = self._request(url)
         soup = BeautifulSoup(text, 'html.parser')
-        title = soup.find('h1', {'class': 'page-title'}).text
+        titleel = soup.find('h1', {'class': 'page-title'})
+        if titleel is None:
+            print('cannot find title')
+            return None
+        title = titleel.text
 
         # print('title', title)
         text = self._request('https://anime1.me')
@@ -83,6 +87,9 @@ class Anime1Me:
 
         url = claims['P38'][0].getTarget()
         data = self.getData(url)
+
+        if data is None:
+            return
 
         # 總集數
         if 'episodes' in data:
