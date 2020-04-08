@@ -12,36 +12,30 @@ site.login()
 datasite = site.data_repository()
 
 
-def fixUrl(title):
+def removeProperty(property_id, title):
     print(title)
 
     myitem = pywikibot.ItemPage(datasite, title)
-    claims = myitem.get()['claims']['P66']
+    claims = myitem.get()['claims'][property_id]
 
-    toRemove = []
-    for claim in claims:
-        if not re.search(r'^https?://zh.moegirl.org', claim.getTarget()):
-            toRemove.append(claim)
+    print(claims)
 
-    print('toRemove', toRemove)
-    if not toRemove:
-        return
-
-    myitem.removeClaims(toRemove, summary='移除錯誤放置的連結')
+    myitem.removeClaims(claims)
 
 
-def main():
-    moegirlitem = pywikibot.PropertyPage(datasite, 'Property:P66')
+def main(property_id):
+    moegirlitem = pywikibot.PropertyPage(datasite, 'Property:{}'.format(property_id))
 
     for backlink in moegirlitem.backlinks():
-        fixUrl(backlink.title())
+        removeProperty(property_id, backlink.title())
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
+    parser.add_argument('property')
     parser.add_argument('title', nargs='?')
     args = parser.parse_args()
     if args.title is None:
-        main()
+        main(args.property)
     else:
-        fixUrl(args.title)
+        removeProperty(args.property, args.title)
