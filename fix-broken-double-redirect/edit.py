@@ -9,12 +9,6 @@ import pywikibot
 from config import config_page_name  # pylint: disable=E0611,W0614
 
 
-parser = argparse.ArgumentParser()
-parser.add_argument('-c', '--check', action='store_true', dest='check')
-parser.set_defaults(check=False)
-args = parser.parse_args()
-print(args)
-
 os.environ['TZ'] = 'UTC'
 
 site = pywikibot.Site()
@@ -28,14 +22,10 @@ print(json.dumps(cfg, indent=4, ensure_ascii=False))
 if not cfg['enable']:
     exit('disabled\n')
 
-cat = pywikibot.Page(site, cfg['csd_category'])
 
-for sourcePage in site.categorymembers(cat):
+def fixPage(sourcePage):
     print(sourcePage.title())
     text = sourcePage.text
-    if '{{d|bot=Jimmy-bot|g15|' not in text:
-        print('\tnot g15')
-        continue
 
     m = re.search(r'#(?:重定向|REDIRECT) ?\[\[(.+?)]]', text, flags=re.I)
     if m:
@@ -43,11 +33,11 @@ for sourcePage in site.categorymembers(cat):
         logs = list(site.logevents(page=middlePage, total=1))
         if len(logs) == 0:
             print('\tno logs')
-            continue
+            return
         log = logs[0]
         if log.type() != 'move':
             print('\trecent log not move')
-            continue
+            return
         targetPage = log.target_page
         print('\ttarget', targetPage.title())
         text = re.sub(r'^{{d\|bot=Jimmy-bot\|g15\|.+\n', '', text)
@@ -56,8 +46,29 @@ for sourcePage in site.categorymembers(cat):
         summary = cfg['summary'].format(log.logid())
         print(summary)
         if args.check and input('Save?').lower() not in ['', 'y', 'yes']:
-            continue
+            return
         sourcePage.text = text
         sourcePage.save(summary=summary, minor=False, asynchronous=True)
     else:
         print('\tcannot get redirect target')
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument('page', nargs='?')
+    parser.add_argument('-c', '--check', action='store_true', dest='check')
+    parser.set_defaults(check=False)
+    args = parser.parse_args()
+    print(args)
+
+    if args.page:
+        page = pywikibot.Page(site, args.page)
+        fixPage(page)
+    else:
+        cat = pywikibot.Page(site, cfg['csd_category'])
+
+        for sourcePage in site.categorymembers(cat):
+            if '{{d|bot=Jimmy-bot|g15|' not in sourcePage.text:
+                print('\tnot g15')
+                continue
+            fixPage(sourcePage)
