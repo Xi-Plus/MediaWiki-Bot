@@ -41,7 +41,11 @@ def fixPage(sourcePage):
         targetPage = log.target_page
         print('\ttarget', targetPage.title())
         text = re.sub(r'^{{d\|bot=Jimmy-bot\|g15\|.+\n', '', text)
-        text = re.sub(r'(#(?:重定向|REDIRECT) ?\[\[).+?(]])', r'\g<1>{}\g<2>'.format(targetPage.title()), text)
+        oldtext = text
+        text = re.sub(r'(#(?:重定向|REDIRECT) ?\[\[).+?(]])', r'\g<1>{}\g<2>'.format(targetPage.title()), text, flags=re.I)
+        if oldtext == text:
+            print('Nothing changed')
+            return
         pywikibot.showDiff(sourcePage.text, text)
         summary = cfg['summary'].format(log.logid())
         print(summary)
