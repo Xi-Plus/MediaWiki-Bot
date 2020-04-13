@@ -350,8 +350,34 @@ print(guidelineTextList)
 # In[ ]:
 
 
-text = re.sub(r'(\[\[Special:链出更改/Category:维基百科方针\|方針]]：).*', r'\1' + '、'.join(policyTextList) + '。', text)
-text = re.sub(r'(\[\[Special:链出更改/Category:维基百科指引\|指引]]：).*', r'\1' + '、'.join(guidelineTextList) + '。', text)
+newPolicyText = ''
+if len(policyTextList) >= 2:
+    newPolicyText = '、'.join(policyTextList[:-1]) + '及' + policyTextList[-1]
+elif len(policyTextList) == 1:
+    newPolicyText = policyTextList[0]
+else:
+    newPolicyText = '無'
+print(newPolicyText)
+
+
+# In[ ]:
+
+
+newGuidelineText = ''
+if len(policyTextList) >= 2:
+    newGuidelineText = '、'.join(guidelineTextList[:-1]) + '及' + guidelineTextList[-1]
+elif len(policyTextList) == 1:
+    newGuidelineText = guidelineTextList[0]
+else:
+    newGuidelineText = '無'
+print(newGuidelineText)
+
+
+# In[ ]:
+
+
+text = re.sub(r'(\[\[Special:链出更改/Category:维基百科方针\|方針]]：).*', r'\1' + newPolicyText + '。', text)
+text = re.sub(r'(\[\[Special:链出更改/Category:维基百科指引\|指引]]：).*', r'\1' + newGuidelineText + '。', text)
 
 
 # In[ ]:
