@@ -1,9 +1,8 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[ ]:
 
-
+import argparse
 import json
 import os
 import re
@@ -11,33 +10,23 @@ import re
 import pymysql
 import pywikibot
 
-# In[ ]:
+from config import host, password, user  # pylint: disable=E0611,W0614
 
 
-RUN_PAGENAME = 'Wikipedia:維基百科政策簡報/存檔/2020.03.04'
-
-
-# In[ ]:
+parser = argparse.ArgumentParser()
+parser.add_argument('page')
+args = parser.parse_args()
 
 
 site = pywikibot.Site('zh', 'wikipedia')
 site.login()
 
 
-# In[ ]:
-
-
-page = pywikibot.Page(site, RUN_PAGENAME)
-
-
-# In[ ]:
+page = pywikibot.Page(site, args.page)
 
 
 text = page.text
 print(text)
-
-
-# In[ ]:
 
 
 m = re.search(r'過去一個月（(\d+)年(\d+)月(\d+)日至(\d+)年(\d+)月(\d+)日）內', text)
@@ -47,9 +36,6 @@ if m:
     print(time1, time2)
 else:
     exit('Failed to get date range')
-
-
-# In[ ]:
 
 
 pos1 = text.index("'''方針與指引重要變動'''")
@@ -62,15 +48,9 @@ for temp in re.findall(r'《\[\[Special:Diff/(\d+)/(\d+)\|', policyText):
 print(policyRevids)
 
 
-# In[ ]:
-
-
 host = os.environ['MYSQL_HOST']
 user = os.environ['MYSQL_USERNAME']
 password = os.environ['MYSQL_PASSWORD']
-
-
-# In[ ]:
 
 
 conn = pymysql.connect(
@@ -79,9 +59,6 @@ conn = pymysql.connect(
     password=password,
     charset="utf8"
 )
-
-
-# In[ ]:
 
 
 # https://quarry.wmflabs.org/query/33421
@@ -102,13 +79,14 @@ with conn.cursor() as cur:
             FROM pagelinks
             LEFT JOIN page ON pagelinks.pl_title = page.page_title AND pagelinks.pl_namespace = page.page_namespace
             WHERE pl_from = 1608664 AND pl_namespace = 4
+                AND page_id NOT IN (
+                    590741, # 嵌入包含
+                    977277 # 模板文檔頁模式
+                )
         )
         ORDER BY revision.rev_timestamp ASC
     """.format(time1, time2))
     res = cur.fetchall()
-
-
-# In[ ]:
 
 
 record = {}
@@ -136,9 +114,6 @@ for row in res:
     })
 
 
-# In[ ]:
-
-
 for revids in policyRevids:
     page_id = revid2page_id[revids[0]]
     idx1 = 0
@@ -152,13 +127,7 @@ for revids in policyRevids:
         record[page_id]['history'][i]['minor'] = False
 
 
-# In[ ]:
-
-
 print(json.dumps(record, indent=4, ensure_ascii=False))
-
-
-# In[ ]:
 
 
 policyList = [
@@ -227,9 +196,6 @@ policyList = [
 ]
 
 
-# In[ ]:
-
-
 minorPolicyChanges = {}
 minorGuidelineChanges = {}
 for page_id in record:
@@ -267,9 +233,6 @@ print(minorPolicyChanges)
 print(minorGuidelineChanges)
 
 
-# In[ ]:
-
-
 minorPolicyChanges = list(minorPolicyChanges.values())
 minorPolicyChanges.sort(key=lambda v: v['first_time'])
 minorGuidelineChanges = list(minorGuidelineChanges.values())
@@ -278,22 +241,13 @@ print(minorPolicyChanges)
 print(minorGuidelineChanges)
 
 
-# In[ ]:
-
-
 chineseNumber = ['一', '二', '三', '四', '五']
-
-
-# In[ ]:
 
 
 def formatTitle(title):
     title = re.sub(r'^(.+)/(.+)$', r'\g<1>（\g<2>）', title)
     title = re.sub(r'^(.+)_\((.+)\)$', r'\g<1>（\g<2>）', title)
     return title
-
-
-# In[ ]:
 
 
 policyTextList = []
@@ -320,9 +274,6 @@ for change in minorPolicyChanges:
 print(policyTextList)
 
 
-# In[ ]:
-
-
 guidelineTextList = []
 for change in minorGuidelineChanges:
     title = formatTitle(change['page_title'])
@@ -347,9 +298,6 @@ for change in minorGuidelineChanges:
 print(guidelineTextList)
 
 
-# In[ ]:
-
-
 newPolicyText = ''
 if len(policyTextList) >= 2:
     newPolicyText = '、'.join(policyTextList[:-1]) + '及' + policyTextList[-1]
@@ -358,9 +306,6 @@ elif len(policyTextList) == 1:
 else:
     newPolicyText = '無'
 print(newPolicyText)
-
-
-# In[ ]:
 
 
 newGuidelineText = ''
@@ -373,26 +318,14 @@ else:
 print(newGuidelineText)
 
 
-# In[ ]:
-
-
 text = re.sub(r'(\[\[Special:链出更改/Category:维基百科方针\|方針]]：).*', r'\1' + newPolicyText + '。', text)
 text = re.sub(r'(\[\[Special:链出更改/Category:维基百科指引\|指引]]：).*', r'\1' + newGuidelineText + '。', text)
-
-
-# In[ ]:
 
 
 print(text)
 
 
-# In[ ]:
-
-
 pywikibot.showDiff(page.text, text)
-
-
-# In[ ]:
 
 
 if input('Save?').lower() in ['y', 'yes']:
