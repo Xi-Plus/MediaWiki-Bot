@@ -4,7 +4,6 @@
 
 import argparse
 import json
-import os
 import re
 
 import pymysql
@@ -46,11 +45,6 @@ policyRevids = []
 for temp in re.findall(r'《\[\[Special:Diff/(\d+)/(\d+)\|', policyText):
     policyRevids.append((int(temp[0]), int(temp[1])))
 print(policyRevids)
-
-
-host = os.environ['MYSQL_HOST']
-user = os.environ['MYSQL_USERNAME']
-password = os.environ['MYSQL_PASSWORD']
 
 
 conn = pymysql.connect(
