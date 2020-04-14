@@ -103,8 +103,5 @@ output = """* 參見[[Special:MostTranscludedPages]]
 {2}
 """.format(countsysop, countautoconfirmed, table)
 
-if len(output) / len(outputPage.text) < 0.5:
-    exit('Something went wrong!\n')
-
 outputPage.text = output
 outputPage.save(summary=cfg['summary'])
