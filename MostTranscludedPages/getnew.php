@@ -51,6 +51,7 @@ $results = $res["query"]["querypage"]["results"];
 if (count($results) === 0) {
 	exit("No result returned\n");
 }
+echo "got " . count($results) . " rows\n";
 
 foreach ($results as $page) {
 	$title = $page["title"];
@@ -87,7 +88,7 @@ foreach ($results as $page) {
 	}
 }
 
-if ($C["deleteold"]) {
+if ($C["deleteold"] && count($results) >= 5000) {
 	foreach ($pagelist as $page) {
 		$sth = $G["db"]->prepare("DELETE FROM `{$C['DBTBprefix']}page` WHERE `wiki` = :wiki AND `title` = :title");
 		$sth->bindValue(":wiki", $wiki);
