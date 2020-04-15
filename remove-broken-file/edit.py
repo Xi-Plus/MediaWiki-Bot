@@ -321,7 +321,7 @@ for page in pages:
 
                     if deleted_f6 and page.namespace().id == 0:
                         drv_page = pywikibot.Page(site, cfg["drv_page"])
-                        drv_page_text = drv_page.text
+                        drv_page_text = drv_page.text.strip()
                         if image_fullname not in drv_page_text:
                             drv_page_text += cfg["drv_append_text"].format(
                                 image_fullname, pagetitle, deletelog["user"], deletelog["comment"], deletelog["logid"])
