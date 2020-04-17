@@ -54,7 +54,8 @@ if talkPage.exists():
     pos1 = talkText.index('<!-- bot ignore start -->')
     pos2 = talkText.index('<!-- bot ignore end -->')
     talkText = talkText[pos1:pos2]
-    for temp in re.findall(r'《\[\[Special:Diff/(\d+)/(\d+)\|', talkText):
+    print(talkText)
+    for temp in re.findall(r'\[\[Special:Diff/(\d+)/(\d+)(?:\||\]\])', talkText):
         ignoreRevids.append((int(temp[0]), int(temp[1])))
 
 
