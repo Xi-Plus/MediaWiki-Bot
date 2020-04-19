@@ -318,9 +318,9 @@ print(newPolicyText)
 
 
 newGuidelineText = ''
-if len(policyTextList) >= 2:
+if len(guidelineTextList) >= 2:
     newGuidelineText = '、'.join(guidelineTextList[:-1]) + '及' + guidelineTextList[-1]
-elif len(policyTextList) == 1:
+elif len(guidelineTextList) == 1:
     newGuidelineText = guidelineTextList[0]
 else:
     newGuidelineText = '無'
