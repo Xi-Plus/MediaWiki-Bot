@@ -18,7 +18,9 @@ require __DIR__ . "/config.default.php";
 require __DIR__ . "/../function/curl.php";
 require __DIR__ . "/../function/login.php";
 require __DIR__ . "/../function/edittoken.php";
+require __DIR__ . "/../function/log.php";
 
+WriteLog("[$wiki][getnew] start");
 echo "The time now is " . date("Y-m-d H:i:s") . " (UTC)\n";
 
 login("user");
@@ -51,6 +53,7 @@ $results = $res["query"]["querypage"]["results"];
 if (count($results) === 0) {
 	exit("No result returned\n");
 }
+WriteLog("[$wiki][getnew] got " . count($results) . " rows");
 echo "got " . count($results) . " rows\n";
 
 foreach ($results as $page) {
@@ -71,6 +74,7 @@ foreach ($results as $page) {
 		if ($res === false) {
 			echo $sth->errorInfo()[2] . "\n";
 		}
+		WriteLog("[$wiki][getnew] new " . $page["title"] . " (" . $page["value"] . ")");
 		echo "new " . $page["title"] . " (" . $page["value"] . ")\n";
 	} else {
 		if ($pagelist[$title]["count"] != $page["value"]) {
@@ -82,6 +86,7 @@ foreach ($results as $page) {
 			if ($res === false) {
 				echo $sth->errorInfo()[2] . "\n";
 			}
+			WriteLog("[$wiki][getnew] update " . $page["title"] . " (" . $pagelist[$title]["count"] . "->" . $page["value"] . ")");
 			echo "update " . $page["title"] . " (" . $pagelist[$title]["count"] . "->" . $page["value"] . ")\n";
 		}
 		unset($pagelist[$title]);
@@ -94,9 +99,11 @@ if ($C["deleteold"] && count($results) >= 5000) {
 		$sth->bindValue(":wiki", $wiki);
 		$sth->bindValue(":title", $page["title"]);
 		$res = $sth->execute();
+		WriteLog("[getnew] remove " . $page["title"] . " (" . $page["count"] . ")");
 		echo "remove " . $page["title"] . " (" . $page["count"] . ")\n";
 	}
 }
 
 $spendtime = (microtime(true) - $starttime);
+WriteLog("[$wiki][getnew] spend " . $spendtime . " s");
 echo "spend " . $spendtime . " s.\n";

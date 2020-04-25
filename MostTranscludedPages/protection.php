@@ -17,6 +17,9 @@ $starttime = microtime(true);
 require __DIR__ . "/../function/curl.php";
 require __DIR__ . "/../function/login.php";
 require __DIR__ . "/../function/edittoken.php";
+require __DIR__ . "/../function/log.php";
+
+WriteLog("[$wiki][protection] start");
 
 echo "The time now is " . date("Y-m-d H:i:s") . " (UTC)\n";
 
@@ -37,6 +40,7 @@ $pages = [];
 foreach ($pagelist as $temp) {
 	$pages[$temp["title"]] = $temp;
 }
+WriteLog("[$wiki][protection] update " . count($pagelist) . " pages");
 echo "update " . count($pagelist) . " pages\n";
 
 $pagelist = array_chunk($pagelist, 500, true);
@@ -88,6 +92,7 @@ foreach ($pagelist as $pagelist2) {
 			$sth->bindValue(":redirect", $redirect);
 			$sth->bindValue(":time", date("Y-m-d H:i:s"));
 			$res = $sth->execute();
+			WriteLog("[$wiki][protection] " . $result["title"] . " edit=" . $protect["edit"] . " move=" . $protect["move"] . " " . ($redirect ? "(redirect)" : ""));
 			echo $result["title"] . " edit=" . $protect["edit"] . " move=" . $protect["move"] . " " . ($redirect ? "(redirect)" : "") . "\n";
 			if ($res === false) {
 				echo $sth->errorInfo()[2] . "\n";
@@ -103,4 +108,5 @@ foreach ($pagelist as $pagelist2) {
 }
 
 $spendtime = (microtime(true) - $starttime);
+WriteLog("[$wiki][protection] spend " . $spendtime . " s");
 echo "spend " . $spendtime . " s.\n";
