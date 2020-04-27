@@ -87,7 +87,7 @@ for page in site.categorymembers(cat):
                              int(m[4]), int(m[5]), tzinfo=timezone.utc)
 
                 username = ''
-                m2 = re.search(r'\[\[(?:(?:User|User[ _]talk|U|UT|用户|用戶|使用者|用戶對話|用戶討論|用户对话|用户讨论|使用者討論):|(?:Special|特殊):(?:(?:Contributions|Contribs)|(?:用户|用戶|使用者)?(?:贡献|貢獻))/)([^|\]]+)', m[0])
+                m2 = re.search(r'\[\[(?:(?:User|User[ _]talk|U|UT|用户|用戶|使用者|用戶對話|用戶討論|用户对话|用户讨论|使用者討論):|(?:Special|特殊):(?:(?:Contributions|Contribs)|(?:用户|用戶|使用者)?(?:贡献|貢獻))/)([^|\]/]+)', m[0])
                 if m2:
                     username = m2.group(1)
 
