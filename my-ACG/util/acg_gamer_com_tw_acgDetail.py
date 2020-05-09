@@ -69,6 +69,43 @@ class AcgGamerComTwAcgDetail:
         url = claims['P1'][0].getTarget()
         data = self.getData(url)
 
+        # 總集數
+        if 'episodes' in data:
+            # 已看集數
+            if 'P28' not in claims:
+                new_claim = pywikibot.page.Claim(datasite, 'P28')
+                new_claim.setTarget(pywikibot.WbQuantity(0, site=datasite))
+                logging.info('\t Add seen episodes')
+                item.addClaim(new_claim, summary='新增已看集數')
+
+            new_episodes = data['episodes']
+            if 'P27' in claims:
+                episodesValue = claims['P27'][0].getTarget()
+                old_episodes = episodesValue.amount
+                if new_episodes > old_episodes:
+                    logging.info('\t Episodes should be updated from %s to %s', old_episodes, new_episodes)
+            else:
+                new_claim = pywikibot.page.Claim(datasite, 'P27')
+                new_claim.setTarget(pywikibot.WbQuantity(new_episodes, site=datasite))
+                logging.info('\t Add new episodes %s', new_episodes)
+                item.addClaim(new_claim, summary='新增總集數')
+
+        # 年份
+        if 'year' in data:
+            if 'P29' in claims:
+                if claims['P29'][0].getTarget().precision < 11:
+                    wbtime = self._get_wbtime(data['year'])
+                    if wbtime:
+                        logging.info('\t Update year to %s', data['year'])
+                        claims['P29'][0].changeTarget(wbtime, summary='更新年份')
+            else:
+                wbtime = self._get_wbtime(data['year'])
+                if wbtime:
+                    new_claim = pywikibot.page.Claim(datasite, 'P29')
+                    new_claim.setTarget(wbtime)
+                    logging.info('\t Add new year %s', data['year'])
+                    item.addClaim(new_claim, summary='新增年份')
+
         # 台灣分級
         if 'rating' in data:
             rating_exists = False
@@ -98,43 +135,6 @@ class AcgGamerComTwAcgDetail:
 
                 logging.info('\t Add new rating %s', data['rating'])
                 item.addClaim(new_claim, summary='新增台灣分級')
-
-        # 年份
-        if 'year' in data:
-            if 'P29' in claims:
-                if claims['P29'][0].getTarget().precision < 11:
-                    wbtime = self._get_wbtime(data['year'])
-                    if wbtime:
-                        logging.info('\t Update year to %s', data['year'])
-                        claims['P29'][0].changeTarget(wbtime, summary='更新年份')
-            else:
-                wbtime = self._get_wbtime(data['year'])
-                if wbtime:
-                    new_claim = pywikibot.page.Claim(datasite, 'P29')
-                    new_claim.setTarget(wbtime)
-                    logging.info('\t Add new year %s', data['year'])
-                    item.addClaim(new_claim, summary='新增年份')
-
-        # 總集數
-        if 'episodes' in data:
-            # 已看集數
-            if 'P28' not in claims:
-                new_claim = pywikibot.page.Claim(datasite, 'P28')
-                new_claim.setTarget(pywikibot.WbQuantity(0, site=datasite))
-                logging.info('\t Add seen episodes')
-                item.addClaim(new_claim, summary='新增已看集數')
-
-            new_episodes = data['episodes']
-            if 'P27' in claims:
-                episodesValue = claims['P27'][0].getTarget()
-                old_episodes = episodesValue.amount
-                if new_episodes > old_episodes:
-                    logging.info('\t Episodes should be updated from %s to %s', old_episodes, new_episodes)
-            else:
-                new_claim = pywikibot.page.Claim(datasite, 'P27')
-                new_claim.setTarget(pywikibot.WbQuantity(new_episodes, site=datasite))
-                logging.info('\t Add new episodes %s', new_episodes)
-                item.addClaim(new_claim, summary='新增總集數')
 
 
 if __name__ == "__main__":
