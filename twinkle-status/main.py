@@ -249,7 +249,7 @@ for user, userrecord in record:
     text += '\n'
     text += '| {} |'.format(user)
     text += '| {} |'.format(user_group[user])
-    text += '| v_{} |'.format(get_branch(user))
+    text += '| {} |'.format(get_branch(user))
     text += '| {} |'.format(userrecord['total'])
     edits_in_branch[get_branch(user)] += userrecord['total']
     for atype in alltypes:
