@@ -223,7 +223,7 @@ print('ignore', ignore)
 
 
 alltypes = sorted(alltypes)
-record = sorted(record.items(), key=lambda v: v[1]['total'], reverse=True)
+record = sorted(record.items(), key=lambda v: v[0])
 # print(record)
 
 
@@ -263,7 +263,7 @@ text += """{| class="wikitable sortable"
 !使用版本
 !人數
 !編輯數"""
-for branch in users_in_branch:
+for branch in sorted(users_in_branch.keys()):
     text += '\n|-'
     text += '\n'
     text += '| {} || {} || {}'.format(
