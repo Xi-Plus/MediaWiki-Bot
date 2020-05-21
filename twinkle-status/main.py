@@ -44,7 +44,7 @@ def parse_type(summary, ns, title):
     # arv
     if ns == 4 and title == '元維基用戶查核請求' and re.search(r'^(報告|报告)', summary):
         return 'arv', 'reportrfcu'
-    if ns == 3 and re.search(r'通知用戶查核請求|通知用户查核请求', summary):
+    if ns == 3 and re.search(r'通知(用戶|使用者)查核請求|通知用户查核请求', summary):
         return 'arv', 'noticerfcu'
     if ns == 4 and title == '当前的破坏' and re.search(r'^(報告|报告)', summary):
         return 'arv', 'reportaiv'
@@ -56,14 +56,14 @@ def parse_type(summary, ns, title):
         return 'batch', 'delete'
 
     # block
-    if ns == 3 and re.search(r'{{uw-(ublock|block1|block2|block3|vblock|dblock|3block)|{{blocked proxy}}', summary):
+    if ns == 3 and re.search(r'{{uw-([uvds3]block|block[123])|{{(blocked proxy|anonblock|schoolblock)}}', summary):
         return 'block', 'notice'
     if ns == 2 and re.search(r'(標記被永久封[禁鎖]的用戶頁|标记被永久封禁的用户页)', summary):
         return 'block', 'taguser'
 
     # close
     CLOSEREASON = (
-        r'((轉移至|转移至)(維基導遊|維基詞典|维基共享资源|其他維基計劃)|快速保留|請求理由消失|请求理由消失|重定向|请求无效|請求無效|保留|删除|刪除|提删者未取得提删资格'
+        r'((轉移至|转移至)(維基導遊|維基詞典|维基词典|维基共享资源|其他維基計劃)|快速保留|請求理由消失|请求理由消失|重定向|请求无效|請求無效|保留|删除|刪除|提删者未取得提删资格'
         + r'|提刪者未取得提刪資格|移动|并入|併入|轉交侵權|转交侵权|无共识|重複提出|移動|無共識|重复提出|目标页面或档案不存在，无效)'
     )
     if (ns == 4 and re.search(r'^(頁面存廢討論|檔案存廢討論)/記錄/', title)
@@ -101,7 +101,7 @@ def parse_type(summary, ns, title):
     # protect
     if ns == 4 and title == '请求保护页面' and re.search(r'请求对.+保护', summary):
         return 'protect', 'request'
-    if ns == 4 and title == '请求保护页面' and re.search(r'(半|全)(保護|保护)', summary):
+    if ns == 4 and title == '请求保护页面' and re.search(r'(半|全|白紙|解除)(保護|保护)', summary):
         return 'protect', 'close'
     if re.search(r'移除保護模板|(加入|添加){{pp-', summary):
         return 'protect', 'tag'
