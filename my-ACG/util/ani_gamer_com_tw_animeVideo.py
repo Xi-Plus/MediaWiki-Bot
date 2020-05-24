@@ -5,6 +5,7 @@ import re
 import pywikibot
 import requests
 from bs4 import BeautifulSoup
+from fake_useragent import UserAgent
 
 
 class AniGamerComTwAnimeVideo:
@@ -23,8 +24,12 @@ class AniGamerComTwAnimeVideo:
         18: 'Q50',
     }
 
+    def __init__(self):
+        self.ua = UserAgent()
+
     def getData(self, url):
-        text = requests.get(url).text
+        headers = {'User-Agent': self.ua.random}
+        text = requests.get(url, headers=headers).text
         data = {}
 
         if '目前無此動畫或動畫授權已到期！' in text:
