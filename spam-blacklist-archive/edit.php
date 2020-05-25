@@ -75,7 +75,7 @@ if ($res === false) {
 $res = json_decode($res, true);
 $pages = current($res["query"]["pages"]);
 $redirects = $pages["redirects"];
-$ep = [];
+$ep = ['Editprotected'];
 foreach ($redirects as $redirect) {
 	if (preg_match("/^Template:(.+?)$/", $redirect["title"], $m)) {
 		$ep[] = $m[1];
