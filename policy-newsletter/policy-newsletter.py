@@ -47,6 +47,8 @@ print(policyText)
 for temp in re.findall(r'《\[\[Special:Diff/(\d+)/(\d+)\|', policyText):
     ignoreRevids.append((int(temp[0]), int(temp[1])))
 
+for temp in re.findall(r'《\[\[Special:Permalink/(\d+)\|', policyText):
+    ignoreRevids.append((0, int(temp)))
 
 talkPage = page.toggleTalkPage()
 if talkPage.exists():
@@ -124,10 +126,11 @@ for row in res:
 
 
 for revids in ignoreRevids:
-    page_id = revid2page_id[revids[0]]
+    page_id = revid2page_id[revids[1]]
     idx1 = 0
-    while record[page_id]['history'][idx1]['rev_parent_id'] != revids[0]:
-        idx1 += 1
+    if revids[0] != 0:
+        while record[page_id]['history'][idx1]['rev_parent_id'] != revids[0]:
+            idx1 += 1
     idx2 = 0
     while record[page_id]['history'][idx2]['revid'] != revids[1]:
         idx2 += 1
