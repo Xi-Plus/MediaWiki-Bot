@@ -25,7 +25,7 @@ page = pywikibot.Page(site, args.page)
 
 
 text = page.text
-print(text)
+# print(text)
 
 
 m = re.search(r'過去一個月（(\d+)年(\d+)月(\d+)日至(\d+)年(\d+)月(\d+)日）內', text)
@@ -43,7 +43,7 @@ ignoreRevids = []
 pos1 = text.index("'''方針與指引重要變動'''")
 pos2 = text.index("'''其他方針與指引雜項修訂'''")
 policyText = text[pos1:pos2]
-print(policyText)
+# print(policyText)
 for temp in re.findall(r'\[\[Special:Diff/(\d+)/(\d+)\|', policyText):
     ignoreRevids.append((int(temp[0]), int(temp[1])))
 
@@ -61,7 +61,7 @@ if talkPage.exists():
         ignoreRevids.append((int(temp[0]), int(temp[1])))
 
 
-print(ignoreRevids)
+print('ignoreRevids', ignoreRevids)
 
 
 conn = pymysql.connect(
@@ -139,7 +139,7 @@ for revids in ignoreRevids:
         record[page_id]['history'][i]['minor'] = False
 
 
-print(json.dumps(record, indent=4, ensure_ascii=False))
+# print(json.dumps(record, indent=4, ensure_ascii=False))
 
 
 policyList = [
@@ -241,16 +241,16 @@ for page_id in record:
                 ))
             idx1 = idx2
         idx1 += 1
-print(minorPolicyChanges)
-print(minorGuidelineChanges)
+# print(minorPolicyChanges)
+# print(minorGuidelineChanges)
 
 
 minorPolicyChanges = list(minorPolicyChanges.values())
 minorPolicyChanges.sort(key=lambda v: v['first_time'])
 minorGuidelineChanges = list(minorGuidelineChanges.values())
 minorGuidelineChanges.sort(key=lambda v: v['first_time'])
-print(minorPolicyChanges)
-print(minorGuidelineChanges)
+# print(minorPolicyChanges)
+# print(minorGuidelineChanges)
 
 
 chineseNumber = ['一', '二', '三', '四', '五']
@@ -283,7 +283,7 @@ for change in minorPolicyChanges:
             title,
             '、'.join(diffList),
         ))
-print(policyTextList)
+# print('policyTextList', policyTextList)
 
 
 guidelineTextList = []
@@ -307,7 +307,7 @@ for change in minorGuidelineChanges:
             title,
             '、'.join(diffList),
         ))
-print(guidelineTextList)
+# print('guidelineTextList', guidelineTextList)
 
 
 newPolicyText = ''
@@ -317,7 +317,7 @@ elif len(policyTextList) == 1:
     newPolicyText = policyTextList[0]
 else:
     newPolicyText = '無'
-print(newPolicyText)
+# print('newPolicyText', newPolicyText)
 
 
 newGuidelineText = ''
@@ -327,17 +327,18 @@ elif len(guidelineTextList) == 1:
     newGuidelineText = guidelineTextList[0]
 else:
     newGuidelineText = '無'
-print(newGuidelineText)
+# print('newGuidelineText', newGuidelineText)
 
 
 text = re.sub(r'(\[\[Special:链出更改/Category:维基百科方针\|方針]]：).*', r'\1' + newPolicyText + '。', text)
 text = re.sub(r'(\[\[Special:链出更改/Category:维基百科指引\|指引]]：).*', r'\1' + newGuidelineText + '。', text)
 
 
-print(text)
+# print(text)
 
-
+print('Diff:')
 pywikibot.showDiff(page.text, text)
+print('-' * 50)
 
 
 if input('Save?').lower() in ['y', 'yes']:
