@@ -44,10 +44,10 @@ pos1 = text.index("'''方針與指引重要變動'''")
 pos2 = text.index("'''其他方針與指引雜項修訂'''")
 policyText = text[pos1:pos2]
 print(policyText)
-for temp in re.findall(r'《\[\[Special:Diff/(\d+)/(\d+)\|', policyText):
+for temp in re.findall(r'\[\[Special:Diff/(\d+)/(\d+)\|', policyText):
     ignoreRevids.append((int(temp[0]), int(temp[1])))
 
-for temp in re.findall(r'《\[\[Special:Permalink/(\d+)\|', policyText):
+for temp in re.findall(r'\[\[Special:Permalink/(\d+)\|', policyText):
     ignoreRevids.append((0, int(temp)))
 
 talkPage = page.toggleTalkPage()
