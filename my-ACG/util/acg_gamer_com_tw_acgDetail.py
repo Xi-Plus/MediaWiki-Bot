@@ -5,6 +5,7 @@ import re
 import pywikibot
 import requests
 from bs4 import BeautifulSoup
+from fake_useragent import UserAgent
 
 
 class AcgGamerComTwAcgDetail:
@@ -23,8 +24,12 @@ class AcgGamerComTwAcgDetail:
         18: 'Q50',
     }
 
+    def __init__(self):
+        self.ua = UserAgent()
+
     def getData(self, url):
-        text = requests.get(url).text
+        headers = {'User-Agent': self.ua.random}
+        text = requests.get(url, headers=headers).text
         soup = BeautifulSoup(text, 'html.parser')
         data = {}
 
