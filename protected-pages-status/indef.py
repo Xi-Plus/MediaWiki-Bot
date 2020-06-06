@@ -1,5 +1,4 @@
 import json
-import os
 
 import pymysql
 import pywikibot
