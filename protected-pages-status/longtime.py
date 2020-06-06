@@ -2,11 +2,11 @@ import json
 import os
 from datetime import datetime, timedelta
 
-os.environ['PYWIKIBOT_DIR'] = os.path.dirname(os.path.realpath(__file__))
+import pymysql
 import pywikibot
 
-import toolforge
-from config import config_page_name  # pylint: disable=E0611,W0614
+from config import (config_page_name, host,  # pylint: disable=E0611,W0614
+                    password, user)
 
 
 site = pywikibot.Site()
@@ -20,12 +20,18 @@ print(json.dumps(cfg, indent=4, ensure_ascii=False))
 if not cfg['longtime_enable']:
     exit('disabled\n')
 
-conn = toolforge.connect('zhwiki')
+conn = pymysql.connect(
+    host=host,
+    user=user,
+    password=password,
+    charset="utf8"
+)
 
 d = datetime.today() + timedelta(days=30)
 
 
 with conn.cursor() as cur:
+    cur.execute('use zhwiki_p')
     cur.execute("""
         SELECT pr_page, page_namespace, page_title, pr_expiry
         FROM page_restrictions
