@@ -60,7 +60,7 @@ for row in res:
     text += "\n|-\n"
     text += "|[[Special:Redirect/page/" + pid + "|{{subst:#ifeq:" + ns + "|0||{{subst:ns:" + ns + "}}:}}" + title + "]]"
     text += "||[{{fullurl:Special:日志/protect|page={{subst:#ifeq:" + ns + "|0||{{subst:ns:" + ns + "}}:}}" + title + "}} 保護日誌]"
-    text += "||" + expiry
+    text += "||{{subst:#time:Y年n月j日 (D) H:i (T)|" + expiry + "}}"
 text += "\n|}"
 
 
