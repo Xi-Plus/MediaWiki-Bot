@@ -9,7 +9,8 @@ os.environ['TZ'] = 'UTC'
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--auto', action='store_true')
-parser.set_defaults(auto=False)
+parser.add_argument('--no-diff', action='store_true')
+parser.set_defaults(auto=False, no_diff=False)
 args = parser.parse_args()
 print(args)
 
@@ -151,7 +152,8 @@ for fromname in files:
         print('Nothing changed. Skipped.')
         continue
     else:
-        pywikibot.showDiff(page.text, text)
+        if not args.no_diff:
+            pywikibot.showDiff(page.text, text)
     if args.auto:
         save = 'yes'
     else:
