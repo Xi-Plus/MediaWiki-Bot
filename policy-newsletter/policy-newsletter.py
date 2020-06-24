@@ -126,6 +126,8 @@ for row in res:
 
 
 for revids in ignoreRevids:
+    if revids[1] not in revid2page_id:
+        continue
     page_id = revid2page_id[revids[1]]
     idx1 = 0
     if revids[0] != 0:
