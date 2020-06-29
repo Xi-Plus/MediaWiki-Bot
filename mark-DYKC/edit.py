@@ -40,6 +40,8 @@ for article in matches:
         continue
 
     articlePage = pywikibot.Page(site, article)
+    if not articlePage.exists():
+        continue
     talkPage = articlePage.toggleTalkPage()
     print(talkPage.title())
     DYKCPages.append(talkPage.title())
