@@ -9,8 +9,10 @@ import pywikibot
 from config import config_page_name  # pylint: disable=E0611,W0614
 
 parser = argparse.ArgumentParser()
+parser.add_argument('--limit', type=int, default=0)
 parser.add_argument('--confirm', action='store_true')
-parser.set_defaults(confirm=False)
+parser.add_argument('--no-mark', action='store_true')
+parser.set_defaults(confirm=False, no_mark=False)
 args = parser.parse_args()
 print(args)
 
@@ -33,6 +35,7 @@ text = dykcpage.text
 matches = re.findall(r'\|\s*article\s*=\s*([^|]+?)\s*(?:\||}})', text)
 print(matches)
 
+count = 0
 DYKCPages = []
 for article in matches:
     article = article.strip()
@@ -45,6 +48,9 @@ for article in matches:
     talkPage = articlePage.toggleTalkPage()
     print(talkPage.title())
     DYKCPages.append(talkPage.title())
+
+    if args.no_mark:
+        continue
 
     talkText = talkPage.text
     sections = pywikibot.textlib.extract_sections(talkText)
@@ -61,6 +67,11 @@ for article in matches:
             save = 'yes'
         if save in ['yes', 'y', '']:
             talkPage.save(summary=summary, minor=True)
+            count += 1
+            if args.limit and count >= args.limit:
+                exit('Reach the limit')
+
+print(DYKCPages)
 
 # 開始移除模板
 templatePage = pywikibot.Page(site, 'Template:DYK Invite')
@@ -87,3 +98,6 @@ for talkPage in templatePage.embeddedin(namespaces=1):
             save = 'yes'
         if save in ['yes', 'y', '']:
             talkPage.save(summary=summary, minor=True)
+            count += 1
+            if args.limit and count >= args.limit:
+                exit('Reach the limit')
