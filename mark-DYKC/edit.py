@@ -80,7 +80,7 @@ for talkPage in templatePage.embeddedin(namespaces=1):
         print(talkPage.title())
         sections = pywikibot.textlib.extract_sections(talkPage.text)
         header = sections[0]
-        header = re.sub(r'{{\s*(DYK[ _]Invite|DYKInvite|DYKC|DYKN)\s*(\|.*)*}} *\n?', '', header)
+        header = re.sub(r'{{\s*(DYK[ _]Invite|DYKInvite|DYKC|DYKN)\s*(\|.*)*}} *\n?', '', header, flags=re.I)
 
         newText = header
         for body in sections[1]:
