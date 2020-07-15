@@ -10,7 +10,8 @@ os.environ['TZ'] = 'UTC'
 parser = argparse.ArgumentParser()
 parser.add_argument('--auto', action='store_true')
 parser.add_argument('--no-diff', action='store_true')
-parser.set_defaults(auto=False, no_diff=False)
+parser.add_argument('--pull', action='store_true')
+parser.set_defaults(auto=False, no_diff=False, pull=False)
 args = parser.parse_args()
 print(args)
 
@@ -138,6 +139,17 @@ for fromname in files:
     toname = files[fromname]
     fromname = source + fromname
     toname = target + toname
+
+    if args.pull:
+        print(fromname, '<-', toname)
+        page = pywikibot.Page(site, toname)
+        if not page.exists():
+            print('Page is not exists')
+            continue
+        with open(fromname, 'w', encoding='utf8') as f:
+            f.write(page.text)
+        continue
+
     print(fromname, '->', toname)
     try:
         text = file_get_contents(fromname)
