@@ -74,6 +74,7 @@ for secid in range(1, len(text)):
                         if (logevent['params']['type'] == 'revision'
                                 and logevent['params']['new']['bitmask'] & flag == flag):
                             for rvid in logevent['params']['ids']:
+                                rvid = str(rvid)
                                 if rvid in ids:
                                     deleted += 1
                                     if admin not in admins:
