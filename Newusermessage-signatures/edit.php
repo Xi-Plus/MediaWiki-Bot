@@ -62,7 +62,7 @@ for ($i = 0; $i < $C["fail_retry"]; $i++) {
 	foreach ($m[0] as $key => $temp) {
 		$status = $m[1][$key];
 		if ($status[0] === "*") {
-			$status = "";
+			$status = "active";
 		} else {
 			$status = substr($status, 2, -1);
 		}
