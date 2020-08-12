@@ -2,11 +2,14 @@
 import argparse
 import json
 import os
-import pymysql
+import re
 
 os.environ['PYWIKIBOT_DIR'] = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'protect-config')
+import pymysql
 import pywikibot
-from config import protect_config_page_name, database  # pylint: disable=E0611,W0614
+
+from config import (database,  # pylint: disable=E0611,W0614
+                    protect_config_page_name)
 
 
 parser = argparse.ArgumentParser()
@@ -41,18 +44,14 @@ rows = cur.fetchall()
 
 
 def check_required_protection(title, count):
-    if title.startswith('模块:'):
-        if count >= cfg['module_full'] and cfg['module_full'] > 0:
-            return 2
-        if count >= cfg['module_semi'] and cfg['module_semi'] > 0:
-            return 1
-        return 0
     if title.startswith('MediaWiki:'):
         return 0
     if title.startswith('User:'):
         if title.endswith('.js') or title.endswith('.css') or title.endswith('.json'):
             return 0
     if count >= cfg['template_full'] and cfg['template_full'] > 0:
+        return 3
+    if count >= cfg['template_temp'] and cfg['template_temp'] > 0:
         return 2
     if count >= cfg['template_semi'] and cfg['template_semi'] > 0:
         return 1
@@ -60,12 +59,14 @@ def check_required_protection(title, count):
 
 
 protection2number = {
-    'sysop': 2,
+    'sysop': 3,
+    'templateeditor': 2,
     'autoconfirmed': 1,
     '': 0,
 }
 number2protection = {
-    2: 'sysop',
+    3: 'sysop',
+    2: 'templateeditor',
     1: 'autoconfirmed',
     0: '',
 }
@@ -85,6 +86,10 @@ for row in rows:
 
         if not page.exists():
             print('{} is not exist'.format(title))
+            continue
+
+        if 'exclude_regex' in cfg and re.search(cfg['exclude_regex'], title):
+            print('Ignore {}'.format(title))
             continue
 
         args = {

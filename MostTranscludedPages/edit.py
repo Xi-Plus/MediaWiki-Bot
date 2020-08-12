@@ -50,25 +50,29 @@ rows = cur.fetchall()
 
 
 def check_required_protection(title, count):
-    if title.startswith('模块:'):
-        if count >= cfg['module_full'] and cfg['module_full'] > 0:
-            return 2
-        if count >= cfg['module_semi'] and cfg['module_semi'] > 0:
-            return 1
-        return 0
     if title.startswith('MediaWiki:'):
         return 0
     if title.startswith('User:'):
         if title.endswith('.js') or title.endswith('.css') or title.endswith('.json'):
             return 0
     if count >= cfg['template_full'] and cfg['template_full'] > 0:
+        return 3
+    if count >= cfg['template_temp'] and cfg['template_temp'] > 0:
         return 2
     if count >= cfg['template_semi'] and cfg['template_semi'] > 0:
         return 1
     return 0
 
 
+protection2number = {
+    'sysop': 3,
+    'templateeditor': 2,
+    'autoconfirmed': 1,
+    '': 0,
+}
+
 countsysop = 0
+counttemplateeditor = 0
 countautoconfirmed = 0
 for row in rows:
     title = row[0]
@@ -79,13 +83,18 @@ for row in rows:
     comment = ''
 
     required_protection = check_required_protection(title, count)
-    if required_protection == 2:
-        if protectedit != 'sysop':
+    current_protection = protection2number[protectedit]
+
+    if required_protection > current_protection:
+        if required_protection == 3:
             comment = '[{{{{fullurl:{0}|action=protect&mwProtect-level-edit=sysop&mwProtect-level-move=sysop&mwProtect-level-create=sysop&mwProtect-reason=高風險模板：{1}引用}}}} 需要全保護]'.format(
                 title, count)
             countsysop += 1
-    if required_protection == 1:
-        if protectedit == '':
+        if required_protection == 2:
+            comment = '[{{{{fullurl:{0}|action=protect&mwProtect-level-edit=templateeditor&mwProtect-level-move=templateeditor&mwProtect-level-create=templateeditor&mwProtect-reason=高風險模板：{1}引用}}}} 需要模板保護]'.format(
+                title, count)
+            counttemplateeditor += 1
+        if required_protection == 1:
             comment = '[{{{{fullurl:{0}|action=protect&mwProtect-level-edit=autoconfirmed&mwProtect-level-move=autoconfirmed&mwProtect-level-create=autoconfirmed&mwProtect-reason=高風險模板：{1}引用}}}} 需要半保護]'.format(
                 title, count)
             countautoconfirmed += 1
@@ -98,10 +107,11 @@ table += '\n|}'
 
 output = """* 參見[[Special:MostTranscludedPages]]
 * {0}個頁面需要全保護
-* {1}個頁面需要半保護
+* {1}個頁面需要模板保護
+* {2}個頁面需要半保護
 * 產生時間：<onlyinclude>{{{{#time:Y年n月j日 (D) H:i (T)|{{{{REVISIONTIMESTAMP:{{{{subst:FULLPAGENAME}}}}}}}}}}}}</onlyinclude>
-{2}
-""".format(countsysop, countautoconfirmed, table)
+{3}
+""".format(countsysop, counttemplateeditor, countautoconfirmed, table)
 
 outputPage.text = output
 outputPage.save(summary=cfg['summary'])
