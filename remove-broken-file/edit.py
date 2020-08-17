@@ -2,25 +2,28 @@
 import argparse
 import json
 import os
-import time
 import re
+import time
+from datetime import datetime, timezone
 
 import pymysql
 os.environ["PYWIKIBOT_DIR"] = os.path.dirname(os.path.realpath(__file__))
 import pywikibot
 
-from config import config_page_name, skip_title, database, skip_time  # pylint: disable=E0611,W0614
+from config import config_page_name, database, skip_time, skip_title  # pylint: disable=E0611,W0614
 
 
 os.environ["TZ"] = "UTC"
 
 parser = argparse.ArgumentParser()
+parser.add_argument('-f', '--force', dest='force', action='store_true')
 parser.add_argument('--category', type=str, default=None)
 parser.add_argument('--page', type=str, default=None)
 parser.add_argument('--confirm', type=bool, default=False)
 parser.add_argument('--limit', type=int, default=0)
 parser.add_argument('--skiplimit', type=int, default=100)
 parser.add_argument('--regex', type=bool, default=False)
+parser.set_defaults(force=False)
 args = parser.parse_args()
 print(args)
 
@@ -151,6 +154,13 @@ for page in pages:
 
     if page.namespace().id in [8]:
         print('Skip page in specify namespace.')
+        continue
+
+    lastEditTime = list(page.revisions(total=1))[0]['timestamp']
+    lastEditTimestamp = datetime(lastEditTime.year, lastEditTime.month, lastEditTime.day,
+                                 lastEditTime.hour, lastEditTime.minute, tzinfo=timezone.utc).timestamp()
+    if time.time() - lastEditTimestamp < cfg['interval'] and not args.force:
+        print('Skip. Last edit on {0}'.format(lastEditTime))
         continue
 
     is_skip = False
