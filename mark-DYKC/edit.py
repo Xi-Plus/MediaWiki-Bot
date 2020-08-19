@@ -35,11 +35,21 @@ text = dykcpage.text
 matches = re.findall(r'\|\s*article\s*=\s*([^|]+?)\s*(?:\||}})', text)
 print(matches)
 
+TaggedPages = set()
+templatePage = pywikibot.Page(site, 'Template:DYK Invite')
+for talkPage in templatePage.embeddedin(namespaces=1):
+    TaggedPages.add(talkPage.title())
+
 count = 0
 DYKCPages = []
 for article in matches:
     article = article.strip()
     if article == '':
+        continue
+
+    talkPageTitle = 'Talk:{}'.format(article.replace('_', ' '))
+    if talkPageTitle in TaggedPages:
+        DYKCPages.append(talkPageTitle)
         continue
 
     articlePage = pywikibot.Page(site, article)
