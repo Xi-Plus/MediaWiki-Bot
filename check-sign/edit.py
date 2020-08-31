@@ -64,15 +64,11 @@ text = ''
 for row in res:
     username = row[1].decode()
     sign = row[3].decode()
-    print(username, sign)
     raw_sign[username] = sign
     usernames.append(username)
     text += '<!-- {0} start -->{1}<!-- {0} end -->\n'.format(username, sign)
 
-print(len(usernames))
-print(usernames)
-
-print(text)
+print('Process {} users'.format(len(usernames)))
 
 API = 'https://zh.wikipedia.org/w/api.php'
 data = requests.post(API, data={
@@ -83,8 +79,6 @@ data = requests.post(API, data={
     "contentmodel": "wikitext",
     "utf8": 1
 }).json()
-
-print(data)
 
 parsed_text = data['parse']['text']['*']
 
@@ -99,7 +93,6 @@ for username in usernames:
     idx2 = parsed_text.index('<!-- {} end -->'.format(username))
     sign = parsed_text[idx1 + len(flag):idx2]
     clearsign = re.sub(r'[^\x00-\x7F]', 'C', sign)
-    print(username, sign)
 
     expanded_sign[username] = sign
     sign_errors[username] = set()
@@ -119,10 +112,6 @@ for username in usernames:
     if signlen > 255:
         sign_errors[username].add('簽名過長-{}'.format(signlen))
 
-print(text2)
-
-print(text2index)
-
 data = requests.post('https://zh.wikipedia.org/api/rest_v1/transform/wikitext/to/lint', data=json.dumps({
     "wikitext": text2,
 }).encode(), headers={
@@ -133,14 +122,11 @@ data = requests.post('https://zh.wikipedia.org/api/rest_v1/transform/wikitext/to
 for row in data:
     idx = bisect.bisect_left(text2index, row['dsr'][0])
     username = usernames[idx]
-    print(row['type'], row['params']['name'], username, expanded_sign[username], row['dsr'])
     linttype = row['type']
     linttag = row['params']['name']
     if linttype == 'obsolete-tag':
         linttype = '過時的標籤'
     sign_errors[username].add('{}-{}'.format(linttype, linttag))
-
-print(sign_errors)
 
 text3 = '''{| class="wikitable sortable"
 !使用者
@@ -162,11 +148,14 @@ for username in sorted(usernames):
 | {2}
 | {3}
 '''.format(username, checklink, sign, error)
-        print(username, expanded_sign[username], error)
+
 text3 += '|}'
 
-print(text3)
-
 page = pywikibot.Page(site, cfg['output_page'])
+
+print('Diff:')
+pywikibot.showDiff(page.text, text3)
+print('-' * 50)
+
 page.text = text3
 page.save(summary=cfg['summary'], minor=False)
