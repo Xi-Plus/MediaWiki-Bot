@@ -33,7 +33,6 @@ if not cfg['enable']:
 skip_pages = set()
 for title in cfg['skip_templates']:
     for page in pywikibot.Page(site, title).getReferences(only_template_inclusion=True):
-        print(page.title())
         skip_pages.add(page.title())
 
 
@@ -52,18 +51,15 @@ while True:
     for row in data['query']['querypage']['results']:
         allpages.append(row)
     del data['query']
-    print(data)
     if 'query-continue' not in data:
         break
     for key in data['query-continue']['querypage']:
         parameters[key] = data['query-continue']['querypage'][key]
-print('allpages', len(allpages))
 
 
 text_temp = {}
 for ns in cfg['namespaces']:
     text_temp[int(ns)] = ''
-print('text_temp', text_temp)
 
 for row in allpages:
     title = row['title']
@@ -79,7 +75,6 @@ for row in allpages:
     if skiped:
         continue
 
-    print(title)
     text_temp[row['ns']] += '# [[:{}]]\n'.format(title)
 
 
