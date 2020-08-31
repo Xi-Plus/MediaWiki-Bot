@@ -20,6 +20,7 @@ AFD-stats/list/
 bad-image-list/remove.txt
 DRV-tag-talk/lastrevid.txt
 DRV-tag-talk/lasttime.txt
+DRV-tag-talk/revcache/
 MostTranscludedPages/config.*.php
 move-faga/page.txt
 move-g15-file/skipedpage.txt
