@@ -7,6 +7,7 @@ import os
 import re
 
 import pymysql
+os.environ['PYWIKIBOT_DIR'] = os.path.dirname(os.path.realpath(__file__))
 import pywikibot
 import requests
 
