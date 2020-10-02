@@ -25,7 +25,7 @@ parser.add_argument('--skiplimit', type=int, default=100)
 parser.add_argument('--regex', type=bool, default=False)
 parser.set_defaults(force=False)
 args = parser.parse_args()
-print(args)
+pywikibot.log(args)
 
 site = pywikibot.Site()
 site.login()
@@ -34,7 +34,7 @@ sitecommons = pywikibot.Site("commons", "commons")
 config_page = pywikibot.Page(site, config_page_name)
 cfg = config_page.text
 cfg = json.loads(cfg)
-print(json.dumps(cfg, indent=4, ensure_ascii=False))
+pywikibot.log(json.dumps(cfg, indent=4, ensure_ascii=False))
 
 if not cfg["enable"]:
     exit("disabled\n")
@@ -53,10 +53,10 @@ cur = db.cursor()
 
 cnt = cur.execute("""DELETE FROM `remove_broken_file_pages` WHERE `time` < FROM_UNIXTIME(%s)""",
                   (time.time() - skip_time))
-print('Deleted {} rows from remove_broken_file_pages'.format(cnt))
+pywikibot.log('Deleted {} rows from remove_broken_file_pages'.format(cnt))
 
 cnt = cur.execute("""DELETE FROM `remove_broken_file_files` WHERE `page` NOT IN ( SELECT `page` FROM `remove_broken_file_pages` )""")
-print('Deleted {} rows from remove_broken_file_files'.format(cnt))
+pywikibot.log('Deleted {} rows from remove_broken_file_files'.format(cnt))
 
 db.commit()
 
@@ -143,30 +143,30 @@ limit = 1
 skiplimit = 0
 for page in pages:
     if args.limit > 0 and limit > args.limit:
-        print('Reach the limit. Quitting.')
+        pywikibot.log('Reach the limit. Quitting.')
         break
     if args.skiplimit > 0 and skiplimit >= args.skiplimit:
-        print('Reach the skiplimit. Quitting.')
+        pywikibot.log('Reach the skiplimit. Quitting.')
         break
 
     pagetitle = page.title()
-    print(limit, pagetitle)
+    pywikibot.log(limit, pagetitle)
 
     if page.namespace().id in [8]:
-        print('Skip page in specify namespace.')
+        pywikibot.log('Skip page in specify namespace.')
         continue
 
     lastEditTime = list(page.revisions(total=1))[0]['timestamp']
     lastEditTimestamp = datetime(lastEditTime.year, lastEditTime.month, lastEditTime.day,
                                  lastEditTime.hour, lastEditTime.minute, tzinfo=timezone.utc).timestamp()
     if time.time() - lastEditTimestamp < cfg['interval'] and not args.force:
-        print('Skip. Last edit on {0}'.format(lastEditTime))
+        pywikibot.log('Skip. Last edit on {0}'.format(lastEditTime))
         continue
 
     is_skip = False
     for skip_regex in cfg['skip_title']:
         if re.search(skip_regex, pagetitle):
-            print('skip ({0})'.format(skip_regex))
+            pywikibot.log('skip ({0})'.format(skip_regex))
             is_skip = True
             break
     if re.search(skip_title, pagetitle):
@@ -174,7 +174,7 @@ for page in pages:
     if is_skip:
         continue
     if pagetitle in skippages and not args.page:
-        print("skip")
+        pywikibot.log("skip")
         continue
     text = page.text
     summary_comment = []
@@ -184,7 +184,7 @@ for page in pages:
     try:
         for image in page.imagelinks():
             if cfg['removal_limit_one_edit'] > 0 and len(summary_comment) + len(summary_moved) + len(summary_deleted) >= cfg['removal_limit_one_edit']:
-                print('Reach removal limit in one edit')
+                pywikibot.log('Reach removal limit in one edit')
                 break
 
             if not image.exists():
@@ -210,7 +210,7 @@ for page in pages:
                         break
 
                 if existother is not None:
-                    print("{} exist on {}".format(image_fullname, existother))
+                    pywikibot.log("{} exist on {}".format(image_fullname, existother))
 
                     for regex_type in cfg["regex"]:
                         regex = cfg["regex"][regex_type]["pattern"].format(
@@ -218,8 +218,8 @@ for page in pages:
                         replace = cfg["regex"][regex_type]["replace"]["comment_other"].format(
                             cfg["check_other_wiki"][existother])
                         if args.regex:
-                            print('comment_other regex: {}'.format(regex))
-                            print('comment_other replace: {}'.format(replace))
+                            pywikibot.log('comment_other regex: {}'.format(regex))
+                            pywikibot.log('comment_other replace: {}'.format(replace))
 
                         newtext, count = re.subn(
                             regex, replace, text, flags=re.M | re.I)
@@ -238,7 +238,7 @@ for page in pages:
                 movelog = followMove(image_fullname)
                 if len(movelog) > 0:
                     if checkImageExists(imagename):
-                        print("File:{} moved".format(imagename))
+                        pywikibot.log("File:{} moved".format(imagename))
 
                         for regex_type in cfg["regex"]:
                             regex = cfg["regex"][regex_type]["pattern"].format(
@@ -246,8 +246,8 @@ for page in pages:
                             replace = cfg["regex"][regex_type]["replace"]["moved"].format(
                                 movelog[-1]["params"]["target_title_without_ns"])
                             if args.regex:
-                                print('moved regex: {}'.format(regex))
-                                print('moved replace: {}'.format(replace))
+                                pywikibot.log('moved regex: {}'.format(regex))
+                                pywikibot.log('moved replace: {}'.format(replace))
 
                             newtext, count = re.subn(
                                 regex, replace, text, flags=re.M | re.I)
@@ -265,7 +265,7 @@ for page in pages:
                         continue
                     else:
                         image_fullname = movelog[-1]["params"]["target_title"]
-                        print("Info: File moved to {}".format(image_fullname))
+                        pywikibot.log("Info: File moved to {}".format(image_fullname))
 
                 # moved end
 
@@ -309,15 +309,15 @@ for page in pages:
                             summary_prefix, log["params"]["target_title_without_ns"], log["logid"])
 
                 if deleted_comment:
-                    print("{} deleted by F6".format(image_fullname))
+                    pywikibot.log("{} deleted by F6".format(image_fullname))
 
                     for regex_type in cfg["regex"]:
                         regex = cfg["regex"][regex_type]["pattern"].format(
                             imageregex)
                         replace = cfg["regex"][regex_type]["replace"]["deleted_comment"]
                         if args.regex:
-                            print('deleted_comment regex: {}'.format(regex))
-                            print('deleted_comment replace: {}'.format(replace))
+                            pywikibot.log('deleted_comment regex: {}'.format(regex))
+                            pywikibot.log('deleted_comment replace: {}'.format(replace))
 
                         newtext, count = re.subn(
                             regex, replace, text, flags=re.M | re.I)
@@ -337,7 +337,7 @@ for page in pages:
                                 image_fullname, pagetitle, deletelog["user"], deletelog["comment"], deletelog["logid"])
                             pywikibot.showDiff(drv_page.text, drv_page_text)
                             summary = cfg["drv_summary"]
-                            print("summary = {}".format(summary))
+                            pywikibot.output("summary = {}".format(summary))
 
                             if args.confirm:
                                 save = input("save?")
@@ -348,23 +348,23 @@ for page in pages:
                                 drv_page.save(summary=summary,
                                               minor=False, botflag=False)
                         else:
-                            print('Already reported to DRV.')
+                            pywikibot.log('Already reported to DRV.')
 
                     continue
 
                 if deleted_local or deleted_commons:
                     if deleted_local:
-                        print("{} deleted on local".format(image_fullname))
+                        pywikibot.log("{} deleted on local".format(image_fullname))
                     elif deleted_commons:
-                        print("{} deleted on commons".format(image_fullname))
+                        pywikibot.log("{} deleted on commons".format(image_fullname))
 
                     for regex_type in cfg["regex"]:
                         regex = cfg["regex"][regex_type]["pattern"].format(
                             imageregex)
                         replace = cfg["regex"][regex_type]["replace"]["deleted"]
                         if args.regex:
-                            print('deleted regex: {}'.format(regex))
-                            print('deleted replace: {}'.format(replace))
+                            pywikibot.log('deleted regex: {}'.format(regex))
+                            pywikibot.log('deleted replace: {}'.format(replace))
 
                         newtext, count = re.subn(
                             regex, replace, text, flags=re.M | re.I)
@@ -411,15 +411,15 @@ for page in pages:
                         uploaded = True
 
                 if not uploaded:
-                    print("{} never uploaded".format(image_fullname))
+                    pywikibot.log("{} never uploaded".format(image_fullname))
 
                     for regex_type in cfg["regex"]:
                         regex = cfg["regex"][regex_type]["pattern"].format(
                             imageregex)
                         replace = cfg["regex"][regex_type]["replace"]["comment"]
                         if args.regex:
-                            print('comment regex: {}'.format(regex))
-                            print('comment replace: {}'.format(replace))
+                            pywikibot.log('comment regex: {}'.format(regex))
+                            pywikibot.log('comment replace: {}'.format(replace))
 
                         newtext, count = re.subn(
                             regex, replace, text, flags=re.M | re.I)
@@ -436,10 +436,10 @@ for page in pages:
                 # comment end
 
                 # unknown start
-                print("{} missed for unknown reason".format(image_fullname))
+                pywikibot.log("{} missed for unknown reason".format(image_fullname))
                 # unknown end
     except Exception as e:
-        print(e)
+        pywikibot.error(e)
 
     summary = []
     if len(summary_comment):
@@ -452,16 +452,16 @@ for page in pages:
         summary.append(cfg["summary"]["prepend"]
                        ["deleted"] + "、".join(summary_deleted))
     summary = cfg["summary"]["prepend"]["all"] + "；".join(summary)
-    print("summary = {}".format(summary))
+    pywikibot.log("summary = {}".format(summary))
 
     if page.text == text:
-        print("nothing changed")
+        pywikibot.log("nothing changed")
         if args.confirm:
             input()
         add_skip_page(pagetitle, missing_files)
         skiplimit += 1
         if args.skiplimit > 0 and skiplimit >= args.skiplimit:
-            print('Reach the skiplimit. Quitting.')
+            pywikibot.log('Reach the skiplimit. Quitting.')
             break
         continue
 
@@ -486,20 +486,20 @@ for page in pages:
             page.save(summary=summary, minor=False)
             limit += 1
         except (pywikibot.exceptions.SpamfilterError, pywikibot.exceptions.OtherPageSaveError) as e:
-            print(e)
+            pywikibot.error(e)
             summary = re.sub(r'\[https?://(.+?)\]', r'\1', summary)
             summary = re.sub(r'https?://', '', summary)
-            print('Trying to remove url in summary and save again.')
-            print("summary = {}".format(summary))
+            pywikibot.log('Trying to remove url in summary and save again.')
+            pywikibot.output("summary = {}".format(summary))
             try:
                 page.save(summary=summary, minor=False)
                 limit += 1
             except (pywikibot.exceptions.SpamfilterError, pywikibot.exceptions.OtherPageSaveError) as e:
-                print(e)
+                pywikibot.error(e)
                 if args.confirm:
                     input()
                 add_skip_page(pagetitle, missing_files)
                 skiplimit += 1
     else:
-        print("skip")
+        pywikibot.log("skip")
         add_skip_page(pagetitle, missing_files)
