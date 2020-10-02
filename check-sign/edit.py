@@ -107,6 +107,8 @@ for username in usernames:
         hide_sign[username] = True
     if '{{' in sign:
         sign_errors[username].add('模板')
+    if '<templatestyles' in sign:
+        sign_errors[username].add('模板樣式')
     if re.search(r'\[(https?)?://', sign):
         sign_errors[username].add('外部連結')
     signlen = len(sign.encode())
