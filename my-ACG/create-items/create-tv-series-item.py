@@ -39,7 +39,7 @@ def main():
     parser.add_argument('--seen', type=int, default=0)
     parser.add_argument('--episodes', type=int, default=0)
     parser.add_argument('--status', type=int, choices=[0, 1, 2], default=2)
-    parser.add_argument('--length', type=int, default=24)
+    parser.add_argument('--length', type=float, default=24)
     parser.add_argument('--wp')
     args = parser.parse_args()
 
