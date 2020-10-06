@@ -150,7 +150,7 @@ for page in pages:
         break
 
     pagetitle = page.title()
-    pywikibot.log(limit, pagetitle)
+    pywikibot.log('{} {}'.format(limit, pagetitle))
 
     if page.namespace().id in [8]:
         pywikibot.log('Skip page in specify namespace.')
