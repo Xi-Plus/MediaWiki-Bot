@@ -1,12 +1,14 @@
 import json
+import os
 from datetime import datetime, timedelta
 
 import pymysql
+
+os.environ['PYWIKIBOT_DIR'] = os.path.dirname(os.path.realpath(__file__))
 import pywikibot
 
 from config import (config_page_name, host,  # pylint: disable=E0611,W0614
                     password, user)
-
 
 site = pywikibot.Site()
 site.login()
