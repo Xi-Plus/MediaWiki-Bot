@@ -45,8 +45,7 @@ for targetPage in site.categorymembers(cat):
     targetPage.delete(reason='[[Wiktionary:CSD|G8]]: 刪除以便移動', prompt=False)
 
     print('Moving {} to {}'.format(sourceTitle, targetTitle))
-    sourcePage.move(targetTitle, reason='合併歷史', movetalk=True,
-                    sysop=True, noredirect=True)
+    sourcePage.move(targetTitle, reason='合併歷史', movetalk=True, noredirect=True)
 
     print('Undeleting {}'.format(targetTitle))
     targetPage.undelete(reason='合併歷史')
