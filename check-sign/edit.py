@@ -105,7 +105,7 @@ for username in usernames:
     if '<div' in sign:
         sign_errors[username].add('div')
         hide_sign[username] = True
-    if '{{' in sign:
+    if len(re.findall(r'{{', sign)) > len(re.findall(r'{{!}}', sign)):
         sign_errors[username].add('模板')
     if '<templatestyles' in sign:
         sign_errors[username].add('模板樣式')
