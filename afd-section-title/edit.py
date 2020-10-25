@@ -100,6 +100,16 @@ def appendComment(text, mode):
     return text
 
 
+def escapeEqualSign(titlelist):
+    anyEqual = any(['=' in title for title in titlelist])
+    if anyEqual:
+        newtitlelist = []
+        for i, title in enumerate(titlelist, 1):
+            newtitlelist.append('{}={}'.format(i, title))
+        return newtitlelist
+    return titlelist
+
+
 def fix(pagename):
     if re.search(r'\d{4}/\d{2}/\d{2}', pagename):
         pagename = 'Wikipedia:頁面存廢討論/記錄/' + pagename
@@ -176,6 +186,7 @@ def fix(pagename):
                 else:
                     print('  wrong title: ' + title)
                     return
+            newtitlelist = escapeEqualSign(newtitlelist)
             title = '{{al|' + '|'.join(newtitlelist) + '}}'
             if str(section.get(0).title) != title:
                 print('  set new title = ' + title)
@@ -190,6 +201,10 @@ def fix(pagename):
             newtitlelist = []
             mode = []
             for title in titlelist:
+                m = re.search(r'^\s*\d+\s*=\s*(.+)$', title)
+                if m:
+                    title = m.group(1)
+
                 if title[0] == ':':
                     title = title[1:]
 
@@ -201,6 +216,7 @@ def fix(pagename):
                 mode += convert['mode']
 
                 newtitlelist.append(title)
+            newtitlelist = escapeEqualSign(newtitlelist)
             title = '{{al|' + '|'.join(newtitlelist) + '}}'
             if str(section.get(0).title) != title:
                 print('  set new title = ' + title)
