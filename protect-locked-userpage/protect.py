@@ -50,7 +50,7 @@ for page in site.categorymembers(cat):
 
     if locked:
         args = {
-            'reason': '被全域鎖定的使用者頁面',  # cfg['summary'],
+            'reason': cfg['summary'],
             'prompt': False,
             'protections': {
                 'edit': 'sysop',
