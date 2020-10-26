@@ -44,7 +44,7 @@ for page in site.categorymembers(cat):
     locked = False
     if 'locked' in data['query']['globaluserinfo']:
         locked = True
-    elif data['query']['logevents'][0]['params']['0'] == 'locked':
+    elif len(data['query']['logevents']) > 0 and data['query']['logevents'][0]['params']['0'] == 'locked':
         locked = True
     print(locked)
 
