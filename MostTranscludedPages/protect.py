@@ -88,7 +88,7 @@ for row in rows:
             print('{} is not exist'.format(title))
             continue
 
-        if 'exclude_regex' in cfg and re.search(cfg['exclude_regex'], title):
+        if 'exclude_regex' in cfg and cfg['exclude_regex'] != '' and re.search(cfg['exclude_regex'], title):
             print('Ignore {}'.format(title))
             continue
 
