@@ -65,6 +65,7 @@ def update(templatename, dry_run=False, add_template=False, check=False, diff_li
         return
 
     text = templatedoc.text
+    text = re.sub(r'({{\s*(?:High-use|High-risk|高風險模板|高风险模板|U!|High[ _]use)\s*)(}})', r'\g<1>|1\g<2>', text)
     m = re.findall(r'{{\s*(?:High-use|High-risk|高風險模板|高风险模板|U!|High[ _]use)\s*\|\s*([0-9,+]+|)\s*(?:\||}})', text, flags=re.I)
     if len(m) >= 2:
         print('Found multiple templates')
