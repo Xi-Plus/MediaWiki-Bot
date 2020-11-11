@@ -18,10 +18,8 @@ class AgefansTv:
         soup = BeautifulSoup(text, 'html.parser')
         data = {}
 
-        for movurl in soup.findAll('div', {'class': 'movurl'}):
-            episodes = len(movurl.findAll('li'))
-            if 'episodes' not in data or episodes > data['episodes']:
-                data['episodes'] = episodes
+        movurl = soup.find('div', {'class': 'movurl', 'style': 'display:block'})
+        data['episodes'] = len(movurl.findAll('li'))
 
         return data
 
