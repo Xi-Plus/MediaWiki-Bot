@@ -83,8 +83,9 @@ for secid, section in enumerate(sections[1:], 1):
                     "letype": "delete",
                     "lelimit": "1"
                 }).submit()
-                print(data['query']['logevents'][0]['comment'])
-                remove = True
+                if len(data['query']['logevents']) > 0:
+                    print(data['query']['logevents'][0]['comment'])
+                    remove = True
 
             if remove:
                 cnt += 1
