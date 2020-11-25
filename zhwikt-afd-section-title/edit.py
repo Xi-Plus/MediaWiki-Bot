@@ -57,7 +57,7 @@ def fix(pagename):
     text = afdpage.text
 
     temptext = re.sub(r'\n===.+=== *\n', '', text)
-    for titlelist in re.findall(r'{{al\|((?:[^\]]+\|)+[^\]]+)}}', temptext):
+    for titlelist in re.findall(r'{{al\|((?:[^\]]+?\|)+[^\]]+?)}}', temptext):
         titlelist = titlelist.split('|')
         for title in titlelist:
             checkAfdTemplate(title)
