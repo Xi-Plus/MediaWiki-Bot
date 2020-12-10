@@ -75,7 +75,7 @@ function userright($username, $checkawb = true) {
 	if ($checkawb) {
 		$res2 = file_get_contents($cfg["AWBpage"]);
 		if ($res2 === false) {
-			exit("fetch page fail\n");
+			echo "fetch AWB page fail\n";
 		}
 		if (preg_match("/^\* *{$username} *$/m", $res2)) {
 			$rights[] = $cfg["AWBright"];
