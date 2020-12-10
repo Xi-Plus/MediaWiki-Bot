@@ -16,6 +16,16 @@ require __DIR__ . "/function.php";
 
 echo "The time now is " . date("Y-m-d H:i:s") . " (UTC)\n";
 
+$config_page = file_get_contents($C["config_page_getnew"]);
+if ($config_page === false) {
+	exit("get config failed\n");
+}
+$cfg = json_decode($config_page, true);
+
+if (!$cfg["enable"]) {
+	exit("disabled\n");
+}
+
 login("bot");
 $edittoken = edittoken();
 
