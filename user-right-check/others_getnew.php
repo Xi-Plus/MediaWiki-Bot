@@ -14,6 +14,8 @@ require __DIR__ . "/../function/edittoken.php";
 require __DIR__ . "/../function/log.php";
 require __DIR__ . "/function.php";
 
+WriteLog('others_getnew start');
+
 echo "The time now is " . date("Y-m-d H:i:s") . " (UTC)\n";
 
 $config_page = file_get_contents($C["config_page_getnew"]);
@@ -136,3 +138,5 @@ foreach ($userlist as $user) {
 
 $spendtime = (microtime(true) - $starttime);
 echo "spend " . $spendtime . " s.\n";
+
+WriteLog('others_getnew stop');
