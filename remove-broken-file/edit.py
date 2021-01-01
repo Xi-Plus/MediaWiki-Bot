@@ -485,7 +485,7 @@ for page in pages:
         try:
             page.save(summary=summary, minor=False)
             limit += 1
-        except (pywikibot.exceptions.SpamfilterError, pywikibot.exceptions.OtherPageSaveError) as e:
+        except pywikibot.exceptions.PageSaveRelatedError as e:
             pywikibot.error(e)
             summary = re.sub(r'\[https?://(.+?)\]', r'\1', summary)
             summary = re.sub(r'https?://', '', summary)
@@ -494,7 +494,7 @@ for page in pages:
             try:
                 page.save(summary=summary, minor=False)
                 limit += 1
-            except (pywikibot.exceptions.SpamfilterError, pywikibot.exceptions.OtherPageSaveError) as e:
+            except pywikibot.exceptions.PageSaveRelatedError as e:
                 pywikibot.error(e)
                 if args.confirm:
                     input()
