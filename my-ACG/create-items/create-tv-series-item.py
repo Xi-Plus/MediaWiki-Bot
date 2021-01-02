@@ -49,6 +49,8 @@ def main():
     episodes = args.episodes
     status = args.status
     length = args.length
+    if length == int(length):
+        length = int(length)
 
     zhtitle = converttitle(zhsite, args.wp or title)
 
