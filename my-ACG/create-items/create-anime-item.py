@@ -18,7 +18,6 @@ site = pywikibot.Site()
 site.login()
 datasite = site.data_repository()
 zhsite = pywikibot.Site('zh', 'wikipedia')
-moesite = pywikibot.Site('zh', 'moegirl')
 
 STATUS_QID = ['Q57', 'Q56', 'Q58']
 
@@ -48,7 +47,6 @@ def main():
     parser.add_argument('--status', type=int, choices=[0, 1, 2], default=1)
     parser.add_argument('--length', type=float, default=24)
     parser.add_argument('--wp')
-    parser.add_argument('--moe')
     parser.add_argument('--gamer')
     args = parser.parse_args()
 
@@ -63,7 +61,6 @@ def main():
     gamer = args.gamer
 
     zhtitle = converttitle(zhsite, args.wp or title)
-    moetitle = converttitle(moesite, args.moe or args.wp or title)
 
     print('title', title)
     print('year', year)
@@ -71,7 +68,6 @@ def main():
     print('status', status)
     print('length', length)
     print('zhtitle', zhtitle)
-    print('moetitle', moetitle)
     print('gamer', gamer)
 
     new_item = pywikibot.ItemPage(datasite)
@@ -132,12 +128,6 @@ def main():
     if zhtitle:
         new_claim = pywikibot.page.Claim(datasite, 'P68')
         new_claim.setTarget(zhtitle)
-        data['claims'].append(new_claim.toJSON())
-
-    # 萌娘百科
-    if moetitle:
-        new_claim = pywikibot.page.Claim(datasite, 'P70')
-        new_claim.setTarget(moetitle)
         data['claims'].append(new_claim.toJSON())
 
     # 巴哈姆特作品資料
