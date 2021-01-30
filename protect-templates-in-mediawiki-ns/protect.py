@@ -36,10 +36,10 @@ with conn.cursor() as cur:
         SELECT tl_namespace, tl_title, page_id, pr_level
         FROM
         (
-        SELECT DISTINCT tl_namespace, tl_title
-        FROM templatelinks
-        WHERE tl_from_namespace = 8 AND tl_namespace != 8 AND tl_namespace % 2 = 0
-          AND tl_from NOT IN (6709868, 6743456, 5545686, 5733059, 6486575, 3073030)
+            SELECT DISTINCT tl_namespace, tl_title
+            FROM templatelinks
+            WHERE tl_from_namespace = 8 AND tl_namespace != 8 AND tl_namespace % 2 = 0
+            AND tl_from NOT IN (6709868, 6743456, 5545686, 5733059, 6486575, 3073030)
         ) t1
         LEFT JOIN page ON tl_namespace = page_namespace AND tl_title = page_title
         LEFT JOIN page_restrictions ON pr_page = page_id AND pr_type = 'edit'
@@ -77,4 +77,4 @@ for row in res:
 
     page = pywikibot.Page(site, title, ns)
     print(ns, title, pageid, page.title())
-    page.protect()
+    page.protect(**protectargs)
