@@ -15,13 +15,13 @@ from config import config_page_name, host, password, user  # pylint: disable=E06
 site = pywikibot.Site('zh', 'wikipedia')
 site.login()
 
-# config_page = pywikibot.Page(site, config_page_name)
-# cfg = config_page.text
-# cfg = json.loads(cfg)
-# print(json.dumps(cfg, indent=4, ensure_ascii=False))
+config_page = pywikibot.Page(site, config_page_name)
+cfg = config_page.text
+cfg = json.loads(cfg)
+print(json.dumps(cfg, indent=4, ensure_ascii=False))
 
-# if not cfg['enable']:
-#     exit('disabled\n')
+if not cfg['enable']:
+    exit('disabled\n')
 
 conn = pymysql.connect(
     host=host,
@@ -30,51 +30,58 @@ conn = pymysql.connect(
     charset="utf8"
 )
 
+mediawiki_whitelist = []
+for title in cfg['mediawiki_whitelist']:
+    page = pywikibot.Page(site, title)
+    mediawiki_whitelist.append(str(page.pageid))
+
+mediawiki_whitelist = ', '.join(mediawiki_whitelist)
+
 with conn.cursor() as cur:
     cur.execute('use zhwiki_p')
     cur.execute("""
-        SELECT tl_namespace, tl_title, page_id, pr_level
-        FROM
-        (
-            SELECT DISTINCT tl_namespace, tl_title
-            FROM templatelinks
-            WHERE tl_from_namespace = 8 AND tl_namespace != 8 AND tl_namespace % 2 = 0
-            AND tl_from NOT IN (6709868, 6743456, 5545686, 5733059, 6486575, 3073030)
-        ) t1
-        LEFT JOIN page ON tl_namespace = page_namespace AND tl_title = page_title
-        LEFT JOIN page_restrictions ON pr_page = page_id AND pr_type = 'edit'
-        WHERE pr_level != 'sysop'
-    """)
+        SELECT tl_namespace, tl_title, tl_from
+        FROM templatelinks
+        WHERE tl_from_namespace = 8 AND tl_namespace != 8
+        AND tl_from NOT IN ({})
+    """.format(mediawiki_whitelist))
     res = cur.fetchall()
 
-whitelist = [
-    68860,  # TOWitem
-    79357,  # TOWpercent
-    71082,  # Bulletin
-    1224493,  # Bulletin/maintenance
-    1612163,  # Recent_changes_article_requests/list
-    84599,  # 新条目推荐/候选
-]
-
-protectargs = {
-    'reason': '[[Wikipedia:保護方針#永久保护|嵌入在MediaWiki命名空間的頁面]]',
-    'prompt': False,
-    'protections': {
-        'edit': 'sysop',
-        'move': 'sysop',
-    }
-}
-
+templates = dict()
 for row in res:
     ns = int(row[0])
     title = row[1].decode()
-    pageid = int(row[2])
+    tl_from = int(row[2])
+    if (ns, title) not in templates:
+        templates[(ns, title)] = set()
+    templates[(ns, title)].add(tl_from)
 
-    if '历史上的今天' in title:
-        continue
-    if pageid in whitelist:
-        continue
-
+titles = []
+for (ns, title) in templates:
     page = pywikibot.Page(site, title, ns)
-    print(ns, title, pageid, page.title())
-    page.protect(**protectargs)
+    fulltitle = page.title()
+    if re.search(cfg['template_whiteregex'], fulltitle):
+        continue
+
+    titles.append(fulltitle)
+
+titles.sort()
+
+text = '\n'
+for title in titles:
+    # print(title)
+    text += '| ' + title + '\n'
+
+page = pywikibot.Page(site, cfg['page'])
+try:
+    idx1 = page.text.index('<!--listbegins-->') + len('<!--listbegins-->')
+    idx2 = page.text.index('<!--listends-->', idx1)
+except ValueError:
+    print('Cannot locate insertion position')
+    exit()
+
+newtext = page.text[:idx1] + text + page.text[idx2:]
+pywikibot.showDiff(page.text, newtext)
+
+page.text = newtext
+page.save(cfg['summary'])
