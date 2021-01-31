@@ -47,17 +47,15 @@ with conn.cursor() as cur:
     """.format(mediawiki_whitelist))
     res = cur.fetchall()
 
-templates = dict()
+templates = set()
 for row in res:
     ns = int(row[0])
     title = row[1].decode()
     tl_from = int(row[2])
-    if (ns, title) not in templates:
-        templates[(ns, title)] = set()
-    templates[(ns, title)].add(tl_from)
+    templates.add((ns, title))
 
 titles = []
-for (ns, title) in templates.keys():
+for (ns, title) in templates:
     page = pywikibot.Page(site, title, ns)
     fulltitle = page.title()
     if re.search(cfg['template_whiteregex'], fulltitle):
