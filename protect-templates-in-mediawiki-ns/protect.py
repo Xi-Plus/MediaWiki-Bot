@@ -57,7 +57,7 @@ for row in res:
     templates[(ns, title)].add(tl_from)
 
 titles = []
-for (ns, title) in templates:
+for (ns, title) in templates.keys():
     page = pywikibot.Page(site, title, ns)
     fulltitle = page.title()
     if re.search(cfg['template_whiteregex'], fulltitle):
