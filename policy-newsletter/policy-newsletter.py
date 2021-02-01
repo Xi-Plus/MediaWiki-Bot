@@ -2,10 +2,13 @@
 # coding: utf-8
 
 import argparse
+import os
 import re
 from datetime import date
 
 import pymysql
+
+os.environ['PYWIKIBOT_DIR'] = os.path.dirname(os.path.realpath(__file__))
 import pywikibot
 from dateutil.relativedelta import relativedelta
 
