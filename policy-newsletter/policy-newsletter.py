@@ -30,6 +30,9 @@ site.login()
 
 print(title)
 page = pywikibot.Page(site, title)
+if not page.exists():
+    print('page is not exists')
+    exit()
 
 
 text = page.text
