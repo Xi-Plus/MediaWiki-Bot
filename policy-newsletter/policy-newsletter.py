@@ -273,15 +273,24 @@ minorGuidelineChanges.sort(key=lambda v: v['first_time'])
 chineseNumber = ['一', '二', '三', '四', '五']
 
 
-def formatTitle(title):
+def formatTitle(title, isPolicy):
+    if title == '可靠来源/布告板/评级指引':
+        return '可靠来源布告板评级指引'
+
+    title = re.sub(r'/(条目指引)', r'\1', title)
     title = re.sub(r'^(.+)/(.+)$', r'\g<1>（\g<2>）', title)
     title = re.sub(r'^(.+)_\((.+)\)$', r'\g<1>（\g<2>）', title)
+    if not re.search(r'方[針针]|指引|格式手[冊册]|五大支柱', title):
+        if isPolicy:
+            title = re.sub(r'^(.+?)(（.+?）)?$', r'\g<1>方針\g<2>', title)
+        else:
+            title = re.sub(r'^(.+?)(（.+?）)?$', r'\g<1>指引\g<2>', title)
     return title
 
 
 policyTextList = []
 for change in minorPolicyChanges:
-    title = formatTitle(change['page_title'])
+    title = formatTitle(change['page_title'], True)
     if len(change['changes']) == 1:
         policyTextList.append('《[[Special:Diff/{}/{}|{}]]》'.format(
             change['changes'][0][0],
@@ -305,7 +314,7 @@ for change in minorPolicyChanges:
 
 guidelineTextList = []
 for change in minorGuidelineChanges:
-    title = formatTitle(change['page_title'])
+    title = formatTitle(change['page_title'], False)
     if len(change['changes']) == 1:
         guidelineTextList.append('《[[Special:Diff/{}/{}|{}]]》'.format(
             change['changes'][0][0],
@@ -356,7 +365,6 @@ text = re.sub(r'(\[\[Special:链出更改/Category:维基百科指引\|指引]]�
 print('Diff:')
 pywikibot.showDiff(page.text, text)
 print('-' * 50)
-
 
 page.text = text
 page.save(summary='[[User:A2093064-bot/task/36|機器人36]]：自動更新雜項修訂', minor=False)
