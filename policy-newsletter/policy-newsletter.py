@@ -355,6 +355,5 @@ pywikibot.showDiff(page.text, text)
 print('-' * 50)
 
 
-if input('Save?').lower() in ['y', 'yes']:
-    page.text = text
-    page.save(summary='[[User:A2093064-bot/task/36|機器人36]]：自動更新雜項修訂', minor=False)
+page.text = text
+page.save(summary='[[User:A2093064-bot/task/36|機器人36]]：自動更新雜項修訂', minor=False)
