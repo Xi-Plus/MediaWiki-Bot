@@ -285,6 +285,9 @@ def formatTitle(title, isPolicy):
             title = re.sub(r'^(.+?)(（.+?）)?$', r'\g<1>方針\g<2>', title)
         else:
             title = re.sub(r'^(.+?)(（.+?）)?$', r'\g<1>指引\g<2>', title)
+
+    title = re.sub(r'名字空[间間]', '命名空間', title)
+
     return title
 
 
