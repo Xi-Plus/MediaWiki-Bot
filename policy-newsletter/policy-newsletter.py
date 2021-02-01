@@ -1,27 +1,35 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-
 import argparse
-# import json
 import re
+from datetime import date
 
 import pymysql
 import pywikibot
+from dateutil.relativedelta import relativedelta
 
 from config import host, password, user  # pylint: disable=E0611,W0614
 
 
 parser = argparse.ArgumentParser()
-parser.add_argument('page')
+parser.add_argument('--page')
+parser.add_argument('--months', type=int, default=0)
 args = parser.parse_args()
+print(args)
+
+title = args.page
+if title is None:
+    rundate = date.today() + relativedelta(months=args.months)
+    title = 'Wikipedia:維基百科政策簡報/存檔/{:04}-{:02}'.format(rundate.year, rundate.month)
 
 
 site = pywikibot.Site('zh', 'wikipedia')
 site.login()
 
 
-page = pywikibot.Page(site, args.page)
+print(title)
+page = pywikibot.Page(site, title)
 
 
 text = page.text
