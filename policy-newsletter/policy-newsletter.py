@@ -51,6 +51,11 @@ else:
     exit('Failed to get date range')
 
 
+if '簡報發送時間：</div>' not in text:
+    print('page is locked')
+    exit()
+
+
 ignoreRevids = []
 
 
