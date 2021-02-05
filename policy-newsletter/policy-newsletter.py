@@ -67,12 +67,15 @@ for temp in re.findall(r'\[\[Special:Permalink/(\d+)\|', policyText):
 talkPage = page.toggleTalkPage()
 if talkPage.exists():
     talkText = talkPage.text
-    pos1 = talkText.index('<!-- bot ignore start -->')
-    pos2 = talkText.index('<!-- bot ignore end -->')
-    talkText = talkText[pos1:pos2]
-    print(talkText)
-    for temp in re.findall(r'\[\[Special:Diff/(\d+)/(\d+)(?:\||\]\])', talkText):
-        ignoreRevids.append((int(temp[0]), int(temp[1])))
+    try:
+        pos1 = talkText.index('<!-- bot ignore start -->')
+        pos2 = talkText.index('<!-- bot ignore end -->')
+        talkText = talkText[pos1:pos2]
+        print(talkText)
+        for temp in re.findall(r'\[\[Special:Diff/(\d+)/(\d+)(?:\||\]\])', talkText):
+            ignoreRevids.append((int(temp[0]), int(temp[1])))
+    except ValueError:
+        print('cannot find flag')
 
 
 print('ignoreRevids', ignoreRevids)
