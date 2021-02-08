@@ -45,15 +45,12 @@ for secid in range(1, len(text)):
         print(title)
         if re.search(r'\|\s*status\s*=\s*((新申請)?<!--(不要修改本参数|不要修改本參數)-->)?\s*\|', sectext):
             flag = 0
-            if re.search(r'\|\s*set\s*=\s*([編编][輯辑])?[內内]容\s*\|', sectext):
-                flag = 1
+            if re.search(r'\|\s*set\s*=.*([編编][輯辑])?[內内]容', sectext):
+                flag |= 1
                 print('\tcontent')
-            elif re.search(r'\|\s*set\s*=\s*([編编][輯辑])?摘要\s*\|', sectext):
-                flag = 2
+            if re.search(r'\|\s*set\s*=.*([編编][輯辑])?摘要', sectext):
+                flag |= 2
                 print('\tsummary')
-            elif re.search(r'\|\s*set\s*=\s*([編编][輯辑])?[內内]容(、|\+)([編编][輯辑])?摘要\s*\|', sectext):
-                flag = 1 | 2
-                print('\tcontent & summary')
             if flag != 0:
                 ids = re.findall(r'\|id\d+\s*=\s*(\d+)', sectext)
                 if ids:
