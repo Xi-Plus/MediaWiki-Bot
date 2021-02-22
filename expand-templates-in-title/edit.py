@@ -2,10 +2,10 @@ import argparse
 import json
 import os
 import re
-from pywikibot.data.api import Request
 
 os.environ['PYWIKIBOT_DIR'] = os.path.dirname(os.path.realpath(__file__))
 import pywikibot
+from pywikibot.data.api import Request
 
 from config import config_page_name  # pylint: disable=E0611,W0614
 
