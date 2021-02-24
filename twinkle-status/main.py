@@ -56,20 +56,20 @@ def parse_type(summary, ns, title):
         return 'batch', 'delete'
 
     # block
-    if ns == 3 and re.search(r'{{uw-([uvds3]block|block[123])|{{(blocked proxy|anonblock|schoolblock)}}', summary):
+    if ns == 3 and re.search(r'封[禁鎖]通知', summary):
         return 'block', 'notice'
-    if ns == 2 and re.search(r'(標記被永久封[禁鎖]的用戶頁|标记被永久封禁的用户页)', summary):
+    if ns == 2 and re.search(r'(標記被永久封鎖的使用者頁面|标记被永久封禁的用户页)', summary):
         return 'block', 'taguser'
 
     # close
     CLOSEREASON = (
-        r'((轉移至|转移至)(維基導遊|維基詞典|维基词典|维基共享资源|其他維基計劃)|快速保留|請求理由消失|请求理由消失|重定向|请求无效|請求無效|保留|删除|刪除|提删者未取得提删资格'
+        r'((轉移至|转移至)(維基導遊|維基詞典|维基词典|维基共享资源|其他維基計劃)|快速保留|請求理由消失|请求理由消失|重定向|请求无效|請求無效|暫時保留|保留|删除|刪除|提删者未取得提删资格'
         + r'|提刪者未取得提刪資格|移动|并入|併入|轉交侵權|转交侵权|无共识|重複提出|移動|無共識|重复提出|目标页面或档案不存在，无效)'
     )
     if (ns == 4 and re.search(r'^(頁面存廢討論|檔案存廢討論)/記錄/', title)
             and re.search(CLOSEREASON, summary)):
         return 'close', 'close'
-    if re.search(r'Wikipedia:(頁面存廢討論|檔案存廢討論)/記錄/\d+/\d+/\d+\]\]：.*' + CLOSEREASON, summary):
+    if re.search(r'Wikipedia:(頁面存廢討論|檔案存廢討論)/記錄/\d+/\d+/\d+#.*\]\]：.*' + CLOSEREASON, summary):
         return 'close', 'tagtalk'
     if re.search(r'(存廢討論關閉|存废讨论关闭)：', summary):
         return 'close', 'rmtem'
@@ -101,7 +101,7 @@ def parse_type(summary, ns, title):
     # protect
     if ns == 4 and title == '请求保护页面' and re.search(r'请求对.+保护', summary):
         return 'protect', 'request'
-    if ns == 4 and title == '请求保护页面' and re.search(r'(半|全|白紙|解除)(保護|保护)', summary):
+    if ns == 4 and title == '请求保护页面' and re.search(r'(半|全|白紙|白纸|解除|移動)(保護|保护)', summary):
         return 'protect', 'close'
     if re.search(r'移除保護模板|(加入|添加){{pp-', summary):
         return 'protect', 'tag'
@@ -129,18 +129,24 @@ def parse_type(summary, ns, title):
         return 'tag', 'movetagtalk'
 
     # talkback
-    if ns == 3 and re.search(r'(回复通告|回覆通告|通知：有新郵件|有關.+的通知)', summary):
+    if ns == 3 and re.search(r'(回复通告|回覆通告|通知：有新郵件|通知：有新邮件|有關.+的通知)', summary):
         return 'talkback', 'talkback'
 
     # unlink
-    if re.search(r'(注释出文件使用|取消链接到)', summary):
+    if re.search(r'(注释文件使用|取消使用已被刪除檔案)', summary):
         return 'unlink', 'unlink'
 
     # warn
-    if ns == 3 and re.search(r'((層級|层级)(1|2|3|4|4im)|单层级通知|單層級通知|单层级警告|單層級警告|提示)：|您翻譯的質量有待改善', summary):
+    if ns == 3 and re.search(r'(提醒|警告|注意)：', summary):
         return 'warn', 'warn'
 
+    # welcome
+    if ns == 3 and re.search(r'歡迎來到維基百科|欢迎来到维基百科', summary):
+        return 'welcome', 'welcome'
+
     # xfd
+    if ns == 2 and re.search(r'(记录对|記錄對).+(的存废讨论提名|的存廢討論提名)', summary):
+        return 'speedy', 'record'
     if ns == 4 and re.search(r'^(頁面存廢討論|檔案存廢討論)/記錄/', title) and re.search(r'(添加|加入)\[\[', summary):
         return 'xfd', 'report'
     if ns == 3 and re.search(r'通知：(页面|文件).+存废讨论提名', summary):
@@ -162,6 +168,7 @@ def check_branch_from_js(user):
         return 'gadget'
 
     text = page.text
+    text = re.sub(r'\n\s*//.*?\n', '\n', text)
     if 'Xiplus/Twinkle.js' in text:
         return 'xiplus'
     m = re.search(r'User:(.+?)/Twinkle.js', text)
