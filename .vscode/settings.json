@@ -12,5 +12,6 @@
 		"StripNewlineWithinClassBody"
 	],
 	"phpfmt.psr2": false,
-	"phpfmt.detect_indent": true
+	"phpfmt.detect_indent": true,
+	"python.linting.pylintEnabled": true
 }
