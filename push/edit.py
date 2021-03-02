@@ -48,6 +48,19 @@ while web is None:
 print('web', web)
 print()
 
+
+os.environ['PYWIKIBOT_DIR'] = os.path.join(
+    os.path.dirname(os.path.realpath(__file__)),
+    'user-config',
+    webname
+)
+
+import pywikibot
+
+site = pywikibot.Site()
+site.login()
+
+
 print('===== source =====')
 source = None
 while source is None:
@@ -123,17 +136,6 @@ if temp != '':
     summary = temp
 print('summary:', summary)
 print()
-
-os.environ['PYWIKIBOT_DIR'] = os.path.join(
-    os.path.dirname(os.path.realpath(__file__)),
-    'user-config',
-    webname
-)
-
-import pywikibot
-
-site = pywikibot.Site()
-site.login()
 
 for fromname in files:
     toname = files[fromname]
