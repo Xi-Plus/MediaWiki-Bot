@@ -51,7 +51,7 @@ else:
     exit('Failed to get date range')
 
 
-if '本期簡報發送者：</div>' not in text:
+if not page.botMayEdit():
     print('page is locked')
     exit()
 
