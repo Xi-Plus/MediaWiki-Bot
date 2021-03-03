@@ -12,60 +12,42 @@ require __DIR__ . "/../function/curl.php";
 require __DIR__ . "/../function/login.php";
 require __DIR__ . "/../function/edittoken.php";
 
-function purge($page) {
+function purge($pages)
+{
 	global $edittoken, $C;
+
+	if (!is_array($pages)) {
+		$pages = [$pages];
+	}
+	$pages = implode('|', $pages);
 
 	if ($C["sleep"] !== 0) {
 		usleep($C["sleep"] * 1000 * 1000);
 	}
-	echo "purge " . $page . "\n";
-
-	$starttimestamp = time();
-	$res = cURL($C["wikiapi"] . "?" . http_build_query(array(
-		"action" => "query",
-		"prop" => "revisions",
-		"format" => "json",
-		"rvprop" => "content|timestamp",
-		"titles" => $page,
-	)));
-	if ($res === false) {
-		exit("fetch page fail\n");
-	}
-	$res = json_decode($res, true);
-	if (!isset($res["query"]["pages"])) {
-		echo $page . " not found!\n";
-		return;
-	}
-	$pages = current($res["query"]["pages"]);
-	if (isset($pages["missing"])) {
-		echo $page . " not found!\n";
-		return;
-	}
-	$text = $pages["revisions"][0]["*"];
-	$basetimestamp = $pages["revisions"][0]["timestamp"];
+	echo "purge " . $pages . "\n";
 
 	$post = array(
-		"action" => "edit",
+		"action" => "purge",
 		"format" => "json",
-		"title" => $page,
-		"summary" => "purge",
-		"text" => $text,
+		"titles" => $pages,
+		"forcelinkupdate" => "1",
 		"token" => $edittoken,
-		"minor" => "",
-		"nocreate" => "",
-		"starttimestamp" => $starttimestamp,
-		"basetimestamp" => $basetimestamp,
 	);
 	if (!$C["test"]) {
 		$res = cURL($C["wikiapi"], $post);
 	} else {
 		$res = false;
-		file_put_contents(__DIR__ . "/out.txt", $text);
 	}
 	$res = json_decode($res, true);
 	if (isset($res["error"])) {
-		echo "edit fail\n";
+		echo "purge fail\n";
 		var_dump($res["error"]);
+	}
+}
+function multipurge($pages)
+{
+	foreach (array_chunk($pages, 10) as $chunkedpages) {
+		purge($chunkedpages);
 	}
 }
 
@@ -106,14 +88,16 @@ if (!isset($options["p"]) && !isset($options["c"]) && !isset($options["t"])) {
 		$options["p"][] = $line;
 	}
 }
+
+$pages = [];
+
 if (isset($options["p"])) {
 	if (is_string($options["p"])) {
 		$options["p"] = [$options["p"]];
 	}
-	foreach ($options["p"] as $page) {
-		purge($page);
-	}
+	$pages = array_merge($pages, $options["p"]);
 }
+
 if (isset($options["t"])) {
 	if (is_string($options["t"])) {
 		$options["t"] = [$options["t"]];
@@ -133,11 +117,12 @@ if (isset($options["t"])) {
 		$res = json_decode($res, true);
 		$pagelist = $res["query"]["embeddedin"];
 		foreach ($pagelist as $page) {
-			purge($page["title"]);
+			$pages[] = $page["title"];
 		}
-		purge($template);
+		$pages[] = $template;
 	}
 }
+
 if (isset($options["c"])) {
 	if (is_string($options["c"])) {
 		$options["c"] = [$options["c"]];
@@ -160,8 +145,10 @@ if (isset($options["c"])) {
 		$res = json_decode($res, true);
 		$pagelist = $res["query"]["categorymembers"];
 		foreach ($pagelist as $page) {
-			purge($page["title"]);
+			$pages[] = $page["title"];
 		}
-		purge($category);
+		$pages[] = $category;
 	}
 }
+
+multipurge($pages);
