@@ -373,6 +373,10 @@ text = re.sub(r'(\[\[Special:链出更改/Category:维基百科指引\|指引]]�
 
 # print(text)
 
+if page.text == text:
+    print('No diff')
+    exit()
+
 print('Diff:')
 pywikibot.showDiff(page.text, text)
 print('-' * 50)
