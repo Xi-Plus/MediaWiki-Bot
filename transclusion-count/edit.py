@@ -156,7 +156,7 @@ for section in output:
     report.text = report_template.format('\n'.join(output[section]))
     if not args.dry_run:
         try:
-            report.save(cfg['summary2'])
+            report.save(cfg['summary'])
         except Exception as e:
             print('Error at {}: {}'.format(time.ctime(), e))
     else:
