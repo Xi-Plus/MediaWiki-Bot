@@ -1,6 +1,7 @@
 # global
 .vscode/
 apicache-py3/
+log/
 tmp/
 config.php
 config.py
