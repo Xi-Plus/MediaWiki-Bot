@@ -107,9 +107,8 @@ while not connectSuccess:
         if tries > 24:
             print('Script failed after 24 tries at {}.'.format(time.ctime()))
             raise SystemExit(e)
-        else:
-            print('Waiting 1 hour starting at {}...'.format(time.ctime()))
-            time.sleep(3600)
+        print('Waiting 1 hour starting at {}...'.format(time.ctime()))
+        time.sleep(3600)
 
 if args.dry_run:
     try:
