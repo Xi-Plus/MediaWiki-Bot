@@ -346,7 +346,8 @@ for page in pages:
                             if save in ["Yes", "yes", "Y", "y", ""]:
                                 drv_page.text = drv_page_text
                                 drv_page.save(summary=summary,
-                                              minor=False, botflag=False)
+                                              minor=False, botflag=False,
+                                              apply_cosmetic_changes=False)
                         else:
                             pywikibot.log('Already reported to DRV.')
 
