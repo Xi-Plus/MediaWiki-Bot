@@ -1,4 +1,5 @@
 import argparse
+import collections
 import json
 import os
 import re
@@ -8,7 +9,6 @@ import pywikibot
 from pywikibot.data.api import Request
 
 from config import config_page_name  # pylint: disable=E0611,W0614
-
 
 parser = argparse.ArgumentParser()
 parser.add_argument('lang', nargs='?', default='zh')
@@ -56,10 +56,7 @@ while True:
     for key in data['query-continue']['querypage']:
         parameters[key] = data['query-continue']['querypage'][key]
 
-
-text_temp = {}
-for ns in cfg['namespaces']:
-    text_temp[int(ns)] = ''
+text_temp = collections.defaultdict(str)
 
 for row in allpages:
     title = row['title']
@@ -75,13 +72,13 @@ for row in allpages:
     if skiped:
         continue
 
-    text_temp[row['ns']] += '# [[:{}]]\n'.format(title)
+    text_temp[int(row['ns'])] += '# [[:{}]]\n'.format(title)
 
 
 text = cfg['header_text']
 
 for ns in text_temp:
-    text += '== {} ==\n'.format(cfg['namespaces'][str(ns)])
+    text += '== {} ==\n'.format(site.namespace(ns))
     text += text_temp[ns]
 
 
