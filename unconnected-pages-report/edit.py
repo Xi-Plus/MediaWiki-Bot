@@ -78,7 +78,7 @@ for row in allpages:
 text = cfg['header_text']
 
 for ns in text_temp:
-    text += '== {} ==\n'.format(site.namespace(ns))
+    text += '== {} ==\n'.format(site.namespace(ns) if ns != 0 else 'Main')
     text += text_temp[ns]
 
 
