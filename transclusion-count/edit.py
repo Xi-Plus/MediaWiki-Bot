@@ -151,9 +151,9 @@ for row in result2:
     except Exception:
         output['other'].append(table_row)
 
-for section in output:
+for section, content in sorted(output.items()):
     report = pywikibot.Page(site, cfg['data_root'] + section)
-    report.text = report_template.format('\n'.join(output[section]))
+    report.text = report_template.format('\n'.join(content))
     if not args.dry_run:
         try:
             report.save(cfg['summary'])
