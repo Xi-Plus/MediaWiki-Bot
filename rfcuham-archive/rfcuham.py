@@ -34,7 +34,7 @@ for section in wikicode.get_sections()[2:]:
     title = str(section.get(0).title)
     print(title, end="\t")
     for template in section.filter_templates():
-        if template.name.lower() == "status2":
+        if template.name.lower() == "Status":
             if template.has(1):
                 status = template.get(1)
             else:

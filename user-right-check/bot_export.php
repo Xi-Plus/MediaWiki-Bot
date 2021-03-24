@@ -24,7 +24,7 @@ $count = 1;
 foreach ($row as $user) {
 	?>
 ==[[User:<?=$user["botname"]?>|<?=$user["botname"]?>]]==<br>
-*{{status2|新提案}}<br>
+*{{Status|新提案}}<br>
 *機器人：{{User-multi|user=<?=$user["botname"]?>|t|c|l|cr}}<br>
 *操作者：{{User-multi|user=<?=$user["username"]?>|t|c|l|sul2}}<br>
 *機器人最後活動時間：<?php

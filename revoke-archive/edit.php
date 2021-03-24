@@ -102,9 +102,9 @@ for ($i = $C["fail_retry"]; $i > 0; $i--) {
 			foreach ($text[$i] as $temp) {
 				preg_match("/{{User\|(.+)}}/", $temp, $m);
 				echo $m[1] . "\t";
-				preg_match("/{{status2\|(.+?)(\||}})/", $temp, $m);
+				preg_match("/{{Status\|(.+?)(\||}})/", $temp, $m);
 				echo "status " . $m[1] . "\t";
-				if (in_array($m[1], $cfg["status2done"])) {
+				if (in_array($m[1], $cfg["statusdone"])) {
 					preg_match_all("/\d{4}年\d{1,2}月\d{1,2}日 \(.{3}\) \d{2}\:\d{2} \(UTC\)/", $temp, $m);
 					$firsttime = time();
 					$lasttime = 0;

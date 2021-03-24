@@ -90,7 +90,7 @@ for ($i = $C["fail_retry"]; $i > 0; $i--) {
 			continue;
 		}
 		$count++;
-		$out .= "*{{User|" . $user["name"] . "}}\n*:{{status2|新提案}}\n*:需複審或解除之權限：";
+		$out .= "*{{User|" . $user["name"] . "}}\n*:{{Status|新提案}}\n*:需複審或解除之權限：";
 		foreach ($user["rights"] as $key => $value) {
 			if ($key) {
 				$out .= "、";
