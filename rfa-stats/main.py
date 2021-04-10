@@ -9,8 +9,6 @@ from datetime import datetime, timezone
 
 os.environ['PYWIKIBOT_DIR'] = os.path.dirname(os.path.realpath(__file__))
 import pywikibot
-from config import config_page_name  # pylint: disable=E0611,W0614
-
 
 os.environ['TZ'] = 'UTC'
 
@@ -107,7 +105,7 @@ newresult = []
 try:
     for rev in allrevs:
         if rev.revid not in oldresultdict:
-            if rev.revid not in rfaPage._revisions:
+            if rev.revid not in rfaPage._revisions:  # pylint: disable=W0212
                 rfaPage.revisions(content=True, reverse=True, starttime=rev.timestamp, total=50)
 
             print('#{} Parsing {} {}'.format(len(newresult) + 1, rev.timestamp, rev.revid))
