@@ -26,7 +26,8 @@ MostTranscludedPages/config.*.php
 move-faga/page.txt
 move-g15-file/skipedpage.txt
 remove-broken-file/skipedpage.txt
-RFA-stats/list/
+rfa-stats/data/
+rfa-stats-php/list/
 user-config/
 *.csv
 *.pyc
