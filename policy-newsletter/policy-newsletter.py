@@ -288,7 +288,7 @@ def formatTitle(title, isPolicy):
     title = re.sub(r'/(条目指引)', r'\1', title)
     title = re.sub(r'^(.+)/(.+)$', r'\g<1>（\g<2>）', title)
     title = re.sub(r'^(.+)_\((.+)\)$', r'\g<1>（\g<2>）', title)
-    if not re.search(r'方[針针]|指引|格式手[冊册]|五大支柱|维基百科不是什么', title):
+    if not re.search(r'方[針针]|指引|格式手[冊册]|五大支柱|维基百科不是什么|命名常规|忽略所有规则', title):
         if isPolicy:
             title = re.sub(r'^(.+?)(（.+?）)?$', r'\g<1>方針\g<2>', title)
         else:
