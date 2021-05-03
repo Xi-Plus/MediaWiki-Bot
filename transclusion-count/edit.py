@@ -8,6 +8,7 @@ import json
 import os
 import re
 import time
+from math import floor, log10
 
 import pymysql
 os.environ['PYWIKIBOT_DIR'] = os.path.dirname(os.path.realpath(__file__))
@@ -21,6 +22,7 @@ LOGDIR = os.path.join(ROOTDIR, 'log')
 os.makedirs(LOGDIR, exist_ok=True)
 
 parser = argparse.ArgumentParser()
+parser.add_argument('--sigfigs', type=int, default=2)
 parser.add_argument('--dry-run', action='store_true')
 parser.set_defaults(dry_run=False)
 args = parser.parse_args()
@@ -131,7 +133,11 @@ for row in result1:
     except Exception:
         tl_title = str(row[0])
     index_letter = tl_title[0]
-    uses = row[1]
+    if row[1] < 100000:  # Use an extra sigfig for very large counts
+        sigfigs = args.sigfigs - 1
+    else:
+        sigfigs = args.sigfigs
+    uses = round(row[1], -int(floor(log10(row[1]))) + sigfigs)
     table_row = '''["%s"] = %i,''' % (tl_title.replace("\\", "\\\\").replace('"', '\\"'), uses)
     try:
         output[index_letter].append(table_row)
@@ -144,7 +150,11 @@ for row in result2:
     except Exception:
         tl_title = str(row[0])
     index_letter = tl_title[0]
-    uses = row[1]
+    if row[1] < 100000:  # Use an extra sigfig for very large counts
+        sigfigs = args.sigfigs - 1
+    else:
+        sigfigs = args.sigfigs
+    uses = round(row[1], -int(floor(log10(row[1]))) + sigfigs)
     table_row = '''["Module:{}"] = {},'''.format(tl_title.replace('\\', '\\\\').replace('"', '\\"'), uses)
     try:
         output[index_letter].append(table_row)
