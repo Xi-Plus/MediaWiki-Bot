@@ -10,7 +10,7 @@ import requests
 os.environ['PYWIKIBOT_DIR'] = os.path.dirname(os.path.realpath(__file__))
 import pywikibot
 
-from util import headers, noteTA
+from util import headers, noteTA  # pylint: disable=E0611
 
 
 def translateText(strings, tolang, noteTA, headers):
