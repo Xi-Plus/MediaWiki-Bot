@@ -1,7 +1,8 @@
 <?php
 require __DIR__ . "/../config/config.php";
 if (!in_array(PHP_SAPI, $C["allowsapi"])) {
-	exit("No permission");
+	echo "No permission";
+	exit(0);
 }
 
 set_time_limit(600);
@@ -16,7 +17,8 @@ function converttime($chitime) {
 	if (preg_match("/(\d{4})年(\d{1,2})月(\d{1,2})日 \(.{3}\) (\d{2})\:(\d{2}) \(UTC\)/", $chitime, $m)) {
 		return strtotime($m[1] . "/" . $m[2] . "/" . $m[3] . " " . $m[4] . ":" . $m[5]);
 	} else {
-		exit("converttime fail\n");
+		echo "converttime fail\n";
+		exit(0);
 	}
 }
 function TimediffFormat($time) {
@@ -39,12 +41,14 @@ echo "The time now is " . date("Y-m-d H:i:s") . " (UTC)\n";
 
 $config_page = file_get_contents($C["config_page"]);
 if ($config_page === false) {
-	exit("get config failed\n");
+	echo "get config failed\n";
+	exit(0);
 }
 $cfg = json_decode($config_page, true);
 
 if (!$cfg["enable"]) {
-	exit("disabled\n");
+	echo "disabled\n";
+	exit(0);
 }
 
 var_dump($cfg);
@@ -65,7 +69,8 @@ for ($i = $C["fail_retry"]; $i > 0; $i--) {
 		"titles" => $cfg["main_page_name"],
 	)));
 	if ($res === false) {
-		exit("fetch page fail\n");
+		echo "fetch page fail\n";
+		exit(0);
 	}
 	$res = json_decode($res, true);
 	$pages = current($res["query"]["pages"]);
@@ -105,7 +110,8 @@ for ($i = $C["fail_retry"]; $i > 0; $i--) {
 				"ususers" => $user,
 			)));
 			if ($res === false) {
-				exit("fetch page fail\n");
+				echo "fetch page fail\n";
+				exit(0);
 			}
 			$res = json_decode($res, true);
 			if (isset($res["query"]["users"][0]["blockexpiry"]) && in_array($res["query"]["users"][0]["blockexpiry"], $C['blocked_expiry'])) {
@@ -211,7 +217,8 @@ for ($i = $C["fail_retry"]; $i > 0; $i--) {
 	if (isset($res["error"])) {
 		echo "edit fail\n";
 		if ($i === 1) {
-			exit("quit\n");
+			echo "quit\n";
+			exit(0);
 		} else {
 			echo "retry\n";
 			continue;
@@ -281,7 +288,8 @@ for ($i = $C["fail_retry"]; $i > 0; $i--) {
 	if (isset($res["error"])) {
 		echo "edit fail\n";
 		if ($i === 1) {
-			exit("quit\n");
+			echo "quit\n";
+			exit(0);
 		} else {
 			echo "retry\n";
 			continue;
