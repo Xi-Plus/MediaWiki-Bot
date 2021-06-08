@@ -78,7 +78,6 @@ with open('list.txt', 'r', encoding='utf8') as f:
         print(pagehant.text)
         print('-' * 50)
         pywikibot.showDiff(pagehans.text, newtext)
-        input('Save?')
         pagehans.text = newtext
 
         pagehans.save(summary=summary, asynchronous=True)
