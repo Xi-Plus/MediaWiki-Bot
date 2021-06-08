@@ -175,7 +175,8 @@ for ($i = $C["fail_retry"]; $i > 0; $i--) {
 	}
 
 	if ($archive_count["sum"] === 0) {
-		exit("no change\n");
+		echo "no change\n";
+		exit(0);
 	}
 
 	echo "start edit\n";
