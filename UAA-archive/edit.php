@@ -51,8 +51,6 @@ if (!$cfg["enable"]) {
 	exit(0);
 }
 
-var_dump($cfg);
-
 login("bot");
 $edittoken = edittoken();
 
@@ -76,7 +74,6 @@ for ($i = $C["fail_retry"]; $i > 0; $i--) {
 	$pages = current($res["query"]["pages"]);
 	$text = $pages["revisions"][0]["*"];
 	$basetimestamp = $pages["revisions"][0]["timestamp"];
-	echo "get main page\n";
 
 	$hash = md5(uniqid(rand(), true));
 	$text = preg_replace("/^(\*\s*{{\s*user-uaa\s*\|)/mi", $hash . "$1", $text);
@@ -84,7 +81,6 @@ for ($i = $C["fail_retry"]; $i > 0; $i--) {
 	$oldpagetext = trim($text[0]);
 	$newpagetext = "";
 	unset($text[0]);
-	echo "find " . count($text) . " reports\n";
 
 	$archive_count = [
 		"sum" => 0,
@@ -101,7 +97,6 @@ for ($i = $C["fail_retry"]; $i > 0; $i--) {
 		$lasttime = 0;
 		if (preg_match("/{{user-uaa\|(?:1=)?(.+?)}}/", $temp, $m)) {
 			$user = $m[1];
-			echo "User:" . $user . "\t";
 			$res = cURL($C["wikiapi"] . "?" . http_build_query(array(
 				"action" => "query",
 				"format" => "json",
@@ -122,13 +117,10 @@ for ($i = $C["fail_retry"]; $i > 0; $i--) {
 				$tagged = true;
 			}
 		} else if (preg_match("/^\* *{{deltalk|/i", $temp)) {
-			echo "Deltalk\t";
 			$blocked = true;
 		} else {
-			echo "Unknown user\t";
+			// Unknown user
 		}
-		echo ($blocked ? "blocked" : "not blocked") . "\t";
-		echo ($tagged ? "tagged\t" : "");
 
 		if (preg_match_all("/\d{4}年\d{1,2}月\d{1,2}日 \(.{3}\) \d{2}\:\d{2} \(UTC\)/", $temp, $m)) {
 			foreach ($m[0] as $timestr) {
@@ -146,8 +138,6 @@ for ($i = $C["fail_retry"]; $i > 0; $i--) {
 			$lasttime = time();
 			$temp .= "{{subst:Unsigned-before|~~~~~}}";
 		}
-		echo date("Y/m/d H:i", $starttime) . "\t";
-		echo date("Y/m/d H:i", $lasttime) . "\t";
 
 		$archive_type = null;
 		if (
@@ -169,12 +159,10 @@ for ($i = $C["fail_retry"]; $i > 0; $i--) {
 		}
 
 		if (is_string($archive_type)) {
-			echo "archive\n";
 			$newpagetext .= "\n" . $temp;
 			$archive_count[$archive_type]++;
 			$archive_count["sum"]++;
 		} else {
-			echo "not archive\n";
 			$oldpagetext .= "\n\n" . $temp;
 			$archive_count["remain"]++;
 		}
@@ -185,9 +173,6 @@ for ($i = $C["fail_retry"]; $i > 0; $i--) {
 		exit(0);
 	}
 
-	echo "start edit\n";
-
-	echo "edit main page\n";
 	$summary_append = [];
 	foreach ($cfg["summary_append"] as $type => $_) {
 		if ($archive_count[$type] > 0) {
@@ -224,10 +209,9 @@ for ($i = $C["fail_retry"]; $i > 0; $i--) {
 			continue;
 		}
 	} else {
-		echo "saved\n";
+		// saved
 	}
 
-	echo "edit archive page\n";
 	$page = sprintf(
 		$cfg["archive_page_name"],
 		$year,
@@ -295,7 +279,7 @@ for ($i = $C["fail_retry"]; $i > 0; $i--) {
 			continue;
 		}
 	} else {
-		echo "saved\n";
+		// saved
 		break;
 	}
 }
