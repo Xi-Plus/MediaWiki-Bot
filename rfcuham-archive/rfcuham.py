@@ -70,12 +70,21 @@ cupage.save(summary=cfg["main_page_summary"].format(count), minor=True)
 
 for target in archivelist:
     targetpage = pywikibot.Page(site, cfg["archive_page_name"].format(target[0], target[1]))
-    text = targetpage.text
+    oldtext = targetpage.text
     print(targetpage.title())
+    appendtext = ''
     if not targetpage.exists():
-        text = cfg["archive_page_preload"]
-    text += "\n\n" + "\n\n".join(archivelist[target])
+        appendtext += cfg['archive_page_preload']
+    appendtext += '\n\n'.join(archivelist[target])
 
-    pywikibot.showDiff(targetpage.text, text)
-    targetpage.text = text
-    targetpage.save(summary=cfg["archive_page_summary"].format(len(archivelist[target])), minor=True)
+    targetpage.text = oldtext + '\n\n' + appendtext
+    try:
+        targetpage.save(summary=cfg['archive_page_summary'].format(len(archivelist[target])), minor=True)
+    except pywikibot.exceptions.PageSaveRelatedError as e:
+        appendtext = re.sub(r'\[https?://(.+?)\]', r'\1', appendtext)
+        appendtext = re.sub(r'https?://', '', appendtext)
+        targetpage.text = oldtext + '\n\n' + appendtext
+        try:
+            targetpage.save(summary=cfg['archive_page_summary'].format(len(archivelist[target])), minor=True)
+        except pywikibot.exceptions.PageSaveRelatedError as e:
+            pywikibot.error(e)
