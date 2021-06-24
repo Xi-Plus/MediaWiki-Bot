@@ -64,7 +64,6 @@ text = str(wikicode)
 if cupage.text == text:
     exit("nothing changed")
 
-pywikibot.showDiff(cupage.text, text)
 cupage.text = text
 cupage.save(summary=cfg["main_page_summary"].format(count), minor=True)
 
