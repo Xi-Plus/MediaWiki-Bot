@@ -40,7 +40,7 @@ def checkImageExists(title):
     if image.exists():
         return True
     try:
-        if image.fileIsShared():
+        if image.file_is_shared():
             return True
     except Exception:
         pass

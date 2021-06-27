@@ -39,7 +39,7 @@ if mainpage.exists():
 if mainpage.namespace().id == 6:
     image = pywikibot.FilePage(site, mainpage.title())
     try:
-        if image.fileIsShared():
+        if image.file_is_shared():
             exit("mainpage exist (shared file).\n")
     except Exception as e:
         pass

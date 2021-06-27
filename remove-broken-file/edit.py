@@ -87,7 +87,7 @@ def checkImageExists(title):
     if image.exists():
         return True
     try:
-        if image.fileIsShared():
+        if image.file_is_shared():
             return True
     except Exception:
         pass
@@ -189,7 +189,7 @@ for page in pages:
 
             if not image.exists():
                 try:
-                    if image.fileIsShared():
+                    if image.file_is_shared():
                         continue
                 except Exception as e:
                     pass
