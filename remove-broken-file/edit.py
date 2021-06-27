@@ -34,7 +34,6 @@ sitecommons = pywikibot.Site("commons", "commons")
 config_page = pywikibot.Page(site, config_page_name)
 cfg = config_page.text
 cfg = json.loads(cfg)
-pywikibot.log(json.dumps(cfg, indent=4, ensure_ascii=False))
 
 if not cfg["enable"]:
     exit("disabled\n")
