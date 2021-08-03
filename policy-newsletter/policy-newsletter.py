@@ -10,6 +10,7 @@ import pymysql
 
 os.environ['PYWIKIBOT_DIR'] = os.path.dirname(os.path.realpath(__file__))
 import pywikibot
+import pywikibot.cosmetic_changes
 from dateutil.relativedelta import relativedelta
 
 from config import host, password, user  # pylint: disable=E0611,W0614
@@ -40,6 +41,9 @@ if not page.exists():
 
 text = page.text
 
+# cosmetic changes
+cc_toolkit = pywikibot.cosmetic_changes.CosmeticChangesToolkit(page)
+text = cc_toolkit.change(text)
 text = re.sub(r'\[\[(?:Special|特殊):(?:Diff|差异|差異|编辑差异)', '[[Special:Diff', text)
 text = re.sub(r'\[\[(?:Special|特殊):(?:PermanentLink|Permalink|固定链接|永久链接)', '[[Special:Permalink', text)
 text = re.sub(r'\[\[(?:Special|特殊):(?:Recentchangeslinked|RelatedChanges|链出更改|鏈出更改|連出更改|最近链出更改|相关更改)/', '[[Special:链出更改/', text)
@@ -387,4 +391,4 @@ pywikibot.showDiff(page.text, text)
 print('-' * 50)
 
 page.text = text
-page.save(summary='[[User:A2093064-bot/task/36|機器人36]]：自動更新雜項修訂', minor=False)
+page.save(summary='[[User:A2093064-bot/task/36|機器人36]]：自動更新雜項修訂', minor=False, apply_cosmetic_changes=True)
