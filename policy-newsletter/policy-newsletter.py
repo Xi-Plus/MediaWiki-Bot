@@ -39,6 +39,11 @@ if not page.exists():
 
 
 text = page.text
+
+text = re.sub(r'\[\[(?:Special|特殊):(?:Diff|差异|差異|编辑差异)', '[[Special:Diff', text)
+text = re.sub(r'\[\[(?:Special|特殊):(?:PermanentLink|Permalink|固定链接|永久链接)', '[[Special:Permalink', text)
+text = re.sub(r'\[\[(?:Special|特殊):(?:Recentchangeslinked|RelatedChanges|链出更改|鏈出更改|連出更改|最近链出更改|相关更改)/', '[[Special:链出更改/', text)
+
 # print(text)
 
 
@@ -288,7 +293,7 @@ def formatTitle(title, isPolicy):
     title = re.sub(r'/(条目指引)', r'\1', title)
     title = re.sub(r'^(.+)/(.+)$', r'\g<1>（\g<2>）', title)
     title = re.sub(r'^(.+)_\((.+)\)$', r'\g<1>（\g<2>）', title)
-    if not re.search(r'方[針针]|指引|格式手[冊册]|五大支柱|维基百科不是什么|命名常规|忽略所有规则', title):
+    if not re.search(r'方[針针]|指引|格式手[冊册]|五大支柱|维基百科不是什么|命名常规|忽略所有规则|游戏维基规则|不要伤害新手', title):
         if isPolicy:
             title = re.sub(r'^(.+?)(（.+?）)?$', r'\g<1>方針\g<2>', title)
         else:
