@@ -474,7 +474,7 @@ for page in pages:
     if save in ["Yes", "yes", "Y", "y", ""]:
         page.text = text
         try:
-            page.save(summary=summary, minor=False)
+            page.save(summary=summary, minor=False, apply_cosmetic_changes=True)
             limit += 1
         except pywikibot.exceptions.PageSaveRelatedError as e:
             pywikibot.error(e)
@@ -483,7 +483,7 @@ for page in pages:
             pywikibot.log('Trying to remove url in summary and save again.')
             pywikibot.output("summary = {}".format(summary))
             try:
-                page.save(summary=summary, minor=False)
+                page.save(summary=summary, minor=False, apply_cosmetic_changes=True)
                 limit += 1
             except pywikibot.exceptions.PageSaveRelatedError as e:
                 pywikibot.error(e)
