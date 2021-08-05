@@ -23,6 +23,13 @@ print(json.dumps(cfg, indent=4, ensure_ascii=False))
 if not cfg["enable"]:
     exit("disabled\n")
 
+# Load {{Status}} parameter data
+status_config_text = pywikibot.Page(site, 'Module:Status/data.json').text
+status_config = json.loads(status_config_text)
+status_to_archive = []
+for status in ['done', 'nd', 'wd', 'ad', 'rd']:
+    status_to_archive.extend(status_config[status]['status'])
+
 cupage = pywikibot.Page(site, cfg["main_page_name"])
 text = cupage.text
 
@@ -41,7 +48,7 @@ for section in wikicode.get_sections()[2:]:
                 status = template.get(1)
             break
     print('status', status, end='\t')
-    if status in cfg['status_to_archive']:
+    if status in status_to_archive:
         lasttime = datetime(1, 1, 1)
         for m in re.findall(r'(\d{4})年(\d{1,2})月(\d{1,2})日 \(.\) (\d{2}):(\d{2}) \(UTC\)', str(section)):
             d = datetime(int(m[0]), int(m[1]), int(m[2]), int(m[3]), int(m[4]))
