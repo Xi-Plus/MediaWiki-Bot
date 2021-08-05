@@ -48,7 +48,13 @@ foreach ($dates as $date) {
 	$realdate = date("Y-m-d", strtotime($date));
 	echo $realdate . "\n";
 	$url = "https://xtools.wmflabs.org/adminstats/zh.wikipedia.org/$today/$realdate?uselang=en";
-	$html = file_get_contents($url);
+	for ($i = 0; $i < 3; $i++) {
+		$html = file_get_contents($url);
+		if ($html !== false) {
+			break;
+		}
+		sleep(3);
+	}
 	if ($html === false) {
 		exit("fetch fail\n");
 	}
