@@ -5,6 +5,7 @@ import bisect
 import json
 import os
 import re
+from datetime import datetime, timedelta
 
 import pymysql
 os.environ['PYWIKIBOT_DIR'] = os.path.dirname(os.path.realpath(__file__))
@@ -33,6 +34,9 @@ conn = pymysql.connect(
 )
 
 with conn.cursor() as cur:
+    datelimit = datetime.now() - timedelta(days=7)
+    timestamp = datelimit.strftime('%Y%m%d%H%M%S')
+
     cur.execute('use zhwiki_p')
     cur.execute("""
         SELECT rc_actor, actor_name, actor_user,
@@ -45,7 +49,8 @@ with conn.cursor() as cur:
                 FROM (
                     SELECT DISTINCT rc_actor
                     FROM recentchanges
-                    WHERE rc_namespace = 4 OR rc_namespace % 2 = 1
+                    WHERE (rc_namespace = 4 OR rc_namespace % 2 = 1)
+                        AND rc_timestamp > {}
                     ORDER BY rc_timestamp DESC
                 ) temp1
                 LEFT JOIN actor ON rc_actor = actor_id
@@ -56,7 +61,7 @@ with conn.cursor() as cur:
         ) temp3
         LEFT JOIN user_properties ON actor_user = up_user AND up_property = 'nickname'
         WHERE up_value IS NOT NULL AND up_value != ''
-    """)
+    """.format(timestamp))
     res = cur.fetchall()
 
 usernames = []
@@ -98,7 +103,7 @@ for username in usernames:
     expanded_sign[username] = sign
     sign_errors[username] = set()
     hide_sign[username] = False
-    text2 += '<div id="sign-{}">{}</div>'.format(username, clearsign)
+    text2 += '<div id="sign-{}">{}</div>\n'.format(username, clearsign)
     text2index.append(len(text2))
     if '[[File:' in sign:
         sign_errors[username].add('檔案')
