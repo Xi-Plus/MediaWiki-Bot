@@ -19,12 +19,12 @@ parser = argparse.ArgumentParser()
 parser.add_argument('-f', '--force', dest='force', action='store_true')
 parser.add_argument('--category', type=str, default=None)
 parser.add_argument('--page', type=str, default=None)
-parser.add_argument('--confirm', type=bool, default=False)
+parser.add_argument('--confirm', action='store_true')
 parser.add_argument('--limit', type=int, default=0)
 parser.add_argument('--skiplimit', type=int, default=100)
-parser.add_argument('--regex', type=bool, default=False)
-parser.set_defaults(force=False)
-args = parser.parse_args()
+parser.add_argument('--debug', action='store_true')
+parser.set_defaults(force=False, confirm=False, debug=False)
+args, _ = parser.parse_known_args()
 pywikibot.log(args)
 
 site = pywikibot.Site()
@@ -35,8 +35,9 @@ config_page = pywikibot.Page(site, config_page_name)
 cfg = config_page.text
 cfg = json.loads(cfg)
 
-if not cfg["enable"]:
-    exit("disabled\n")
+if not cfg['enable'] and not args.force:
+    print('disabled')
+    exit()
 
 if args.category:
     cats = [args.category]
@@ -216,7 +217,7 @@ for page in pages:
                             imageregex)
                         replace = cfg["regex"][regex_type]["replace"]["comment_other"].format(
                             cfg["check_other_wiki"][existother])
-                        if args.regex:
+                        if args.debug:
                             pywikibot.log('comment_other regex: {}'.format(regex))
                             pywikibot.log('comment_other replace: {}'.format(replace))
 
@@ -244,7 +245,7 @@ for page in pages:
                                 imageregex)
                             replace = cfg["regex"][regex_type]["replace"]["moved"].format(
                                 movelog[-1]["params"]["target_title_without_ns"])
-                            if args.regex:
+                            if args.debug:
                                 pywikibot.log('moved regex: {}'.format(regex))
                                 pywikibot.log('moved replace: {}'.format(replace))
 
@@ -314,7 +315,7 @@ for page in pages:
                         regex = cfg["regex"][regex_type]["pattern"].format(
                             imageregex)
                         replace = cfg["regex"][regex_type]["replace"]["deleted_comment"]
-                        if args.regex:
+                        if args.debug:
                             pywikibot.log('deleted_comment regex: {}'.format(regex))
                             pywikibot.log('deleted_comment replace: {}'.format(replace))
 
@@ -362,7 +363,7 @@ for page in pages:
                         regex = cfg["regex"][regex_type]["pattern"].format(
                             imageregex)
                         replace = cfg["regex"][regex_type]["replace"]["deleted"]
-                        if args.regex:
+                        if args.debug:
                             pywikibot.log('deleted regex: {}'.format(regex))
                             pywikibot.log('deleted replace: {}'.format(replace))
 
@@ -417,7 +418,7 @@ for page in pages:
                         regex = cfg["regex"][regex_type]["pattern"].format(
                             imageregex)
                         replace = cfg["regex"][regex_type]["replace"]["comment"]
-                        if args.regex:
+                        if args.debug:
                             pywikibot.log('comment regex: {}'.format(regex))
                             pywikibot.log('comment replace: {}'.format(replace))
 
