@@ -17,21 +17,13 @@ os.environ['TZ'] = 'UTC'
 site = pywikibot.Site()
 site.login()
 
-# config_page = pywikibot.Page(site, config_page_name)
-# cfg = config_page.text
-# cfg = json.loads(cfg)
-# print(json.dumps(cfg, indent=4, ensure_ascii=False))
+config_page = pywikibot.Page(site, config_page_name)
+cfg = config_page.text
+cfg = json.loads(cfg)
 
-# if not cfg['enable']:
-#     exit('disabled\n')
-
-cfg = {
-    'category': 'Category:已批准機械人作業申請',
-    'flag1': '<!-- bot:start -->',
-    'flag2': '<!-- bot:end -->',
-    'page': 'User:Xiplus/沙盒',
-    'summary': '機器人：產生機器人列表',
-}
+if not cfg['enable']:
+    print('disabled')
+    exit()
 
 
 cat = pywikibot.Category(site, cfg['category'])
