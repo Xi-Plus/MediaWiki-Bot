@@ -49,7 +49,7 @@ try:
 except Exception:
     pass
 
-oldresultdict = dict()
+oldresultdict = {}
 for rev in oldresult:
     oldresultdict[rev['revid']] = rev
 
