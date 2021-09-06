@@ -68,7 +68,7 @@ for ($i = 0; $i < $C["fail_retry"]; $i++) {
 		}
 		$sign = $m[2][$key];
 		$user = "";
-		if (preg_match_all("/\[\[(?:(?:User(?:[ _]talk)?|U|UT|用户|用戶|使用者|用戶對話|用戶討論|用户对话|用户讨论|使用者討論):|(?:Special|特殊):(?:(?:Contributions|Contribs)|(?:用户|用戶|使用者)?(?:贡献|貢獻))\/)([^|\/]+)/i", $sign, $m2)) {
+		if (preg_match_all("/\[\[(?:(?:User(?:[ _]talk)?|U|UT|用户|用戶|使用者|用戶對話|用戶討論|用户对话|用户讨论|使用者討論):|(?:Special|特殊):(?:(?:Contributions|Contribs)|(?:用户|用戶|使用者)?(?:贡献|貢獻))\/)\s*([^|\/]+?)\s*[|\/]/i", $sign, $m2)) {
 			$user = $m2[1][0];
 		}
 		$res = cURL($C["wikiapi"] . "?" . http_build_query(array(
