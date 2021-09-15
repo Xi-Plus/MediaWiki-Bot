@@ -30,7 +30,7 @@ def fixPage(sourcePage):
     m = re.search(r'#(?:重定向|REDIRECT) ?\[\[(.+?)]]', text, flags=re.I)
     if m:
         middlePage = pywikibot.Page(site, m.group(1))
-        logs = list(site.logevents(page=middlePage, total=1))
+        logs = list(site.logevents(page=middlePage, total=1, logtype='move'))
         if len(logs) == 0:
             print('\tno logs')
             return
