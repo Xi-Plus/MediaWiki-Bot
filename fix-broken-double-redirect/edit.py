@@ -27,7 +27,7 @@ def fixPage(sourcePage):
     print(sourcePage.title())
     text = sourcePage.text
 
-    if re.search(r'{{\s*(Delete|Db-reason|D|Deletebecause|Db|速删|速刪|Speedy|SD|快删|快刪|CSD|QD)\s*(\|bot=Jimmy-bot)?\|g15(\||}})', text, flags=re.I):
+    if not re.search(r'{{\s*(Delete|Db-reason|D|Deletebecause|Db|速删|速刪|Speedy|SD|快删|快刪|CSD|QD)\s*(\|bot=Jimmy-bot)?\|g15(\||}})', text, flags=re.I):
         print('\tnot g15')
         return
 
