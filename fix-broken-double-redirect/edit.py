@@ -72,7 +72,7 @@ if __name__ == "__main__":
         cat = pywikibot.Page(site, cfg['csd_category'])
 
         for sourcePage in site.categorymembers(cat):
-            if '{{d|bot=Jimmy-bot|g15|' not in sourcePage.text:
+            if re.search(r'{{\s*(Delete|Db-reason|D|Deletebecause|Db|速删|速刪|Speedy|SD|快删|快刪|CSD|QD)\s*(\|bot=Jimmy-bot)?\|g15(\||}})', sourcePage.text, flags=re.I):
                 print('\tnot g15')
                 continue
             fixPage(sourcePage)
