@@ -76,12 +76,13 @@ cupage.save(summary=cfg["main_page_summary"].format(count), minor=True)
 
 for target in archivelist:
     targetpage = pywikibot.Page(site, cfg["archive_page_name"].format(target[0], target[1]))
-    oldtext = targetpage.text
     print(targetpage.title())
-    appendtext = ''
-    if not targetpage.exists():
-        appendtext += cfg['archive_page_preload']
-    appendtext += '\n\n'.join(archivelist[target])
+    oldtext = ''
+    if targetpage.exists():
+        oldtext = targetpage.text.strip()
+    if oldtext == '':
+        oldtext = cfg['archive_page_preload']
+    appendtext = '\n\n'.join(archivelist[target])
 
     targetpage.text = oldtext + '\n\n' + appendtext
     try:
