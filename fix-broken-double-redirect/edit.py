@@ -44,10 +44,12 @@ def fixPage(sourcePage):
             return
         targetPage = log.target_page
         print('\ttarget', targetPage.title())
-        text = re.sub(r'^(<noinclude>)?{{d\|bot=Jimmy-bot\|g15\|.+\n(<\/noinclude>)?', '', text)
-        oldtext = text
+        text = re.sub(r'(<noinclude>)?{{\s*(Delete|Db-reason|D|Deletebecause|Db|速删|速刪|Speedy|SD|快删|快刪|CSD|QD)\s*\|(.*)?g15.*}}(<\/noinclude>)?\s*', '', text, flags=re.I)
+        if text == sourcePage.text:
+            print('Nothing changed')
+            return
         text = re.sub(r'(#(?:重定向|REDIRECT) ?\[\[).+?(]])', r'\g<1>{}\g<2>'.format(targetPage.title()), text, flags=re.I)
-        if oldtext == text:
+        if text == sourcePage.text:
             print('Nothing changed')
             return
         pywikibot.showDiff(sourcePage.text, text)
