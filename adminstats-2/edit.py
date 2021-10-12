@@ -78,5 +78,5 @@ for i in range(12):
 
 
 page = pywikibot.Page(site, cfg['page'])
-page.text = json.dumps(res)
+page.text = json.dumps(res, sort_keys=False)
 page.save(summary=cfg['summary'], minor=False)
