@@ -17,6 +17,7 @@ user-config.py
 user-password.py
 
 # single
+adminstats-2/cache/
 AFD-stats/list/
 bad-image-list/remove.txt
 DRV-tag-talk/lastrevid.txt
