@@ -443,15 +443,21 @@ for page in pages:
         pywikibot.error(e)
 
     summary = []
-    if len(summary_comment):
-        summary.append(cfg["summary"]["prepend"]
-                       ["comment"] + "、".join(summary_comment))
-    if len(summary_moved):
-        summary.append(cfg["summary"]["prepend"]
-                       ["moved"] + "、".join(summary_moved))
-    if len(summary_deleted):
-        summary.append(cfg["summary"]["prepend"]
-                       ["deleted"] + "、".join(summary_deleted))
+    if len(summary_comment) == 1:
+        summary.append(
+            cfg['summary']['prepend']['comment'] + '、'.join(summary_comment))
+    elif len(summary_comment) > 1:
+        summary.append(cfg['summary']['prepend']['comment'] + '{}個檔案'.format(len(summary_comment)))
+    if len(summary_moved) == 1:
+        summary.append(
+            cfg['summary']['prepend']['moved'] + '、'.join(summary_moved))
+    elif len(summary_moved) > 1:
+        summary.append(cfg['summary']['prepend']['moved'] + '{}個檔案'.format(len(summary_moved)))
+    if len(summary_deleted) == 1:
+        summary.append(
+            cfg['summary']['prepend']['deleted'] + '、'.join(summary_deleted))
+    elif len(summary_deleted) > 1:
+        summary.append(cfg['summary']['prepend']['deleted'] + '{}個檔案'.format(len(summary_deleted)))
     summary = cfg["summary"]["prepend"]["all"] + "；".join(summary)
     pywikibot.log("summary = {}".format(summary))
 
