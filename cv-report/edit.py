@@ -17,7 +17,6 @@ site.login()
 config_page = pywikibot.Page(site, config_page_name)
 cfg = config_page.text
 cfg = json.loads(cfg)
-print(json.dumps(cfg, indent=4, ensure_ascii=False))
 
 if not cfg["enable"]:
     exit("disabled\n")
@@ -46,11 +45,11 @@ appendtext = ''
 for pagetitle in notreportedpage:
     if '{{{{CopyvioEntry|1={0}|'.format(pagetitle) in text:
         continue
-    appendtext += '\n\n{{{{CopyvioEntry|1={0}|time={{{{subst:#time:U|+7 days}}}}|sign=~~~~}}}}'.format(pagetitle)
+    appendtext += '\n\n{{{{subst:CopyvioVFDRecord|{0}}}}}'.format(pagetitle)
 
 if appendtext:
     d = datetime.today()
-    datestr = d.strftime('%-m月%-d日')
+    datestr = '{}月{}日'.format(d.strftime('%m'), d.strftime('%d'))
     if not re.search(r'===\s*{}\s*==='.format(datestr), text):
         text += '\n\n==={}==='.format(datestr)
     text += appendtext

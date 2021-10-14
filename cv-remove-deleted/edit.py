@@ -56,7 +56,7 @@ for secid, section in enumerate(sections[1:], 1):
     newtext = title + '\n' + text[0]
     cnt = 0
     for entry in text[1:]:
-        m = re.match(r"{{CopyvioEntry\|1=([^|]+)\|time=(\d+)\|", entry)
+        m = re.search(r"{{CopyvioEntry\|1=([^|]+)\|time=(\d+)\|", entry)
         if m:
             pagename = m.group(1)
             entrytime = int(m.group(2))
