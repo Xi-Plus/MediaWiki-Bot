@@ -14,8 +14,9 @@ import pywikibot
 from config import (config_page_name, database,  # pylint: disable=E0611,W0614
                     skip_time, skip_title, use_db)
 
-REGEX = {
-    'infobox': {
+REGEX = [
+    # infobox
+    {
         'pattern': r'(\|\s*)((?:\d+|image[ _-]?(?:|\d+|file[LR]?\d*|flag|map|name|seal|shield|skyline|coat|coat[ _]of[ _]arms|blank[ _]emblem|hans|hant|cn|hk|mo|sg|tw)?|img_\d+|(?:map|dual|net|vfig|uniform|ship|logo|kit|stdg|hans|hant|cn|hk|mo|sg|tw)[ _-]?image|logo[ _-]?(?:file|filename|pic)?|(?:company|uniform)[ _-]?logo|photo\d*[a-c]?|coa[ _-]pic|img|filename|chart|screenshot|cover|symbol|audio[ _-]file|signature|album|(?:city)?[ _-]?seal|map[ _-]?(?:img|location)?|(?:range|Alternative)[ _-]?map|patch|badge|coatofarms|session[ _-]room|static[ _-]image[ _-]name|mapofstate|ribbon|uniform|insignia|zh-?(?:hans|hant|cn|hk|mo|sg|tw)?|flag_[sp]\d+|flag alias[A-Za-z\- ]*|BILDPFAD_KARTE|(?:代表)?(?:圖片|图片|圖像|图像|画像)(?:名称|名稱|\d+)?|電視網商標檔案|[頻频]道[圖图]片(?:檔案|文件)|電臺圖片檔案|路線圖|正面|背面|项目符号文件名称|地图档名|簽名|签名|照片|市旗|市徽|景观照片文件名|画像ファイル)\s*=\s*(?:<!--[^\n]+-->)?\s*)((?:File|Image|文件|檔案|圖像):)? *({0})(\s*?(?:<!--[^\n]+-->)?\s*?(?:\||}}|\n))',
         'replace': {
             'comment_other': r'\1\2<!-- 檔案不存在 \3\4 ，可從{0}取得 -->\5',
@@ -25,7 +26,8 @@ REGEX = {
             'comment': r'\1\2<!-- 檔案不存在 \3\4 -->\5'
         }
     },
-    'normal_whole_line': {
+    # normal_whole_line
+    {
         'pattern': r'(^|\n)[ \t]*(\[\[(?:File|Image|文件|檔案|圖像):) *({0})(\s*(?:\|(?:\[\[[^[\]]*\]\]|\[[^[\]]*\]|[^[\]])*)?\]\])[ \t]*(\n|$)',
         'replace': {
             'comment_other': r'\1<!-- 檔案不存在 \2\3\4 ，可從{0}取得 -->\5',
@@ -35,7 +37,8 @@ REGEX = {
             'comment': r'\1<!-- 檔案不存在 \2\3\4 -->\5'
         }
     },
-    'normal': {
+    # normal
+    {
         'pattern': r'(\[\[(?:File|Image|文件|檔案|圖像):) *({0})(\s*(?:\|(?:\[\[[^[\]]*\]\]|[^[\]])*)?\]\])([ \t]*)',
         'replace': {
             'comment_other': r'<!-- 檔案不存在 \1\2\3 ，可從{0}取得 -->',
@@ -45,7 +48,8 @@ REGEX = {
             'comment': r'<!-- 檔案不存在 \1\2\3 -->'
         }
     },
-    'gallery': {
+    # gallery
+    {
         'pattern': r'(<gallery[^>\n]*?>[\s\S]*?\n)((?:File|Image|文件|檔案|圖像):)? *({0})([ \t]*)(\|[^\n]*?)?\n([\s\S]*?</gallery>)',
         'replace': {
             'comment_other': r'\1<!-- 檔案不存在 \2\3\4\5 ，可從{0}取得 -->\n\6',
@@ -55,7 +59,8 @@ REGEX = {
             'comment': r'\1<!-- 檔案不存在 \2\3\4\5 -->\n\6'
         }
     },
-    'Flagicon image': {
+    # Flagicon image
+    {
         'pattern': r'({{{{(?:flagicon image|Wide image|Spoken Wikipedia)\|)({0})((?:\|[^{{}}]*?)?}}}})([ \t]*)',
         'replace': {
             'comment_other': r'<!-- 檔案不存在 \1\2\3 ，可從{0}取得 -->',
@@ -65,7 +70,7 @@ REGEX = {
             'comment': r'<!-- 檔案不存在 \1\2\3 -->'
         }
     }
-}
+]
 
 os.environ["TZ"] = "UTC"
 
@@ -110,7 +115,7 @@ if use_db:
     cur = db.cursor()
 
     cnt = cur.execute("""DELETE FROM `remove_broken_file_pages` WHERE `time` < FROM_UNIXTIME(%s)""",
-                    (time.time() - skip_time))
+                      (time.time() - skip_time))
     pywikibot.log('Deleted {} rows from remove_broken_file_pages'.format(cnt))
 
     cnt = cur.execute("""DELETE FROM `remove_broken_file_files` WHERE `page` NOT IN ( SELECT `page` FROM `remove_broken_file_pages` )""")
@@ -271,10 +276,10 @@ for page in pages:
                 if existother is not None:
                     pywikibot.log("{} exist on {}".format(image_fullname, existother))
 
-                    for regex_type in REGEX:
-                        regex = REGEX[regex_type]["pattern"].format(
+                    for regex_rule in REGEX:
+                        regex = regex_rule["pattern"].format(
                             imageregex)
-                        replace = REGEX[regex_type]["replace"]["comment_other"].format(
+                        replace = regex_rule["replace"]["comment_other"].format(
                             cfg["check_other_wiki"][existother])
                         if args.debug:
                             pywikibot.log('comment_other regex: {}'.format(regex))
@@ -299,10 +304,10 @@ for page in pages:
                     if checkImageExists(imagename):
                         pywikibot.log("File:{} moved".format(imagename))
 
-                        for regex_type in REGEX:
-                            regex = REGEX[regex_type]["pattern"].format(
+                        for regex_rule in REGEX:
+                            regex = regex_rule["pattern"].format(
                                 imageregex)
-                            replace = REGEX[regex_type]["replace"]["moved"].format(
+                            replace = regex_rule["replace"]["moved"].format(
                                 movelog[-1]["params"]["target_title_without_ns"])
                             if args.debug:
                                 pywikibot.log('moved regex: {}'.format(regex))
@@ -370,10 +375,10 @@ for page in pages:
                 if deleted_comment:
                     pywikibot.log("{} deleted by F6".format(image_fullname))
 
-                    for regex_type in REGEX:
-                        regex = REGEX[regex_type]["pattern"].format(
+                    for regex_rule in REGEX:
+                        regex = regex_rule["pattern"].format(
                             imageregex)
-                        replace = REGEX[regex_type]["replace"]["deleted_comment"]
+                        replace = regex_rule["replace"]["deleted_comment"]
                         if args.debug:
                             pywikibot.log('deleted_comment regex: {}'.format(regex))
                             pywikibot.log('deleted_comment replace: {}'.format(replace))
@@ -418,10 +423,10 @@ for page in pages:
                     elif deleted_commons:
                         pywikibot.log("{} deleted on commons".format(image_fullname))
 
-                    for regex_type in REGEX:
-                        regex = REGEX[regex_type]["pattern"].format(
+                    for regex_rule in REGEX:
+                        regex = regex_rule["pattern"].format(
                             imageregex)
-                        replace = REGEX[regex_type]["replace"]["deleted"]
+                        replace = regex_rule["replace"]["deleted"]
                         if args.debug:
                             pywikibot.log('deleted regex: {}'.format(regex))
                             pywikibot.log('deleted replace: {}'.format(replace))
@@ -473,10 +478,10 @@ for page in pages:
                 if not uploaded:
                     pywikibot.log("{} never uploaded".format(image_fullname))
 
-                    for regex_type in REGEX:
-                        regex = REGEX[regex_type]["pattern"].format(
+                    for regex_rule in REGEX:
+                        regex = regex_rule["pattern"].format(
                             imageregex)
-                        replace = REGEX[regex_type]["replace"]["comment"]
+                        replace = regex_rule["replace"]["comment"]
                         if args.debug:
                             pywikibot.log('comment regex: {}'.format(regex))
                             pywikibot.log('comment replace: {}'.format(replace))
