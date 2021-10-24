@@ -26,7 +26,6 @@ site.login()
 config_page = pywikibot.Page(site, config_page_name)
 cfg = config_page.text
 cfg = json.loads(cfg)
-print(json.dumps(cfg, indent=4, ensure_ascii=False))
 
 if not cfg['enable']:
     exit('disabled\n')
@@ -50,7 +49,6 @@ for page in site.categorymembers(cat):
             break
     if in_whitelist:
         continue
-    print(title)
     text = page.text
 
     rndstr = hashlib.md5(str(time.time()).encode()).hexdigest()
@@ -97,7 +95,6 @@ for page in site.categorymembers(cat):
                 if d > lasttime:
                     lasttime = d
                     lastuser = username
-            print(firsttime, firstuser, lasttime, lastuser)
             if firsttime == datetime(9999, 12, 31, tzinfo=timezone.utc):
                 firstvalue = 0
             else:
@@ -114,6 +111,5 @@ for page in site.categorymembers(cat):
 
 output += '\n{{/footer}}'
 
-print(output)
 outputPage.text = output
 outputPage.save(summary=cfg['summary'])
