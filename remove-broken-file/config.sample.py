@@ -2,6 +2,7 @@
 config_page_name = ''
 skip_title = r''
 
+use_db = True
 database = {
     'host': 'localhost',
     'user': '',

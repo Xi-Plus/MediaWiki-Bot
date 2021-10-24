@@ -7,10 +7,12 @@ import time
 from datetime import datetime, timezone
 
 import pymysql
+
 os.environ["PYWIKIBOT_DIR"] = os.path.dirname(os.path.realpath(__file__))
 import pywikibot
 
-from config import config_page_name, database, skip_time, skip_title  # pylint: disable=E0611,W0614
+from config import (config_page_name, database,  # pylint: disable=E0611,W0614
+                    skip_time, skip_title, use_db)
 
 REGEX = {
     'infobox': {
@@ -96,32 +98,35 @@ if args.category:
 else:
     cats = cfg["category"]
 
-db = pymysql.connect(
-    host=database['host'],
-    user=database['user'],
-    passwd=database['passwd'],
-    db=database['db'],
-    charset=database['charset']
-)
-cur = db.cursor()
-
-cnt = cur.execute("""DELETE FROM `remove_broken_file_pages` WHERE `time` < FROM_UNIXTIME(%s)""",
-                  (time.time() - skip_time))
-pywikibot.log('Deleted {} rows from remove_broken_file_pages'.format(cnt))
-
-cnt = cur.execute("""DELETE FROM `remove_broken_file_files` WHERE `page` NOT IN ( SELECT `page` FROM `remove_broken_file_pages` )""")
-pywikibot.log('Deleted {} rows from remove_broken_file_files'.format(cnt))
-
-db.commit()
-
-cur.execute("""SELECT `page` FROM `remove_broken_file_pages`""")
-rows = cur.fetchall()
 skippages = []
-for row in rows:
-    skippages.append(row[0])
+if use_db:
+    db = pymysql.connect(
+        host=database['host'],
+        user=database['user'],
+        passwd=database['passwd'],
+        db=database['db'],
+        charset=database['charset']
+    )
+    cur = db.cursor()
+
+    cnt = cur.execute("""DELETE FROM `remove_broken_file_pages` WHERE `time` < FROM_UNIXTIME(%s)""",
+                    (time.time() - skip_time))
+    pywikibot.log('Deleted {} rows from remove_broken_file_pages'.format(cnt))
+
+    cnt = cur.execute("""DELETE FROM `remove_broken_file_files` WHERE `page` NOT IN ( SELECT `page` FROM `remove_broken_file_pages` )""")
+    pywikibot.log('Deleted {} rows from remove_broken_file_files'.format(cnt))
+
+    db.commit()
+
+    cur.execute("""SELECT `page` FROM `remove_broken_file_pages`""")
+    rows = cur.fetchall()
+    for row in rows:
+        skippages.append(row[0])
 
 
 def add_skip_page(skip_page, files):
+    if not use_db:
+        return
     cur.execute("""DELETE FROM `remove_broken_file_pages` WHERE `page` = %s""",
                 (skip_page))
     cur.execute("""INSERT INTO `remove_broken_file_pages` (`page`) VALUES (%s)""",
