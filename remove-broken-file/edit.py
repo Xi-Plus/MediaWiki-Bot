@@ -12,6 +12,58 @@ import pywikibot
 
 from config import config_page_name, database, skip_time, skip_title  # pylint: disable=E0611,W0614
 
+REGEX = {
+    'infobox': {
+        'pattern': r'(\|\s*)((?:\d+|image[ _-]?(?:|\d+|file[LR]?\d*|flag|map|name|seal|shield|skyline|coat|coat[ _]of[ _]arms|blank[ _]emblem|hans|hant|cn|hk|mo|sg|tw)?|img_\d+|(?:map|dual|net|vfig|uniform|ship|logo|kit|stdg|hans|hant|cn|hk|mo|sg|tw)[ _-]?image|logo[ _-]?(?:file|filename|pic)?|(?:company|uniform)[ _-]?logo|photo\d*[a-c]?|coa[ _-]pic|img|filename|chart|screenshot|cover|symbol|audio[ _-]file|signature|album|(?:city)?[ _-]?seal|map[ _-]?(?:img|location)?|(?:range|Alternative)[ _-]?map|patch|badge|coatofarms|session[ _-]room|static[ _-]image[ _-]name|mapofstate|ribbon|uniform|insignia|zh-?(?:hans|hant|cn|hk|mo|sg|tw)?|flag_[sp]\d+|flag alias[A-Za-z\- ]*|BILDPFAD_KARTE|(?:代表)?(?:圖片|图片|圖像|图像|画像)(?:名称|名稱|\d+)?|電視網商標檔案|[頻频]道[圖图]片(?:檔案|文件)|電臺圖片檔案|路線圖|正面|背面|项目符号文件名称|地图档名|簽名|签名|照片|市旗|市徽|景观照片文件名|画像ファイル)\s*=\s*(?:<!--[^\n]+-->)?\s*)((?:File|Image|文件|檔案|圖像):)? *({0})(\s*?(?:<!--[^\n]+-->)?\s*?(?:\||}}|\n))',
+        'replace': {
+            'comment_other': r'\1\2<!-- 檔案不存在 \3\4 ，可從{0}取得 -->\5',
+            'moved': r'\1\2\g<3>{0}\5',
+            'deleted_comment': r'\1\2<!-- 檔案已被刪除 \3\4 -->\5',
+            'deleted': r'\1\2\5',
+            'comment': r'\1\2<!-- 檔案不存在 \3\4 -->\5'
+        }
+    },
+    'normal_whole_line': {
+        'pattern': r'(^|\n)[ \t]*(\[\[(?:File|Image|文件|檔案|圖像):) *({0})(\s*(?:\|(?:\[\[[^[\]]*\]\]|\[[^[\]]*\]|[^[\]])*)?\]\])[ \t]*(\n|$)',
+        'replace': {
+            'comment_other': r'\1<!-- 檔案不存在 \2\3\4 ，可從{0}取得 -->\5',
+            'moved': r'\1\g<2>{0}\4\5',
+            'deleted_comment': r'\1<!-- 檔案已被刪除 \2\3\4 -->\5',
+            'deleted': r'\1',
+            'comment': r'\1<!-- 檔案不存在 \2\3\4 -->\5'
+        }
+    },
+    'normal': {
+        'pattern': r'(\[\[(?:File|Image|文件|檔案|圖像):) *({0})(\s*(?:\|(?:\[\[[^[\]]*\]\]|[^[\]])*)?\]\])([ \t]*)',
+        'replace': {
+            'comment_other': r'<!-- 檔案不存在 \1\2\3 ，可從{0}取得 -->',
+            'moved': r'\g<1>{0}\3\4',
+            'deleted_comment': r'<!-- 檔案已被刪除 \1\2\3 -->',
+            'deleted': r'',
+            'comment': r'<!-- 檔案不存在 \1\2\3 -->'
+        }
+    },
+    'gallery': {
+        'pattern': r'(<gallery[^>\n]*?>[\s\S]*?\n)((?:File|Image|文件|檔案|圖像):)? *({0})([ \t]*)(\|[^\n]*?)?\n([\s\S]*?</gallery>)',
+        'replace': {
+            'comment_other': r'\1<!-- 檔案不存在 \2\3\4\5 ，可從{0}取得 -->\n\6',
+            'moved': r'\1\g<2>{0}\4\5\n\6',
+            'deleted_comment': r'\1<!-- 檔案已被刪除 \2\3\4\5 -->\n\6',
+            'deleted': r'\1\6',
+            'comment': r'\1<!-- 檔案不存在 \2\3\4\5 -->\n\6'
+        }
+    },
+    'Flagicon image': {
+        'pattern': r'({{{{(?:flagicon image|Wide image|Spoken Wikipedia)\|)({0})((?:\|[^{{}}]*?)?}}}})([ \t]*)',
+        'replace': {
+            'comment_other': r'<!-- 檔案不存在 \1\2\3 ，可從{0}取得 -->',
+            'moved': r'\g<1>{0}\3\4',
+            'deleted_comment': r'<!-- 檔案已被刪除 \1\2\3 -->',
+            'deleted': r'',
+            'comment': r'<!-- 檔案不存在 \1\2\3 -->'
+        }
+    }
+}
 
 os.environ["TZ"] = "UTC"
 
@@ -44,11 +96,13 @@ if args.category:
 else:
     cats = cfg["category"]
 
-db = pymysql.connect(host=database['host'],
-                     user=database['user'],
-                     passwd=database['passwd'],
-                     db=database['db'],
-                     charset=database['charset'])
+db = pymysql.connect(
+    host=database['host'],
+    user=database['user'],
+    passwd=database['passwd'],
+    db=database['db'],
+    charset=database['charset']
+)
 cur = db.cursor()
 
 cnt = cur.execute("""DELETE FROM `remove_broken_file_pages` WHERE `time` < FROM_UNIXTIME(%s)""",
@@ -212,10 +266,10 @@ for page in pages:
                 if existother is not None:
                     pywikibot.log("{} exist on {}".format(image_fullname, existother))
 
-                    for regex_type in cfg["regex"]:
-                        regex = cfg["regex"][regex_type]["pattern"].format(
+                    for regex_type in REGEX:
+                        regex = REGEX[regex_type]["pattern"].format(
                             imageregex)
-                        replace = cfg["regex"][regex_type]["replace"]["comment_other"].format(
+                        replace = REGEX[regex_type]["replace"]["comment_other"].format(
                             cfg["check_other_wiki"][existother])
                         if args.debug:
                             pywikibot.log('comment_other regex: {}'.format(regex))
@@ -229,7 +283,7 @@ for page in pages:
                             break
 
                     summary_comment.append(
-                        cfg["summary"]["comment_other"].format(imagename, existother))
+                        cfg['summary']["comment_other"].format(imagename, existother))
 
                     continue
                 # coment_other end
@@ -240,10 +294,10 @@ for page in pages:
                     if checkImageExists(imagename):
                         pywikibot.log("File:{} moved".format(imagename))
 
-                        for regex_type in cfg["regex"]:
-                            regex = cfg["regex"][regex_type]["pattern"].format(
+                        for regex_type in REGEX:
+                            regex = REGEX[regex_type]["pattern"].format(
                                 imageregex)
-                            replace = cfg["regex"][regex_type]["replace"]["moved"].format(
+                            replace = REGEX[regex_type]["replace"]["moved"].format(
                                 movelog[-1]["params"]["target_title_without_ns"])
                             if args.debug:
                                 pywikibot.log('moved regex: {}'.format(regex))
@@ -258,7 +312,7 @@ for page in pages:
 
                         summary_temp = image_fullname
                         for log in movelog:
-                            summary_temp = cfg["summary"]["moved"].format(
+                            summary_temp = cfg['summary']["moved"].format(
                                 summary_temp, log["params"]["target_title_without_ns"], log["user"], log["logid"], log["comment"])
                         summary_moved.append(summary_temp)
 
@@ -305,16 +359,16 @@ for page in pages:
                 if deleted_local:
                     summary_prefix = imagename
                     for log in movelog:
-                        summary_prefix = cfg["summary"]["moved_deleted"].format(
+                        summary_prefix = cfg['summary']["moved_deleted"].format(
                             summary_prefix, log["params"]["target_title_without_ns"], log["logid"])
 
                 if deleted_comment:
                     pywikibot.log("{} deleted by F6".format(image_fullname))
 
-                    for regex_type in cfg["regex"]:
-                        regex = cfg["regex"][regex_type]["pattern"].format(
+                    for regex_type in REGEX:
+                        regex = REGEX[regex_type]["pattern"].format(
                             imageregex)
-                        replace = cfg["regex"][regex_type]["replace"]["deleted_comment"]
+                        replace = REGEX[regex_type]["replace"]["deleted_comment"]
                         if args.debug:
                             pywikibot.log('deleted_comment regex: {}'.format(regex))
                             pywikibot.log('deleted_comment replace: {}'.format(replace))
@@ -326,7 +380,7 @@ for page in pages:
                         if count > 0:
                             break
 
-                    summary_comment.append(cfg["summary"]["deleted"]["local"].format(
+                    summary_comment.append(cfg['summary']["deleted"]["local"].format(
                         summary_prefix, deletelog["user"], deletelog["logid"], deletelog["comment"]))
 
                     if deleted_f6 and page.namespace().id == 0:
@@ -359,10 +413,10 @@ for page in pages:
                     elif deleted_commons:
                         pywikibot.log("{} deleted on commons".format(image_fullname))
 
-                    for regex_type in cfg["regex"]:
-                        regex = cfg["regex"][regex_type]["pattern"].format(
+                    for regex_type in REGEX:
+                        regex = REGEX[regex_type]["pattern"].format(
                             imageregex)
-                        replace = cfg["regex"][regex_type]["replace"]["deleted"]
+                        replace = REGEX[regex_type]["replace"]["deleted"]
                         if args.debug:
                             pywikibot.log('deleted regex: {}'.format(regex))
                             pywikibot.log('deleted replace: {}'.format(replace))
@@ -377,10 +431,10 @@ for page in pages:
                     if deleted_commons:
                         comment = re.sub(r"\[\[:?([^\[\]]+?)]]",
                                          r"[[:c:\1]]", deletelog["comment"])
-                        summary_deleted.append(cfg["summary"]["deleted"]["commons"].format(
+                        summary_deleted.append(cfg['summary']["deleted"]["commons"].format(
                             imagename, deletelog["user"], deletelog["logid"], comment))
                     elif deleted_local:
-                        summary_deleted.append(cfg["summary"]["deleted"]["local"].format(
+                        summary_deleted.append(cfg['summary']["deleted"]["local"].format(
                             summary_prefix, deletelog["user"],
                             deletelog["logid"], deletelog["comment"]))
 
@@ -414,10 +468,10 @@ for page in pages:
                 if not uploaded:
                     pywikibot.log("{} never uploaded".format(image_fullname))
 
-                    for regex_type in cfg["regex"]:
-                        regex = cfg["regex"][regex_type]["pattern"].format(
+                    for regex_type in REGEX:
+                        regex = REGEX[regex_type]["pattern"].format(
                             imageregex)
-                        replace = cfg["regex"][regex_type]["replace"]["comment"]
+                        replace = REGEX[regex_type]["replace"]["comment"]
                         if args.debug:
                             pywikibot.log('comment regex: {}'.format(regex))
                             pywikibot.log('comment replace: {}'.format(replace))
@@ -430,7 +484,7 @@ for page in pages:
                             break
 
                     summary_comment.append(
-                        cfg["summary"]["comment"].format(imagename))
+                        cfg['summary']["comment"].format(imagename))
 
                     continue
 
@@ -458,7 +512,7 @@ for page in pages:
             cfg['summary']['prepend']['deleted'] + '、'.join(summary_deleted))
     elif len(summary_deleted) > 1:
         summary.append(cfg['summary']['prepend']['deleted'] + '{}個檔案'.format(len(summary_deleted)))
-    summary = cfg["summary"]["prepend"]["all"] + "；".join(summary)
+    summary = cfg['summary']["prepend"]["all"] + "；".join(summary)
     pywikibot.log("summary = {}".format(summary))
 
     if page.text == text:
