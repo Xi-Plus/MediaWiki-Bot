@@ -15,7 +15,6 @@ $C["retention_bytes_default"] = 1000000;
 $C["fail_retry"] = 5;
 
 $C["summary_prefix"] = "[[User:A2093064-bot/task/1|機器人1]]";
-$C["summary_config_page"] = "[[User:A2093064-bot/task/1/config|門檻]]";
 
 $C["User-Agent"] = "User:A2093064-bot spam-blacklist-archive";
 

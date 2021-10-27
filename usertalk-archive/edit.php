@@ -12,27 +12,13 @@ require __DIR__ . "/../function/curl.php";
 require __DIR__ . "/../function/login.php";
 require __DIR__ . "/../function/edittoken.php";
 
-function converttime($chitime) {
+function converttime($chitime)
+{
 	if (preg_match("/(\d{4})年(\d{1,2})月(\d{1,2})日 \(.{3}\) (\d{2})\:(\d{2}) \(UTC\)/", $chitime, $m)) {
 		return strtotime($m[1] . "/" . $m[2] . "/" . $m[3] . " " . $m[4] . ":" . $m[5]);
 	} else {
 		exit("converttime fail\n");
 	}
-}
-function TimediffFormat($time) {
-	if ($time < 60) {
-		return $time . "秒";
-	}
-
-	if ($time < 60 * 50) {
-		return round($time / 60) . "分";
-	}
-
-	if ($time < 60 * 60 * 23.5) {
-		return round($time / (60 * 60)) . "小時";
-	}
-
-	return round($time / (60 * 60 * 24)) . "天";
 }
 
 echo "The time now is " . date("Y-m-d H:i:s") . " (UTC)\n";
@@ -128,7 +114,7 @@ for ($i = $C["fail_retry"]; $i > 0; $i--) {
 	echo "start edit\n";
 
 	echo "edit main page\n";
-	$summary = $C["summary_prefix"] . "：存檔" . $archive_count . "章節 (" . $C["summary_config_page"] . "：" . TimediffFormat($retention_time) . ")";
+	$summary = $C["summary_prefix"] . "：存檔" . $archive_count . "章節";
 	$post = array(
 		"action" => "edit",
 		"format" => "json",

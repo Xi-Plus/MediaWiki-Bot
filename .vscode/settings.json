@@ -8,10 +8,12 @@
 		"ReindentSwitchBlocks"
 	],
 	"phpfmt.exclude": [
+		"AllmanStyleBraces",
 		"ReindentComments",
 		"StripNewlineWithinClassBody"
 	],
 	"phpfmt.psr2": false,
 	"phpfmt.detect_indent": true,
+	"phpfmt.smart_linebreak_after_curly": true,
 	"python.linting.pylintEnabled": true
 }
