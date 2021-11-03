@@ -49,7 +49,7 @@ for pagetitle in notreportedpage:
 
 if appendtext:
     d = datetime.today()
-    datestr = '{}月{}日'.format(d.strftime('%m'), d.strftime('%d'))
+    datestr = '{}月{}日'.format(d.strftime('%-m'), d.strftime('%-d'))
     if not re.search(r'===\s*{}\s*==='.format(datestr), text):
         text += '\n\n==={}==='.format(datestr)
     text += appendtext
