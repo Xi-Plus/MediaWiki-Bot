@@ -206,12 +206,6 @@ foreach ($newpagetext as $year => $newtext) {
 		$res = json_decode($res, true);
 		$pages = current($res["query"]["pages"]);
 
-		$text = "{{存档页|Wikipedia:申请解除权限}}\n" .
-			"=={$cfg['text1']}==\n" .
-			"=={$cfg['text2']}==\n" .
-			"=={$cfg['text3']}==\n" .
-			"=={$cfg['text4']}\n";
-
 		$basetimestamp2 = null;
 		if (!isset($pages["missing"])) {
 			$text = $pages["revisions"][0]["*"];
@@ -220,10 +214,10 @@ foreach ($newpagetext as $year => $newtext) {
 		} else {
 			echo $page . " not exist\n";
 			$text = "{{存档页|" . $cfg["from_page"] . "}}\n" .
-				"==" . $cfg["text1"] . "==\n" .
-				"==" . $cfg["text2"] . "==\n" .
-				"==" . $cfg["text3"] . "==\n" .
-				"==" . $cfg["text4"] . "==\n";
+				"== " . $cfg["text1"] . " ==\n" .
+				"== " . $cfg["text2"] . " ==\n" .
+				"== " . $cfg["text3"] . " ==\n" .
+				"== " . $cfg["text4"] . " ==\n";
 		}
 
 		$hash = md5(uniqid(rand(), true));
