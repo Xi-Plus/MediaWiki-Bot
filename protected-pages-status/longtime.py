@@ -64,7 +64,7 @@ for row in res:
     text += "\n|-\n"
     text += "|[[Special:Redirect/page/" + pid + "|{{subst:#ifeq:" + ns + "|0||{{subst:ns:" + ns + "}}:}}" + title + "]]"
     text += "||[{{fullurl:Special:日志/protect|page={{subst:#ifeq:" + ns + "|0||{{subst:ns:" + ns + "}}:}}" + title + "}} 保護日誌]"
-    text += '||' + timeobj.strftime('%Y年%m月%d日') + WEEKDAY[timeobj.weekday()] + timeobj.strftime('%H:%M (UTC)')
+    text += '||' + timeobj.strftime('%Y年%-m月%-d日 (') + WEEKDAY[timeobj.weekday()] + timeobj.strftime(') %H:%M (UTC)')
 text += "\n|}"
 
 
