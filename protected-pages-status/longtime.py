@@ -53,15 +53,18 @@ text = cfg['longtime_header_text'].format(d.strftime('%-m月%-d日'))
 text += """{| class="wikitable sortable"
 !頁面!!保護日誌!!期限"""
 
+WEEKDAY = '一二三四五六日'
+
 for row in res:
     pid = str(row[0])
     ns = str(row[1])
     title = row[2].decode()
     expiry = str(row[3].decode())
+    timeobj = datetime.datetime.strptime(expiry, '%Y%m%d%H%M%S')
     text += "\n|-\n"
     text += "|[[Special:Redirect/page/" + pid + "|{{subst:#ifeq:" + ns + "|0||{{subst:ns:" + ns + "}}:}}" + title + "]]"
     text += "||[{{fullurl:Special:日志/protect|page={{subst:#ifeq:" + ns + "|0||{{subst:ns:" + ns + "}}:}}" + title + "}} 保護日誌]"
-    text += "||{{subst:#time:Y年n月j日 (D) H:i (T)|" + expiry + "}}"
+    text += '||' + timeobj.strftime('%Y年%m月%d日') + WEEKDAY[timeobj.weekday()] + timeobj.strftime('%H:%M (UTC)')
 text += "\n|}"
 
 
