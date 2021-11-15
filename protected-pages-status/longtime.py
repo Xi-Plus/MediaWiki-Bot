@@ -60,7 +60,7 @@ for row in res:
     ns = str(row[1])
     title = row[2].decode()
     expiry = str(row[3].decode())
-    timeobj = datetime.datetime.strptime(expiry, '%Y%m%d%H%M%S')
+    timeobj = datetime.strptime(expiry, '%Y%m%d%H%M%S')
     text += "\n|-\n"
     text += "|[[Special:Redirect/page/" + pid + "|{{subst:#ifeq:" + ns + "|0||{{subst:ns:" + ns + "}}:}}" + title + "]]"
     text += "||[{{fullurl:Special:日志/protect|page={{subst:#ifeq:" + ns + "|0||{{subst:ns:" + ns + "}}:}}" + title + "}} 保護日誌]"
