@@ -19,10 +19,10 @@ site.login()
 config_page = pywikibot.Page(site, config_page_name)
 cfg = config_page.text
 cfg = json.loads(cfg)
-print(json.dumps(cfg, indent=4, ensure_ascii=False))
 
 if not cfg['enable']:
-    exit('disabled\n')
+    print('disabled\n')
+    exit()
 
 rrdpage = pywikibot.Page(site, cfg['rrd_page'])
 text = rrdpage.text
@@ -31,7 +31,6 @@ rndstr = hashlib.md5(str(time.time()).encode()).hexdigest()
 
 text = re.sub(r'({{Revdel)', rndstr + r'\1', text)
 text = text.split(rndstr)
-print(len(text))
 
 newtext = text[0]
 remaincnt = 0
@@ -119,10 +118,10 @@ for secid in range(1, len(text)):
 
 
 if re.sub(r'\s', '', rrdpage.text) == re.sub(r'\s', '', newtext):
-    exit('nothing changed')
+    print('nothing changed')
+    exit()
 
 pywikibot.showDiff(rrdpage.text, newtext)
 rrdpage.text = newtext
 summary = cfg['summary'].format(remaincnt)
-print(summary)
 rrdpage.save(summary=summary, minor=True)
