@@ -118,7 +118,10 @@ for username in usernames:
         sign_errors[username].add('外部連結')
     signlen = len(sign.encode())
     if signlen > 255:
-        sign_errors[username].add('簽名過長-{}'.format(signlen))
+        if signlen >= 280:
+            sign_errors[username].add('簽名過長-{{{{red|{}}}}}'.format(signlen))
+        else:
+            sign_errors[username].add('簽名過長-{}'.format(signlen))
 
 data = requests.post('https://zh.wikipedia.org/api/rest_v1/transform/wikitext/to/lint', data=json.dumps({
     "wikitext": text2,
