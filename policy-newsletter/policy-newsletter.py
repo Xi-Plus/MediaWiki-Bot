@@ -120,11 +120,7 @@ with conn.cursor() as cur:
             SELECT page.page_id
             FROM pagelinks
             LEFT JOIN page ON pagelinks.pl_title = page.page_title AND pagelinks.pl_namespace = page.page_namespace
-            WHERE pl_from = 1608664 AND pl_namespace = 4
-                AND page_id NOT IN (
-                    590741, # 嵌入包含
-                    977277 # 模板文檔頁模式
-                )
+            WHERE pl_from = 7745958 AND pl_namespace = 4
         )
         ORDER BY revision.rev_timestamp ASC
     """.format(time1, time2))
