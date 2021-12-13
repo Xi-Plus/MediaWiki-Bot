@@ -31,6 +31,10 @@ def fixPage(sourcePage):
         print('\tnot g15')
         return
 
+    if re.search(r'没有对应母页面的子页面', text, flags=re.I):
+        print('\tblacklist')
+        return
+
     m = re.search(r'#(?:重定向|REDIRECT) ?\[\[(.+?)]]', text, flags=re.I)
     if m:
         middlePage = pywikibot.Page(site, m.group(1))
@@ -44,7 +48,7 @@ def fixPage(sourcePage):
             return
         targetPage = log.target_page
         print('\ttarget', targetPage.title())
-        text = re.sub(r'(<noinclude>)?{{\s*(Delete|Db-reason|D|Deletebecause|Db|速删|速刪|Speedy|SD|快删|快刪|CSD|QD)\s*\|(.*)?g15.*}}(<\/noinclude>)?\s*', '', text, flags=re.I)
+        text = re.sub(r'(<noinclude>)?{{\s*(Delete|Db-reason|D|Deletebecause|Db|速删|速刪|Speedy|SD|快删|快刪|CSD|QD)\s*\|(.*)?g15.*}}\n?(<\/noinclude>)?\s*', '', text, flags=re.I)
         if text == sourcePage.text:
             print('Nothing changed')
             return
