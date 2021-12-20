@@ -14,14 +14,16 @@ from util import Action
 os.environ['TZ'] = 'UTC'
 
 site = pywikibot.Site()
-site.login(sysop=True)
+site.login()
 
 
-db = pymysql.connect(host=DB['host'],
-                     user=DB['user'],
-                     passwd=DB['pass'],
-                     db=DB['db'],
-                     charset=DB['charset'])
+db = pymysql.connect(
+    host=DB['host'],
+    user=DB['user'],
+    passwd=DB['pass'],
+    db=DB['db'],
+    charset=DB['charset']
+)
 cur = db.cursor()
 
 
