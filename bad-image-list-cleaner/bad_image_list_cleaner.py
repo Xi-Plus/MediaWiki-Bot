@@ -51,11 +51,7 @@ class BadImageListCleaner:
             return None
         if page.isRedirectPage():
             logger.debug('%s is a redirect', oldTitle)
-            newTitle = page.getRedirectTarget().title()
-            if '#' in newTitle:
-                return None
-            if re.search(r'^[A-Za-z _]+$', oldTitle):
-                return None
+            newTitle = page.getRedirectTarget().title(with_section=False)
             return newTitle
         return oldTitle
 
