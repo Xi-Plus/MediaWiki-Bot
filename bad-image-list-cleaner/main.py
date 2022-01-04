@@ -28,8 +28,9 @@ logger.addHandler(file_handler)
 
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--no-remove', action='store_false', dest='remove_missing')
-parser.set_defaults(remove_missing=True)
+parser.add_argument('--confirm', action='store_true', dest='confirm')
+parser.add_argument('--dry-run', action='store_true', dest='dry_run')
+parser.set_defaults(confirm=False, dry_run=False)
 args = parser.parse_args()
 logger.debug(args)
 
@@ -47,5 +48,6 @@ if not cfg['enable']:
     exit('disabled\n')
 
 bilc = BadImageListCleaner(site, cfg)
-bilc.REMOVE_MISSING_FILES = args.remove_missing
+bilc.CONFIRM = args.confirm
+bilc.DRY_RUN = args.dry_run
 bilc.main()

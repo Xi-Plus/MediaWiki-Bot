@@ -1,12 +1,11 @@
 # -*- coding: utf-8 -*-
-import enum
 import functools
 import logging
 import re
 import sys
-from unicodedata import normalize
 
 import pywikibot
+from pywikibot.data.api import Request
 
 logger = logging.getLogger('bilc')
 logger.setLevel(logging.DEBUG)
@@ -25,9 +24,11 @@ logger.addHandler(file_handler)
 
 
 class BadImageListCleaner:
-    REMOVE_MISSING_FILES = True
+    CONFIRM = False
+    DRY_RUN = False
     INSERT_FLAG = '<!-- english wikipedia insertion point -->'
     cachedPages = {}
+    cachedFiles = {}
 
     def __init__(self, site, cfg):
         self.site = site
@@ -59,7 +60,16 @@ class BadImageListCleaner:
         return oldTitle
 
     @functools.lru_cache()
-    def check_file_exists(self, title):
+    def get_exists_file_title(self, title):
+        if title in self.cachedFiles:
+            return title
+        filepage = self.get_exists_file(title)
+        if filepage:
+            return filepage.title()
+        return None
+
+    @functools.lru_cache()
+    def get_exists_file(self, title):
         file = pywikibot.FilePage(self.site, title)
         if file.exists():
             return file
@@ -84,12 +94,12 @@ class BadImageListCleaner:
             return None, text
 
         file_title = m.group(1)
-        if self.REMOVE_MISSING_FILES:
-            file = self.check_file_exists(file_title)
-            if not file:
-                logger.debug('%s is not exists', file_title)
-                return None, None
-            file_title = file.title()
+
+        exists_file_title = self.get_exists_file_title(file_title)
+        if not exists_file_title:
+            logger.debug('%s is not exists', file_title)
+            return None, None
+        file_title = exists_file_title
 
         m = re.search(r'except on(.+?)$', text)
         newTitles = []
@@ -138,7 +148,7 @@ class BadImageListCleaner:
                 if file_title in found_files:
                     continue
 
-                file_page = self.check_file_exists(file_title)
+                file_page = self.get_exists_file(file_title)
                 if not file_page:
                     continue
 
@@ -159,19 +169,49 @@ class BadImageListCleaner:
     def main(self):
         badPage = pywikibot.Page(self.site, 'MediaWiki:Bad image list')
         text = badPage.text
-        logger.info('cache links')
+
+        logger.info('cache pages')
         for page in badPage.linkedPages():
             self.cachedPages[page.title()] = page
+
+        logger.info('cache files')
+        data = Request(site=self.site, parameters={
+            'action': 'query',
+            'format': 'json',
+            'formatversion': '2',
+            'prop': 'imageinfo',
+            'titles': 'MediaWiki:Bad image list',
+            'generator': 'links',
+            'gplnamespace': '6',
+            'gpllimit': 'max'
+        }).submit()
+        for page in data['query']['pages']:
+            if page['imagerepository'] != '':
+                self.cachedFiles[page['title']] = True
+            else:
+                self.cachedFiles[page['title']] = False
 
         logger.info('get_en_list')
         en_list = self.get_en_list()
         logger.info('process_text')
         new_text = self.process_text(text, en_list)
+        logger.info('done')
 
-        with open('temp.txt', 'w', encoding='utf8') as f:
-            f.write(new_text)
-        # pywikibot.showDiff(text, new_text)
-        save = input('Save?')
+        if text == new_text:
+            logger.info('nothing changed')
+            return
+
+        if self.CONFIRM:
+            pywikibot.showDiff(text, new_text)
+            save = input('Save?')
+        elif self.DRY_RUN:
+            save = 'no'
+        else:
+            save = 'yes'
+
         if save.lower() in ['y', 'yes']:
             badPage.text = new_text
             badPage.save(summary=self.cfg['summary'], minor=False, botflag=False)
+        else:
+            with open('temp.txt', 'w', encoding='utf8') as f:
+                f.write(new_text)
