@@ -103,19 +103,19 @@ function getstatus($text) {
 			}
 			continue;
 		}
-		if (preg_match("/{{Status\|(?:\+|Done|完成)\|?(?:2=)?(.*?)}}/i", $temp, $m)) {
+		if (preg_match("/{{Status\|(?:1=)?(?:\+|Done|完成)\|?(?:2=)?(.*?)}}/i", $temp, $m)) {
 			$status = trim($m[1]);
 			if ($status === "") {
 				$status = "完成";
 			}
 			$ok = true;
-		} else if (preg_match("/{{Status\|(?:-|Not done|拒絕|拒绝|驳回|駁回|未完成)\|?(?:2=)?(.*?)}}/i", $temp, $m)) {
+		} else if (preg_match("/{{Status\|(?:1=)?(?:-|Not done|拒絕|拒绝|驳回|駁回|未完成)\|?(?:2=)?(.*?)}}/i", $temp, $m)) {
 			$status = trim($m[1]);
 			if ($status === "") {
 				$status = "未完成";
 			}
 			$ok = false;
-		} else if (preg_match("/{{Status\|(?:新申請|on hold|擱置|搁置|等待|等待中|OH|Hold|\*|\?)\|?(?:2=)?(.*?)}}/i", $temp, $m)) {
+		} else if (preg_match("/{{Status\|(?:1=)?(?:新申請|on hold|擱置|搁置|等待|等待中|OH|Hold|\*|\?)\|?(?:2=)?(.*?)}}/i", $temp, $m)) {
 			$status = trim($m[1]);
 			$ok = false;
 		} else {
