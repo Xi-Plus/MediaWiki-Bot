@@ -48,6 +48,9 @@ def fixPage(sourcePage):
             return
         targetPage = log.target_page
         print('\ttarget', targetPage.title())
+        if targetPage.title() == sourcePage.title():
+            print('\tredirect to self')
+            return
         text = re.sub(r'(<noinclude>)?{{\s*(Delete|Db-reason|D|Deletebecause|Db|速删|速刪|Speedy|SD|快删|快刪|CSD|QD)\s*\|(.*)?g15.*}}\n?(<\/noinclude>)?\s*', '', text, flags=re.I)
         if text == sourcePage.text:
             print('Nothing changed')
