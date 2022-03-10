@@ -44,7 +44,7 @@ for secid in range(1, len(text)):
         print(title)
         if re.search(r'\|\s*status\s*=\s*((新申請)?<!--(不要修改本参数|不要修改本參數)-->)?\s*\|', sectext):
             flag = 0
-            if re.search(r'\|\s*set\s*=.*([編编][輯辑])?[內内]容', sectext):
+            if re.search(r'\|\s*set\s*=.*([編编][輯辑]|[刪删]除)?[內内]容', sectext):
                 flag |= 1
                 print('\tcontent')
             if re.search(r'\|\s*set\s*=.*([編编][輯辑])?摘要', sectext):
