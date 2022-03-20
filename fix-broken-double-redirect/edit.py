@@ -31,7 +31,7 @@ def fixPage(sourcePage):
         print('\tnot g15')
         return
 
-    if re.search(r'没有对应母页面的子页面', text, flags=re.I):
+    if re.search(r'没有对应母页面的子页面|不存在注册用户的用户页及用户页子页面', text, flags=re.I):
         print('\tblacklist')
         return
 
