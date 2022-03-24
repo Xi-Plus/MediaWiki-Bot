@@ -60,6 +60,7 @@ SIGN_START = '<!-- sign start -->'
 SIGN_END = '<!-- sign end -->'
 RIGHTS_TO_DISPLAY = [
     'autoreviewer',
+    'awb',
     'confirmed',
     'eventparticipant',
     'filemover',
@@ -337,17 +338,17 @@ for username in user_data:
 # %%
 users_to_notice = {}
 report_text = ''
-cnt = 0
 for user in sorted(user_data.values(), key=lambda user: user.last_time):
     username = user.username
     last_time = user.last_time
+
+    if 'bot' in user.groups:
+        continue
+
     display_groups = list(filter(lambda group: group in RIGHTS_TO_DISPLAY, user.groups))
 
     if len(display_groups) > 0 and last_time < DATE_DISPLAY:
-        right_text = get_right_text(user.groups)
-        if right_text == '':
-            continue
-        cnt += 1
+        right_text = get_right_text(display_groups)
         report_text += '{{/tr|1='
         if last_time < DATE_REVOKE:
             report_text += '#fcc'
