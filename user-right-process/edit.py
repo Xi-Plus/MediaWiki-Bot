@@ -254,11 +254,11 @@ class UserData:
 
 
 class UserDataJSONEncoder(json.JSONEncoder):
-    def default(self, obj):
-        if hasattr(obj, '__jsonencode__'):
-            return obj.__jsonencode__()
+    def default(self, o):
+        if hasattr(o, '__jsonencode__'):
+            return o.__jsonencode__()
 
-        return json.JSONEncoder.default(self, obj)
+        return json.JSONEncoder.default(self, o)
 
 
 # %%
@@ -338,6 +338,7 @@ for username in user_data:
 # %%
 users_to_notice = {}
 report_text = ''
+row_idx = 0
 for user in sorted(user_data.values(), key=lambda user: user.last_time):
     username = user.username
     last_time = user.last_time
@@ -349,6 +350,7 @@ for user in sorted(user_data.values(), key=lambda user: user.last_time):
 
     if len(display_groups) > 0 and last_time < DATE_DISPLAY:
         right_text = get_right_text(display_groups)
+        row_idx += 1
         report_text += '{{/tr|1='
         if last_time < DATE_REVOKE:
             report_text += '#fcc'
@@ -356,7 +358,7 @@ for user in sorted(user_data.values(), key=lambda user: user.last_time):
             report_text += '#ffc'
         else:
             report_text += 'none'
-        report_text += '|2={}'.format(cnt)
+        report_text += '|2={}'.format(row_idx)
         report_text += '|3={}'.format(username)
         report_text += '|4={}'.format(right_text)
         report_text += '|5={}'.format(format_time(user.last_edit))
