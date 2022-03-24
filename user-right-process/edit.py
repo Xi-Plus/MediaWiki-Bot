@@ -5,7 +5,6 @@
 import argparse
 import json
 import os
-import pathlib
 from collections import defaultdict
 from datetime import timedelta
 from functools import lru_cache
@@ -14,15 +13,19 @@ import pymysql
 os.environ['PYWIKIBOT_DIR'] = os.path.dirname(os.path.realpath(__file__))
 import pywikibot
 import pywikibot.flow
-from tqdm import tqdm
 from config import (config_page_name, host,  # pylint: disable=E0611,W0614
                     password, user)
 
 # %%
 parser = argparse.ArgumentParser()
-parser.add_argument('--confirm', action='store_true')
+parser.add_argument('--confirm-export', action='store_true')
+parser.add_argument('--confirm-notice', action='store_true')
 parser.add_argument('--dry-run', action='store_true')
-parser.set_defaults(confirm=False, dry_run=False)
+parser.set_defaults(
+    confirm_export=False,
+    confirm_notice=False,
+    dry_run=False
+)
 args = parser.parse_args()
 if args.dry_run:
     print('dry_run is on')
@@ -42,7 +45,7 @@ if not cfg['enable']:
     exit('disabled\n')
 
 # %%
-BASE_DIR = pathlib.Path(__file__).parent.resolve()
+BASE_DIR = os.path.dirname(os.path.realpath(__file__))
 
 TIME_MIN = pywikibot.Timestamp(1970, 1, 1)
 DATE_LAST_NOTICE = pywikibot.Timestamp.now() - timedelta(days=90)
@@ -153,7 +156,7 @@ def format_time(timestamp):
     return timestamp.strftime('%Y-%m-%d')
 
 
-class UserData(object):
+class UserData:
     def __init__(self):
         self.username = None
         self.actor_id = None
@@ -262,12 +265,13 @@ conn = pymysql.connect(
     host=host,
     user=user,
     password=password,
+    database='zhwiki_p',
     charset='utf8'
 )
 cur = conn.cursor()
 
 # %%
-user_data_path = BASE_DIR / 'user_data.json'
+user_data_path = os.path.join(BASE_DIR, 'user_data.json')
 user_data = defaultdict(UserData)
 try:
     with open(user_data_path, 'r', encoding='utf8') as f:
@@ -313,7 +317,7 @@ for username in set(user_data.keys()) - all_username:
     del user_data[username]
 
 # %%
-for username in tqdm(user_data):
+for username in user_data:
     last_time = user_data[username].last_time
     if last_time > DATE_DISPLAY:
         continue
@@ -375,11 +379,11 @@ idx2 = text.index(REPORT_END)
 text = text[:idx1] + '\n' + report_text + text[idx2:]
 
 # %%
-if args.confirm:
+if args.confirm_export:
     pywikibot.showDiff(exportPage.text, text)
 
 # %%
-if not args.confirm or input('Save export page?').lower() in ['y', 'yes']:
+if not args.confirm_export or input('Save export page?').lower() in ['y', 'yes']:
     exportPage.text = text
     exportPage.save(summary=cfg['export_summary'])
 
@@ -393,7 +397,7 @@ for username, groups in users_to_notice.items():
             title = '因不活躍而取消權限的通知'
             content = '{{subst:Inactive right|1=' + get_right_text(groups, subst=True) + '}}'
 
-        if args.confirm and input('Notice {} with title {} and content {}'.format(username, title, content)).lower() not in ['y', 'yes']:
+        if args.confirm_notice and input('Notice {} with title {} and content {} ?'.format(username, title, content)).lower() not in ['y', 'yes']:
             continue
 
         talkPage = pywikibot.Page(site, 'User talk:' + username)
