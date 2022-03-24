@@ -30,5 +30,7 @@ remove-broken-file/skipedpage.txt
 rfa-stats/data/
 rfa-stats-php/list/
 user-config/
+user-right-process/last_notice.json
 *.csv
 *.pyc
+replica.my.cnf
