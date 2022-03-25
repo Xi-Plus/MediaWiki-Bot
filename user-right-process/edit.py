@@ -338,7 +338,6 @@ for username in user_data:
 # %%
 users_to_notice = {}
 report_text = ''
-row_idx = 0
 for user in sorted(user_data.values(), key=lambda user: user.last_time):
     username = user.username
     last_time = user.last_time
@@ -350,20 +349,18 @@ for user in sorted(user_data.values(), key=lambda user: user.last_time):
 
     if len(display_groups) > 0 and last_time < DATE_DISPLAY:
         right_text = get_right_text(display_groups)
-        row_idx += 1
-        report_text += '{{/tr|1='
+        report_text += '{{/tr|color='
         if last_time < DATE_REVOKE:
             report_text += '#fcc'
         elif last_time < DATE_NOTICE:
             report_text += '#ffc'
         else:
             report_text += 'none'
-        report_text += '|2={}'.format(row_idx)
-        report_text += '|3={}'.format(username)
-        report_text += '|4={}'.format(right_text)
-        report_text += '|5={}'.format(format_time(user.last_edit))
-        report_text += '|6={}'.format(format_time(user.last_log))
-        report_text += '|7={}'.format(format_time(user.last_right))
+        report_text += '|user={}'.format(username)
+        report_text += '|group={}'.format(right_text)
+        report_text += '|edit={}'.format(format_time(user.last_edit))
+        report_text += '|log={}'.format(format_time(user.last_log))
+        report_text += '|right={}'.format(format_time(user.last_right))
         report_text += '}}\n'
 
     if len(display_groups) > 0 and DATE_NOTICE_IGNORE < last_time < DATE_NOTICE and user.last_notice < DATE_LAST_NOTICE:
