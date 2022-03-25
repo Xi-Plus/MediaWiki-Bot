@@ -40,7 +40,7 @@ class BadImageListCleaner:
         m = re.findall(r'^\* *\[\[:(File:.+?)\]\]', text, flags=re.MULTILINE)
         return m
 
-    @functools.lru_cache()
+    @functools.lru_cache(maxsize=None)
     def check_title(self, oldTitle):
         if oldTitle in self.cachedPages:
             page = self.cachedPages[oldTitle]
@@ -55,7 +55,7 @@ class BadImageListCleaner:
             return newTitle
         return oldTitle
 
-    @functools.lru_cache()
+    @functools.lru_cache(maxsize=None)
     def get_exists_file_title(self, title):
         if title in self.cachedFiles:
             return title
@@ -64,7 +64,7 @@ class BadImageListCleaner:
             return filepage.title()
         return None
 
-    @functools.lru_cache()
+    @functools.lru_cache(maxsize=None)
     def get_exists_file(self, title):
         file = pywikibot.FilePage(self.site, title)
         if file.exists():
