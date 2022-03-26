@@ -290,7 +290,7 @@ all_username = set()
 for row in user_with_groups:
     user_id, actor_id, username, groups = row
     username = username.decode()
-    groups = groups.decode().split(',')
+    groups = sorted(groups.decode().split(','))
 
     user_data[username].username = username
     user_data[username].actor_id = actor_id
@@ -310,6 +310,7 @@ for username in awb_data['enabledusers']:
         user_data[username].actor_id = actor_id
         user_data[username].username = username
     user_data[username].groups.append('awb')
+    user_data[username].groups.sort()
 
     all_username.add(username)
 
