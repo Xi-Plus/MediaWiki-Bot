@@ -390,7 +390,7 @@ if args.confirm_export:
     pywikibot.showDiff(exportPage.text, text)
 
 # %%
-if not args.confirm_export or input('Save export page?').lower() in ['y', 'yes']:
+if not args.confirm_export or input('Save export page? ').lower() in ['y', 'yes']:
     exportPage.text = text
     exportPage.save(summary=cfg['export_summary'])
 
@@ -438,10 +438,16 @@ if len(users_to_report) > 0:
         if userTemplate in text:
             continue
 
+        user = user_data[username]
         insertText += '*' + userTemplate + '\n'
         insertText += '*:{{Status|新提案}}\n'
         insertText += '*:需複審或解除之權限：' + get_right_text(groups, subst=True) + '\n'
-        insertText += '*:理由：\n'
+        insertText += '*:理由：逾六個月沒有任何編輯活動、最近編輯：[[Special:用户贡献/{0}|{1}]]、最近日誌：[[Special:日志/{0}|{2}]]、最近授權：[{{{{fullurl:Special:日志/rights|page={{{{urlencode:User:{0}}}}}}}}} {3}]\n'.format(
+            username,
+            format_time(user.last_edit),
+            format_time(user.last_log),
+            format_time(user.last_right)
+        )
         insertText += '*:~~~~\n\n'
 
     if insertText != '':
@@ -457,6 +463,6 @@ if len(users_to_report) > 0:
             if args.confirm_report:
                 pywikibot.showDiff(reportPage.text, text)
 
-            if not args.confirm_report or input('Save report page?').lower() in ['y', 'yes']:
+            if not args.confirm_report or input('Save report page? ').lower() in ['y', 'yes']:
                 reportPage.text = text
                 reportPage.save(summary=cfg['report_summary'])
