@@ -439,7 +439,7 @@ if args.confirm_export:
 # %%
 if not args.confirm_export or input('Save export page? ').lower() in ['y', 'yes']:
     exportPage.text = text
-    exportPage.save(summary=cfg['export_summary'])
+    exportPage.save(summary=cfg['export_summary'], minor=False)
 
 # %%
 for username, groups in users_to_notice.items():
@@ -514,7 +514,7 @@ if len(users_to_report) > 0:
 
             if not args.confirm_report or input('Save report page? ').lower() in ['y', 'yes']:
                 reportPage.text = text
-                reportPage.save(summary=cfg['report_summary'])
+                reportPage.save(summary=cfg['report_summary'], minor=False)
 
                 for username in user_data.keys():
                     user_data[username].last_report = pywikibot.Timestamp.now().totimestampformat()
