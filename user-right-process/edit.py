@@ -20,10 +20,12 @@ from config import (config_page_name, host,  # pylint: disable=E0611,W0614
 parser = argparse.ArgumentParser()
 parser.add_argument('--confirm-export', action='store_true')
 parser.add_argument('--confirm-notice', action='store_true')
+parser.add_argument('--confirm-report', action='store_true')
 parser.add_argument('--dry-run', action='store_true')
 parser.set_defaults(
     confirm_export=False,
     confirm_notice=False,
+    confirm_report=False,
     dry_run=False
 )
 args = parser.parse_args()
@@ -52,7 +54,7 @@ DATE_LAST_NOTICE = pywikibot.Timestamp.now() - timedelta(days=90)
 DATE_REVOKE = pywikibot.Timestamp.now() - timedelta(days=183)
 DATE_NOTICE_IGNORE = pywikibot.Timestamp.now() - timedelta(days=173)
 DATE_NOTICE = pywikibot.Timestamp.now() - timedelta(days=153)
-DATE_DISPLAY = pywikibot.Timestamp.now() - timedelta(days=143)
+DATE_DISPLAY = pywikibot.Timestamp.now() - timedelta(days=146)
 
 REPORT_START = '<!-- report start -->'
 REPORT_END = '<!-- report end -->'
@@ -338,6 +340,7 @@ for username in user_data:
 
 # %%
 users_to_notice = {}
+users_to_report = {}
 report_text = ''
 for user in sorted(user_data.values(), key=lambda user: user.last_time):
     username = user.username
@@ -366,6 +369,9 @@ for user in sorted(user_data.values(), key=lambda user: user.last_time):
 
     if len(display_groups) > 0 and DATE_NOTICE_IGNORE < last_time < DATE_NOTICE and user.last_notice < DATE_LAST_NOTICE:
         users_to_notice[username] = display_groups
+
+    if len(display_groups) > 0 and last_time < DATE_REVOKE:
+        users_to_report[username] = display_groups
 
 # %%
 exportPage = pywikibot.Page(site, cfg['export_page'])
@@ -420,3 +426,37 @@ for username, groups in users_to_notice.items():
 # %%
 with open(user_data_path, 'w', encoding='utf8') as f:
     json.dump(user_data, f, ensure_ascii=False, indent='\t', cls=UserDataJSONEncoder)
+
+# %%
+if len(users_to_report) > 0:
+    reportPage = pywikibot.Page(site, cfg['report_page'])
+    text = reportPage.text
+
+    insertText = ''
+    for username, groups in users_to_report.items():
+        userTemplate = '{{User|' + ('1=' if '=' in username else '') + username + '}}'
+        if userTemplate in text:
+            continue
+
+        insertText += '*' + userTemplate + '\n'
+        insertText += '*:{{Status|新提案}}\n'
+        insertText += '*:需複審或解除之權限：' + get_right_text(groups, subst=True) + '\n'
+        insertText += '*:理由：\n'
+        insertText += '*:~~~~\n\n'
+
+    if insertText != '':
+        idx = None
+        try:
+            idx = text.index(cfg['report_flag'])
+        except IndexError:
+            print('Failed to find report_flag')
+
+        if idx is not None:
+            text = text[:idx] + insertText + text[idx:]
+
+            if args.confirm_report:
+                pywikibot.showDiff(reportPage.text, text)
+
+            if not args.confirm_report or input('Save report page?').lower() in ['y', 'yes']:
+                reportPage.text = text
+                reportPage.save(summary=cfg['report_summary'])
