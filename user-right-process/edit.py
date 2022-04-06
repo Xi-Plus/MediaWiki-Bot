@@ -52,6 +52,7 @@ BASE_DIR = os.path.dirname(os.path.realpath(__file__))
 TIME_MIN = pywikibot.Timestamp(1970, 1, 1)
 DATE_LAST_NOTICE = pywikibot.Timestamp.now() - timedelta(days=90)
 DATE_REVOKE = pywikibot.Timestamp.now() - timedelta(days=183)
+DATE_LAST_REPORT = pywikibot.Timestamp.now() - timedelta(days=183)
 DATE_NOTICE_IGNORE = pywikibot.Timestamp.now() - timedelta(days=173)
 DATE_NOTICE = pywikibot.Timestamp.now() - timedelta(days=153)
 DATE_DISPLAY = pywikibot.Timestamp.now() - timedelta(days=146)
@@ -169,6 +170,7 @@ class UserData:
         self.last_right = TIME_MIN
         self.last_time = TIME_MIN
         self.last_notice = TIME_MIN
+        self.last_report = TIME_MIN
 
     @classmethod
     def fromDict(cls, val):
@@ -179,6 +181,8 @@ class UserData:
             data.last_time = val['last_time']
         if 'last_notice' in val:
             data.last_notice = val['last_notice']
+        if 'last_report' in val:
+            data.last_report = val['last_report']
         return data
 
     @property
@@ -236,6 +240,17 @@ class UserData:
         else:
             self._last_notice = val
 
+    @property
+    def last_report(self):
+        return pywikibot.Timestamp.fromtimestampformat(self._last_report)
+
+    @last_report.setter
+    def last_report(self, val):
+        if isinstance(val, pywikibot.Timestamp):
+            self._last_report = val.totimestampformat()
+        else:
+            self._last_report = val
+
     def __repr__(self):
         return json.dumps({
             'username': self.username,
@@ -245,6 +260,7 @@ class UserData:
             'last_log': self._last_log,
             'last_right': self._last_right,
             'last_notice': self._last_notice,
+            'last_report': self._last_report,
         })
 
     def __jsonencode__(self):
@@ -252,6 +268,7 @@ class UserData:
             'actor_id': self.actor_id,
             'last_time': self._last_time,
             'last_notice': self._last_notice,
+            'last_report': self._last_report,
         }
 
 
@@ -370,7 +387,7 @@ for user in sorted(user_data.values(), key=lambda user: user.last_time):
     if len(display_groups) > 0 and DATE_NOTICE_IGNORE < last_time < DATE_NOTICE and user.last_notice < DATE_LAST_NOTICE:
         users_to_notice[username] = display_groups
 
-    if len(display_groups) > 0 and last_time < DATE_REVOKE:
+    if len(display_groups) > 0 and last_time < DATE_REVOKE and user.last_report < DATE_LAST_REPORT:
         users_to_report[username] = display_groups
 
 # %%
@@ -424,21 +441,22 @@ for username, groups in users_to_notice.items():
             json.dump(user_data, f, ensure_ascii=False, indent='\t', cls=UserDataJSONEncoder)
 
 # %%
-with open(user_data_path, 'w', encoding='utf8') as f:
-    json.dump(user_data, f, ensure_ascii=False, indent='\t', cls=UserDataJSONEncoder)
-
-# %%
 if len(users_to_report) > 0:
     reportPage = pywikibot.Page(site, cfg['report_page'])
     text = reportPage.text
 
     insertText = ''
     for username, groups in users_to_report.items():
-        userTemplate = '{{User|' + ('1=' if '=' in username else '') + username + '}}'
-        if userTemplate in text:
+        user = user_data[username]
+
+        if user.last_report > DATE_LAST_REPORT:
             continue
 
-        user = user_data[username]
+        userTemplate = '{{User|' + ('1=' if '=' in username else '') + username + '}}'
+        if userTemplate in text:
+            user_data[username].last_report = pywikibot.Timestamp.now().totimestampformat()
+            continue
+
         insertText += '*' + userTemplate + '\n'
         insertText += '*:{{Status|新提案}}\n'
         insertText += '*:需複審或解除之權限：' + get_right_text(groups, subst=True) + '\n'
@@ -466,3 +484,9 @@ if len(users_to_report) > 0:
             if not args.confirm_report or input('Save report page? ').lower() in ['y', 'yes']:
                 reportPage.text = text
                 reportPage.save(summary=cfg['report_summary'])
+
+                for username in user_data.keys():
+                    user_data[username].last_report = pywikibot.Timestamp.now().totimestampformat()
+
+                with open(user_data_path, 'w', encoding='utf8') as f:
+                    json.dump(user_data, f, ensure_ascii=False, indent='\t', cls=UserDataJSONEncoder)
