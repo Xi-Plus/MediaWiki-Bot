@@ -98,6 +98,13 @@ WHERE rev_actor = %s
 ORDER BY rev_id DESC
 LIMIT 1
 """
+last_archive_query = """
+SELECT ar_timestamp
+FROM archive
+WHERE ar_actor = %s
+ORDER BY ar_timestamp DESC
+LIMIT 1
+"""
 last_log_query = """
 SELECT log_timestamp
 FROM logging_userindex
@@ -127,6 +134,12 @@ def parse_query_timestamp(row):
 @lru_cache(maxsize=None)
 def get_last_edit_by_actor_id(actor_id):
     cur.execute(last_edit_query, actor_id)
+    return parse_query_timestamp(cur.fetchone())
+
+
+@lru_cache(maxsize=None)
+def get_last_deleted_edit_by_actor_id(actor_id):
+    cur.execute(last_archive_query, actor_id)
     return parse_query_timestamp(cur.fetchone())
 
 
@@ -161,6 +174,14 @@ def format_time(timestamp):
 
 
 class UserData:
+    _last_edit = None
+    last_edit_deleted = False
+    _last_log = None
+    _last_right = None
+    _last_time = None
+    _last_notice = None
+    _last_report = None
+
     def __init__(self):
         self.username = None
         self.actor_id = None
@@ -256,9 +277,11 @@ class UserData:
             'username': self.username,
             'actor_id': self.actor_id,
             'groups': self.groups,
-            'last_time': self._last_time,
+            'last_edit': self._last_edit,
+            'last_edit_deleted': self.last_edit_deleted,
             'last_log': self._last_log,
             'last_right': self._last_right,
+            'last_time': self._last_time,
             'last_notice': self._last_notice,
             'last_report': self._last_report,
         })
@@ -273,7 +296,7 @@ class UserData:
 
 
 class UserDataJSONEncoder(json.JSONEncoder):
-    def default(self, o):
+    def default(self, o):  # pylint: disable=E0202
         if hasattr(o, '__jsonencode__'):
             return o.__jsonencode__()
 
@@ -346,6 +369,11 @@ for username in user_data:
     actor_id = user_data[username].actor_id
 
     user_data[username].last_edit = get_last_edit_by_actor_id(actor_id)
+    if user_data[username].last_edit < DATE_DISPLAY:
+        last_deleted_edit = get_last_deleted_edit_by_actor_id(actor_id)
+        if last_deleted_edit > user_data[username].last_edit:
+            user_data[username].last_edit = last_deleted_edit
+            user_data[username].last_edit_deleted = True
     user_data[username].last_log = get_last_log_by_actor_id(actor_id)
     user_data[username].last_right = get_last_right_by_username(username.replace(' ', '_'))
 
@@ -380,6 +408,8 @@ for user in sorted(user_data.values(), key=lambda user: user.last_time):
         report_text += '|user={}'.format(username)
         report_text += '|group={}'.format(right_text)
         report_text += '|edit={}'.format(format_time(user.last_edit))
+        if user.last_edit_deleted:
+            report_text += '|edit deleted=1'
         report_text += '|log={}'.format(format_time(user.last_log))
         report_text += '|right={}'.format(format_time(user.last_right))
         report_text += '}}\n'
@@ -460,11 +490,12 @@ if len(users_to_report) > 0:
         insertText += '*' + userTemplate + '\n'
         insertText += '*:{{Status|新提案}}\n'
         insertText += '*:需複審或解除之權限：' + get_right_text(groups, subst=True) + '\n'
-        insertText += '*:理由：逾六個月沒有任何編輯活動、最近編輯：[[Special:用户贡献/{0}|{1}]]、最近日誌：[[Special:日志/{0}|{2}]]、最近授權：[{{{{fullurl:Special:日志/rights|page={{{{urlencode:User:{0}}}}}}}}} {3}]\n'.format(
-            username,
-            format_time(user.last_edit),
-            format_time(user.last_log),
-            format_time(user.last_right)
+        insertText += '*:理由：逾六個月沒有任何編輯活動、最近編輯：[[Special:{contrib}/{user}|{edit}]]、最近日誌：[[Special:Log/{user}|{log}]]、最近授權：[{{{{fullurl:Special:Log/rights|page={{{{urlencode:User:{user}}}}}}}}} {right}]\n'.format(
+            user=username,
+            edit=format_time(user.last_edit),
+            contrib='DeletedContributions' if user.last_edit_deleted else 'Contribs',
+            log=format_time(user.last_log),
+            right=format_time(user.last_right)
         )
         insertText += '*:~~~~\n\n'
 
