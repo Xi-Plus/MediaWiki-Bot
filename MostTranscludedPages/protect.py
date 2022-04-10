@@ -50,23 +50,25 @@ def check_required_protection(title, count):
         if title.endswith('.js') or title.endswith('.css') or title.endswith('.json'):
             return 0
     if count >= cfg['template_full'] and cfg['template_full'] > 0:
-        return 3
+        return 4
     if count >= cfg['template_temp'] and cfg['template_temp'] > 0:
-        return 2
+        return 3
     if count >= cfg['template_semi'] and cfg['template_semi'] > 0:
         return 1
     return 0
 
 
 protection2number = {
-    'sysop': 3,
-    'templateeditor': 2,
+    'sysop': 4,
+    'templateeditor': 3,
+    'extendedconfirmed': 2,
     'autoconfirmed': 1,
     '': 0,
 }
 number2protection = {
-    3: 'sysop',
-    2: 'templateeditor',
+    4: 'sysop',
+    3: 'templateeditor',
+    2: 'extendedconfirmed',
     1: 'autoconfirmed',
     0: '',
 }
