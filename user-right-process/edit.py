@@ -21,16 +21,12 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--confirm-export', action='store_true')
 parser.add_argument('--confirm-notice', action='store_true')
 parser.add_argument('--confirm-report', action='store_true')
-parser.add_argument('--dry-run', action='store_true')
 parser.set_defaults(
     confirm_export=False,
     confirm_notice=False,
     confirm_report=False,
-    dry_run=False
 )
 args = parser.parse_args()
-if args.dry_run:
-    print('dry_run is on')
 
 os.environ['TZ'] = 'UTC'
 
