@@ -37,20 +37,29 @@ def fixPage(sourcePage):
 
     m = re.search(r'#(?:重定向|REDIRECT) ?\[\[(.+?)]]', text, flags=re.I)
     if m:
-        middlePage = pywikibot.Page(site, m.group(1))
-        logs = list(site.logevents(page=middlePage, total=1, logtype='move'))
-        if len(logs) == 0:
-            print('\tno logs')
+        targetPage = pywikibot.Page(site, m.group(1))
+        foundTitles = [sourcePage.title(), targetPage.title()]
+        while True:
+            logs = list(site.logevents(page=targetPage, total=1, logtype='move'))
+            if len(logs) == 0:
+                print('\tno logs')
+                return
+            log = logs[0]
+            if log.type() != 'move':
+                print('\trecent log not move')
+                return
+            targetPage = log.target_page
+            if targetPage.title() in foundTitles:
+                foundTitles.append(targetPage.title())
+                print('\tget into loop:', foundTitles)
+                return
+            foundTitles.append(targetPage.title())
+            if targetPage.exists():
+                break
+        if targetPage is None:
+            print('\tcannot found target')
             return
-        log = logs[0]
-        if log.type() != 'move':
-            print('\trecent log not move')
-            return
-        targetPage = log.target_page
-        print('\ttarget', targetPage.title())
-        if targetPage.title() == sourcePage.title():
-            print('\tredirect to self')
-            return
+        print('\ttarget', foundTitles)
         text = re.sub(r'(<noinclude>)?{{\s*(Delete|Db-reason|D|Deletebecause|Db|速删|速刪|Speedy|SD|快删|快刪|CSD|QD)\s*\|(.*)?g15.*}}\n?(<\/noinclude>)?\s*', '', text, flags=re.I)
         if text == sourcePage.text:
             print('Nothing changed')
