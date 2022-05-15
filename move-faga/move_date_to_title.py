@@ -73,5 +73,4 @@ if __name__ == '__main__':
     parser.add_argument('--dry_run', type=bool, default=False)
     args = parser.parse_args()
 
-
     move_date_to_title(args.page, confirm=args.confirm, dry_run=args.dry_run)
