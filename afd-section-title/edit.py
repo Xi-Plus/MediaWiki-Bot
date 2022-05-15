@@ -1,17 +1,24 @@
 # -*- coding: utf-8 -*-
+import argparse
 import json
 import os
 import re
-import sys
 from datetime import datetime, timedelta
 
 import mwparserfromhell
+
 os.environ['PYWIKIBOT_DIR'] = os.path.dirname(os.path.realpath(__file__))
 import pywikibot
 from pywikibot.data.api import Request
 
 from config import config_page_name  # pylint: disable=E0611,W0614
 
+parser = argparse.ArgumentParser()
+parser.add_argument('pagename', nargs='?')
+parser.add_argument('--debug', action='store_true')
+parser.set_defaults(debug=False)
+args = parser.parse_args()
+pywikibot.log(args)
 
 site = pywikibot.Site()
 site.login()
@@ -19,7 +26,8 @@ site.login()
 config_page = pywikibot.Page(site, config_page_name)
 cfg = config_page.text
 cfg = json.loads(cfg)
-print(json.dumps(cfg, indent=4, ensure_ascii=False))
+if args.debug:
+    print(json.dumps(cfg, indent=4, ensure_ascii=False))
 
 if not cfg['enable']:
     exit('disabled\n')
@@ -73,20 +81,25 @@ def appendComment(text, mode):
             comment = []
             if 'redirects' in mode and isinstance(cfg['comment_fix']['redirects'], str):
                 comment.append(cfg['comment_fix']['redirects'])
-                print('\tcomment_fix - redirects')
+                if args.debug:
+                    print('\tcomment_fix - redirects')
             if 'converted' in mode and isinstance(cfg['comment_fix']['converted'], str):
                 comment.append(cfg['comment_fix']['converted'])
-                print('\tcomment_fix - converted')
+                if args.debug:
+                    print('\tcomment_fix - converted')
             if 'normalized' in mode and isinstance(cfg['comment_fix']['normalized'], str):
                 comment.append(cfg['comment_fix']['normalized'])
-                print('\tcomment_fix - normalized')
+                if args.debug:
+                    print('\tcomment_fix - normalized')
             if len(comment) > 0:
                 append_text.append(cfg['comment_fix']['main'].format(
                     ''.join(comment)))
-                print('\tcomment_fix - redirects')
+                if args.debug:
+                    print('\tcomment_fix - redirects')
         if 'no_vfd' in mode:
             append_text.append(cfg['comment_vfd'])
-            print('\tcomment_vfd')
+            if args.debug:
+                print('\tcomment_vfd')
         if len(append_text) > 0:
             text = text.strip()
             append_text = '\n'.join(append_text)
@@ -114,8 +127,9 @@ def fix(pagename):
     if re.search(r'\d{4}/\d{2}/\d{2}', pagename):
         pagename = 'Wikipedia:頁面存廢討論/記錄/' + pagename
 
-    print('-' * 50)
-    print('running for ' + pagename)
+    if args.debug:
+        print('-' * 50)
+        print('running for ' + pagename)
 
     afdpage = pywikibot.Page(site, pagename)
     text = afdpage.text
@@ -127,9 +141,11 @@ def fix(pagename):
         if secid == 0:
             continue
         title = str(section.get(0).title).strip()
-        print(secid, title)
+        if args.debug:
+            print(secid, title)
         if re.search(r'{{\s*(delh|TalkendH)\s*(\||}})', str(section), re.IGNORECASE) is not None:
-            print('  closed, skip')
+            if args.debug:
+                print('  closed, skip')
             continue
 
         m = re.search(r'^\[\[([^\]]+)\]\]$', title, re.IGNORECASE)
@@ -148,7 +164,8 @@ def fix(pagename):
                 title = convert['title']
                 mode.append('fix')
             mode += convert['mode']
-            print('    ', mode)
+            if args.debug:
+                print('    ', mode)
 
             title = '[[' + start + title + ']]'
 
@@ -156,7 +173,8 @@ def fix(pagename):
                 if str(section.get(0).title).strip().replace('_', ' ') != title:
                     section.insert(
                         1, '\n{{formerly|' + str(section.get(0).title) + '}}')
-                print('  set new title = ' + title)
+                if args.debug:
+                    print('  set new title = ' + title)
                 section.get(0).title = title
             newtext = appendComment(str(section), mode)
             changes.append([secid, newtext])
@@ -184,12 +202,14 @@ def fix(pagename):
 
                     newtitlelist.append(title)
                 else:
-                    print('  wrong title: ' + title)
+                    if args.debug:
+                        print('  wrong title: ' + title)
                     return
             newtitlelist = escapeEqualSign(newtitlelist)
             title = '{{al|' + '|'.join(newtitlelist) + '}}'
             if str(section.get(0).title) != title:
-                print('  set new title = ' + title)
+                if args.debug:
+                    print('  set new title = ' + title)
                 section.get(0).title = title
             newtext = appendComment(str(section), mode)
             changes.append([secid, newtext])
@@ -219,13 +239,15 @@ def fix(pagename):
             newtitlelist = escapeEqualSign(newtitlelist)
             title = '{{al|' + '|'.join(newtitlelist) + '}}'
             if str(section.get(0).title) != title:
-                print('  set new title = ' + title)
+                if args.debug:
+                    print('  set new title = ' + title)
                 section.get(0).title = title
             newtext = appendComment(str(section), mode)
             changes.append([secid, newtext])
             continue
 
-        print('  unknown format, skip')
+        if args.debug:
+            print('  unknown format, skip')
 
     for change in changes:
         wikicode = mwparserfromhell.parse(text)
@@ -235,21 +257,24 @@ def fix(pagename):
         text = str(wikicode)
 
     if re.sub(r'\s+', '', afdpage.text) == re.sub(r'\s+', '', text):
-        print('  nothing changed')
+        if args.debug:
+            print('  nothing changed')
         return
 
-    pywikibot.showDiff(afdpage.text, text)
+    if args.debug:
+        pywikibot.showDiff(afdpage.text, text)
     summary = cfg['summary']
-    print(summary)
+    if args.debug:
+        print(summary)
     afdpage.text = text
     afdpage.save(summary=summary, minor=False)
 
 
-if len(sys.argv) >= 2:
-    pagename = sys.argv[1]
-    fix(pagename)
+if args.pagename:
+    fix(args.pagename)
 else:
-    print('run past {} days'.format(cfg['run_past_days']))
+    if args.debug:
+        print('run past {} days'.format(cfg['run_past_days']))
     for delta in range(cfg['run_past_days']):
         rundate = datetime.now() - timedelta(days=delta)
         pagename = rundate.strftime('%Y/%m/%d')
