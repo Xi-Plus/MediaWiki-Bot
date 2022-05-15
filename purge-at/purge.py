@@ -7,6 +7,7 @@ from config import config_page_name  # pylint: disable=E0611,W0614
 
 os.environ['TZ'] = 'UTC'
 
+os.environ['PYWIKIBOT_DIR'] = os.path.dirname(os.path.realpath(__file__))
 import pywikibot
 
 site = pywikibot.Site()
