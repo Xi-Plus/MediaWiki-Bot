@@ -399,7 +399,8 @@ for page in pages:
                         if image_fullname not in drv_page_text:
                             drv_page_text += cfg["drv_append_text"].format(
                                 image_fullname, pagetitle, deletelog["user"], deletelog["comment"], deletelog["logid"])
-                            pywikibot.showDiff(drv_page.text, drv_page_text)
+                            if args.confirm:
+                                pywikibot.showDiff(drv_page.text, drv_page_text)
                             summary = cfg["drv_summary"]
                             pywikibot.output("summary = {}".format(summary))
 
@@ -536,7 +537,8 @@ for page in pages:
             break
         continue
 
-    pywikibot.showDiff(page.text, text)
+    if args.confirm:
+        pywikibot.showDiff(page.text, text)
 
     if args.confirm:
         save = input("save?")
