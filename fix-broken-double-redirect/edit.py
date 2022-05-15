@@ -86,7 +86,6 @@ if __name__ == "__main__":
     parser.add_argument('-f', '--force', action='store_true', dest='force')
     parser.set_defaults(check=False, force=False)
     args = parser.parse_args()
-    print(args)
 
     if args.page:
         page = pywikibot.Page(site, args.page)

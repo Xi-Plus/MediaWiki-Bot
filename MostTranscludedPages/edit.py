@@ -14,7 +14,6 @@ parser.add_argument('lang', nargs='?', default='zh')
 parser.add_argument('wiki', nargs='?', default='wikipedia')
 parser.add_argument('dbwiki', nargs='?', default='zhwiki')
 args = parser.parse_args()
-print(args)
 
 os.environ['TZ'] = 'UTC'
 

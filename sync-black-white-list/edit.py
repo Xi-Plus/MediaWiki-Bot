@@ -20,7 +20,6 @@ parser.add_argument('action', choices=[ACTION_WHITE_ADD, ACTION_WHITE_REMOVE, AC
 parser.add_argument('username')
 parser.add_argument('diffid')
 args = parser.parse_args()
-print(args)
 
 USERNAME = args.username
 ACTION = args.action

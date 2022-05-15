@@ -16,7 +16,6 @@ parser.add_argument('wiki', nargs='?', default='wikipedia')
 parser.add_argument('--dry-run', action='store_true')
 parser.set_defaults(dry_run=False)
 args = parser.parse_args()
-print(args)
 
 site = pywikibot.Site(args.lang, args.wiki)
 site.login()

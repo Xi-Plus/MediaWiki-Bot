@@ -15,7 +15,6 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--confirm', action='store_true')
 parser.set_defaults(confirm=False)
 args = parser.parse_args()
-print(args)
 
 os.environ['TZ'] = 'UTC'
 

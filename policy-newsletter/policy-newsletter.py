@@ -20,7 +20,6 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--page')
 parser.add_argument('--months', type=int, default=0)
 args = parser.parse_args()
-print(args)
 
 title = args.page
 if title is None:

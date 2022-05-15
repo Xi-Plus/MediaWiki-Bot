@@ -28,7 +28,6 @@ os.environ['TZ'] = 'UTC'
 parser = argparse.ArgumentParser()
 parser.add_argument('page')
 args = parser.parse_args()
-print(args)
 
 site = pywikibot.Site()
 site.login()

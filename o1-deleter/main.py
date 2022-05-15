@@ -83,7 +83,6 @@ if __name__ == "__main__":
     parser.add_argument('--dry_run', action='store_true', dest='dry_run')
     parser.set_defaults(check=False, dry_run=False)
     args = parser.parse_args()
-    print(args)
 
     pages = []
     if args.page:

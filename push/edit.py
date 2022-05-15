@@ -13,7 +13,6 @@ parser.add_argument('--no-diff', action='store_true')
 parser.add_argument('--pull', action='store_true')
 parser.set_defaults(auto=False, no_diff=False, pull=False)
 args = parser.parse_args()
-print(args)
 
 print('===== project =====')
 project = None

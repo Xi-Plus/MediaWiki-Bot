@@ -27,7 +27,6 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--limit', type=int, default=0)
 parser.add_argument('--limit2', type=int, default=0)
 args = parser.parse_args()
-print(args)
 
 site = pywikibot.Site()
 site.login()

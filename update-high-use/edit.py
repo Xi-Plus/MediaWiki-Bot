@@ -131,7 +131,6 @@ if __name__ == "__main__":
     parser.add_argument('-l', '--diff-limit', type=float, default=cfg['diff_limit'])
     parser.set_defaults(dry_run=False, add=True, check=False)
     args = parser.parse_args()
-    print(args)
 
     if args.template:
         update(args.template, dry_run=args.dry_run, add_template=args.add, check=args.check, diff_limit=args.diff_limit)

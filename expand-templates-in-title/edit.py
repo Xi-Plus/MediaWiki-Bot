@@ -12,7 +12,6 @@ from config import config_page_name  # pylint: disable=E0611,W0614
 parser = argparse.ArgumentParser()
 parser.add_argument('page', nargs='?')
 args = parser.parse_args()
-print(args)
 
 site = pywikibot.Site()
 site.login()

@@ -16,7 +16,6 @@ parser = argparse.ArgumentParser()
 parser.add_argument('-c', '--check', action='store_true', dest='check')
 parser.set_defaults(check=False)
 args = parser.parse_args()
-print(args)
 
 site = pywikibot.Site()
 site.login()

@@ -95,6 +95,5 @@ if __name__ == "__main__":
     parser.add_argument('--dry-run', action='store_true')
     parser.set_defaults(dry_run=False)
     args = parser.parse_args()
-    print(args)
 
     check_username(args.username, args.dry_run)

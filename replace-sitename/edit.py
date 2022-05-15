@@ -15,7 +15,6 @@ parser.add_argument('--confirm', type=bool, default=False)
 parser.add_argument('--lang', type=str, default='zh')
 parser.add_argument('--family', type=str, default='wikipedia')
 args = parser.parse_args()
-print(args)
 
 site = pywikibot.Site(args.lang, args.family)
 site.login()
