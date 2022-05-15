@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import argparse
 import hashlib
 import json
 import os
@@ -10,6 +11,10 @@ import pywikibot
 from pywikibot.data.api import Request
 from config import config_page_name  # pylint: disable=E0611,W0614
 
+parser = argparse.ArgumentParser()
+parser.add_argument('--debug', action='store_true')
+parser.set_defaults(debug=False)
+args = parser.parse_args()
 
 os.environ['TZ'] = 'UTC'
 
@@ -41,15 +46,18 @@ for secid in range(1, len(text)):
     m = re.search(r'\|\s*article\s*=\s*(.+?)\s*\|', sectext)
     if m:
         title = m.group(1)
-        print(title)
+        if args.debug:
+            print(title)
         if re.search(r'\|\s*status\s*=\s*((新申請)?<!--(不要修改本参数|不要修改本參數)-->)?\s*\|', sectext):
             flag = 0
             if re.search(r'\|\s*set\s*=.*([編编][輯辑]|[刪删]除)?[內内]容', sectext):
                 flag |= 1
-                print('\tcontent')
+                if args.debug:
+                    print('\tcontent')
             if re.search(r'\|\s*set\s*=.*([編编][輯辑])?摘要', sectext):
                 flag |= 2
-                print('\tsummary')
+                if args.debug:
+                    print('\tsummary')
             if flag != 0:
                 ids = re.findall(r'\|id\d+\s*=\s*(\d+)', sectext)
                 if ids:
@@ -61,12 +69,12 @@ for secid in range(1, len(text)):
                         'letitle': title
                     }).submit()
                     deleted = 0
-                    # print(ids)
                     admins = {}
                     for logevent in data['query']['logevents']:
                         logid = str(logevent['logid'])
                         admin = logevent['user']
-                        # print('\t', logevent)
+                        if args.debug:
+                            print('\t', logevent)
                         if (logevent['params']['type'] == 'revision'
                                 and logevent['params']['new']['bitmask'] & flag == flag):
                             for rvid in logevent['params']['ids']:
@@ -102,23 +110,29 @@ for secid in range(1, len(text)):
                     else:
                         remaincnt += 1
 
-                    print('\tdeleted {}/{} in {}'.format(deleted, len(ids), admins))
+                    if args.debug:
+                        print('\tdeleted {}/{} in {}'.format(deleted, len(ids), admins))
 
                 else:
-                    print('\tcannot get ids')
+                    if args.debug:
+                        print('\tcannot get ids')
                     remaincnt += 1
             else:
-                print('\tcannot detect type')
+                if args.debug:
+                    print('\tcannot detect type')
                 remaincnt += 1
         else:
-            print('\tdone')
+            if args.debug:
+                print('\tdone')
     else:
-        print('cannot get article')
+        if args.debug:
+            print('cannot get article')
     newtext += sectext + '\n\n'
 
 
 if re.sub(r'\s', '', rrdpage.text) == re.sub(r'\s', '', newtext):
-    print('nothing changed')
+    if args.debug:
+        print('nothing changed')
     exit()
 
 pywikibot.showDiff(rrdpage.text, newtext)
