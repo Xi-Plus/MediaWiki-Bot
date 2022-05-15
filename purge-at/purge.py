@@ -22,7 +22,7 @@ if not cfg['enable']:
     exit()
 
 now = datetime.datetime.now()
-pywikibot.log('Current time: %s', now)
+pywikibot.log('Current time: {}'.format(now))
 
 categorymembers = []
 cmcontinue = ''
@@ -47,5 +47,5 @@ for row in categorymembers:
     purge_at = datetime.datetime.strptime(row['sortkeyprefix'], '%Y%m%d%H%M%S')
     cat = pywikibot.Page(site, row['title'])
     if now >= purge_at:
-        pywikibot.log('Purge %s %s', cat, purge_at)
+        pywikibot.log('Purge {} {}'.format(cat, purge_at))
         cat.purge()
