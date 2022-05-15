@@ -25,8 +25,6 @@ if (!$cfg["enable"]) {
 	exit("disabled\n");
 }
 
-var_dump($cfg);
-
 login("bot");
 $edittoken = edittoken();
 
