@@ -23,8 +23,6 @@ if not cfg['enable']:
 now = datetime.datetime.now()
 pywikibot.log('Current time: %s', now)
 
-cat = pywikibot.Category(site, cfg['category'])
-
 categorymembers = []
 cmcontinue = ''
 while True:
@@ -33,7 +31,7 @@ while True:
         'format': 'json',
         'list': 'categorymembers',
         'continue': '-||',
-        'cmtitle': 'Category:需要清除快取的頁面',
+        'cmtitle': cfg['category'],
         'cmprop': 'title|sortkeyprefix',
         'cmlimit': 'max',
         'cmcontinue': cmcontinue,
