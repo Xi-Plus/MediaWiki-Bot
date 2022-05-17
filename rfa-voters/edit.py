@@ -38,12 +38,12 @@ conn = pymysql.connect(
 def run_query(query):
     with conn.cursor() as cursor:
         if args.debug:
-            print('Executing query at {}'.format(datetime.datetime.now()))
+            print('\tExecuting query at {}'.format(datetime.datetime.now()))
         cursor.execute('use zhwiki_p')
         cursor.execute(query)
         result = cursor.fetchall()
         if args.debug:
-            print('Done at {}'.format(datetime.datetime.now()))
+            print('\tDone at {}'.format(datetime.datetime.now()))
         return result
 
 
@@ -83,13 +83,71 @@ def edit_count_filter(actor_id_list, start=None, end=None, ns=None, excludens=No
     return edit_counts
 
 
-voters = {}
-actor_id_user_name = {}
+class UserData:
+    users = {}
+    actor_id_to_user_id = {}
+    ELIGIBLE_3000 = 3000
+    ELIGIBLE_MAIN_1500 = 1500
+    ELIGIBLE_120_500 = 500
+
+    def add_user(self, user_id, actor_id, user_name):
+        if user_id not in self.users:
+            self.users[user_id] = {
+                'eligible': False,
+                'banned': False,
+                'type': 0,
+            }
+            if re.search(r'bot\d*(~zhwiki)?$', user_name, flags=re.I):
+                self.users[user_id]['banned'] = True
+        self.users[user_id]['user_id'] = user_id
+        self.users[user_id]['actor_id'] = actor_id
+        self.users[user_id]['user_name'] = user_name
+        self.actor_id_to_user_id[actor_id] = user_id
+
+    def is_eligible(self, actor_id=None, user_id=None):
+        if actor_id:
+            user_id = self.actor_id_to_user_id[actor_id]
+        if user_id not in self.users:
+            return False
+        return self.users[user_id]['eligible']
+
+    def get_user(self, user_id=None, actor_id=None):
+        if actor_id:
+            user_id = self.actor_id_to_user_id[actor_id]
+        return self.users[user_id]
+
+    def set_user(self, key, value, user_id=None, actor_id=None):
+        if actor_id:
+            user_id = self.actor_id_to_user_id[actor_id]
+        self.users[user_id][key] = value
+
+    def set_eligible(self, actor_id, el_type, edit_count):
+        self.set_user('type', el_type, actor_id=actor_id)
+        self.set_user('eligible', True, actor_id=actor_id)
+        if el_type == self.ELIGIBLE_3000:
+            self.set_user('edit_count', edit_count, actor_id=actor_id)
+        elif el_type == self.ELIGIBLE_MAIN_1500:
+            self.set_user('edit_count_main', edit_count, actor_id=actor_id)
+        elif el_type == self.ELIGIBLE_120_500:
+            self.set_user('edit_count_120', edit_count, actor_id=actor_id)
+
+    def user_id_list(self):
+        return list(self.users.keys())
+
+    def count_eligible(self):
+        cnt = 0
+        for user in self.users.values():
+            if user['eligible'] and not user['banned']:
+                cnt += 1
+        return cnt
+
+
+user_data = UserData()
 
 
 # Get users with edit count > 3000
 result = run_query('''
-SELECT user_name, actor_id
+SELECT user_name, actor_id, user_id
 FROM user
 LEFT JOIN actor ON user_id = actor_user
 WHERE user_editcount >= 3000
@@ -101,9 +159,10 @@ actor_id_list = []
 for row in result:
     user_name = row[0].decode()
     actor_id = row[1]
+    user_id = row[2]
     # print(user_name, actor_id)
     actor_id_list.append(actor_id)
-    actor_id_user_name[actor_id] = user_name
+    user_data.add_user(user_id, actor_id, user_name)
 
 # Check real edit count before base time
 edit_counts = edit_count_filter(actor_id_list, None, BASETIME)
@@ -111,10 +170,7 @@ cnt = 0
 for actor_id, edit_count in edit_counts.items():
     # print(actor_id, edit_count)
     if edit_count >= 3000:
-        voters[actor_id_user_name[actor_id]] = {
-            'type': '3000',
-            'editcount': edit_count,
-        }
+        user_data.set_eligible(actor_id, UserData.ELIGIBLE_3000, edit_count)
         cnt += 1
 if args.debug:
     print('Found {} users with > 3000 edits before base time'.format(cnt))
@@ -122,7 +178,7 @@ if args.debug:
 
 # Get users with edit count > 1500
 result = run_query('''
-SELECT user_name, actor_id
+SELECT user_name, actor_id, user_id
 FROM user
 LEFT JOIN actor ON user_id = actor_user
 WHERE user_editcount >= 1500
@@ -133,12 +189,13 @@ if args.debug:
 actor_id_list = []
 for row in result:
     user_name = row[0].decode()
-    if user_name in voters:
-        continue
     actor_id = row[1]
+    user_id = row[2]
+    if user_data.is_eligible(user_id=user_id):
+        continue
     # print(user_name, actor_id)
     actor_id_list.append(actor_id)
-    actor_id_user_name[actor_id] = user_name
+    user_data.add_user(user_id, actor_id, user_name)
 if args.debug:
     print('Remaining {} users with 1500 <= edits < 3000'.format(len(actor_id_list)))
 
@@ -148,10 +205,7 @@ cnt = 0
 for actor_id, edit_count in edit_counts.items():
     if edit_count >= 1500:
         # print(actor_id, actor_id_user_name[actor_id], edit_count)
-        voters[actor_id_user_name[actor_id]] = {
-            'type': 'main1500',
-            'maineditcount': edit_count,
-        }
+        user_data.set_eligible(actor_id, UserData.ELIGIBLE_MAIN_1500, edit_count)
         cnt += 1
 if args.debug:
     print('Found {} users with > 1500 article edits before base time'.format(cnt))
@@ -159,7 +213,7 @@ if args.debug:
 
 # Get extendedconfirmed or sysop
 result = run_query('''
-SELECT user_name, actor_id
+SELECT user_name, actor_id, user_id
 FROM user_groups
 LEFT JOIN user ON ug_user = user_id
 LEFT JOIN actor ON user_id = actor_user
@@ -171,12 +225,13 @@ if args.debug:
 actor_id_list = []
 for row in result:
     user_name = row[0].decode()
-    if user_name in voters:
-        continue
     actor_id = row[1]
+    user_id = row[2]
+    if user_data.is_eligible(user_id=user_id):
+        continue
     # print(user_name, actor_id)
     actor_id_list.append(actor_id)
-    actor_id_user_name[actor_id] = user_name
+    user_data.add_user(user_id, actor_id, user_name)
 if args.debug:
     print('Remaining {} extendedconfirmed or sysop users to check'.format(len(actor_id_list)))
 
@@ -193,10 +248,7 @@ cnt = 0
 for actor_id in actor_id_list:
     if edit_counts_120[actor_id] >= 500:
         if edit_counts_90[actor_id] >= 1:
-            voters[actor_id_user_name[actor_id]] = {
-                'type': '500',
-                '120editcount': edit_counts_120[actor_id],
-            }
+            user_data.set_eligible(actor_id, UserData.ELIGIBLE_120_500, edit_counts_120[actor_id])
             cnt += 1
         # else:
         #     print('{} ({}) have no edits in 90 days'.format(actor_id_user_name[actor_id], actor_id))
@@ -206,60 +258,59 @@ if args.debug:
     print('Remaining {} extendedconfirmed or sysop users'.format(cnt))
 
 
-# Get banned users
-banned_voters = set()
-
 # blocked users
 result = run_query('''
-SELECT ipb_address
+SELECT ipb_user
 FROM ipblocks
-WHERE ipb_user != 0
+WHERE ipb_user IN ({})
     AND ipb_sitewide = 1
-''')
+'''.format(
+    ','.join(map(str, user_data.user_id_list()))
+))
 if args.debug:
     print('Found {} blocked users'.format(len(result)))
 for row in result:
-    user_name = row[0].decode()
-    banned_voters.add(user_name)
+    user_id = row[0]
+    user_data.set_user('banned', True, user_id=user_id)
+
 
 # bots
 result = run_query('''
-SELECT user_name
+SELECT ug_user
 FROM user_groups
-LEFT JOIN user ON ug_user = user_id
-LEFT JOIN actor ON user_id = actor_user
 WHERE ug_group = 'bot'
 ''')
 if args.debug:
     print('Found {} bots'.format(len(result)))
 for row in result:
-    user_name = row[0].decode()
-    banned_voters.add(user_name)
-
-for user_name in list(voters.keys()):
-    if user_name in banned_voters:
-        del voters[user_name]
-    elif re.search(r'bot\d*$', user_name, flags=re.I):
-        print('Ignore {} per username'.format(user_name))
-        del voters[user_name]
+    user_id = row[0]
+    if user_id in user_data.users:
+        user_data.set_user('banned', True, user_id=user_id)
 
 
 text = '''以下根據[[Wikipedia:人事任免投票資格]]列出投票權人名單，目前被全站封鎖的使用者及機器人已被排除，共有{}名。計算基準日為{{{{subst:#time:Y年n月j日 (D) H:i (T)|{}}}}}。
 {{{{HideH|投票權人名單}}}}'''.format(
-    len(voters),
+    user_data.count_eligible(),
     BASETIME.totimestampformat()
 )
-for user_name, value in sorted(voters.items(), key=lambda v: v[0]):
-    text += '\n# [[User:{0}|{0}]] - '.format(user_name)
-    if value['type'] == '3000':
-        text += '{}編輯'.format(value['editcount'])
-    elif value['type'] == 'main1500':
-        text += '{}條目編輯'.format(value['maineditcount'])
-    elif value['type'] == '500':
-        text += '120天前{}編輯'.format(value['120editcount'])
+for user in sorted(user_data.users.values(), key=lambda v: v['user_name']):
+    if not user['eligible'] or user['banned']:
+        continue
+    text += '\n# [[User:{0}|{0}]] - '.format(user['user_name'])
+    if user['type'] == UserData.ELIGIBLE_3000:
+        text += '{}編輯'.format(user['edit_count'])
+    elif user['type'] == UserData.ELIGIBLE_MAIN_1500:
+        text += '{}條目編輯'.format(user['edit_count_main'])
+    elif user['type'] == UserData.ELIGIBLE_120_500:
+        text += '120天前{}編輯'.format(user['edit_count_120'])
 text += '''
 {{HideF}}
 產生時間：~~~~'''
+
+if args.debug:
+    with open('out.txt', 'w', encoding='utf8') as f:
+        f.write(text)
+
 
 page = pywikibot.Page(site, args.outpage)
 new_text = page.text.rstrip()
