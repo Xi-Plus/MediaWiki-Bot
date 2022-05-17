@@ -33,14 +33,20 @@ conn = pymysql.connect(
     password=password,
     charset='utf8'
 )
+authconn = pymysql.connect(
+    host='centralauth.analytics.db.svc.wikimedia.cloud',
+    user=user,
+    password=password,
+    charset='utf8'
+)
 
 
-def run_query(query):
-    with conn.cursor() as cursor:
+def run_query(query, query_args=tuple(), db='zhwiki_p', cluster=conn):
+    with cluster.cursor() as cursor:
         if args.debug:
             print('\tExecuting query at {}'.format(datetime.datetime.now()))
-        cursor.execute('use zhwiki_p')
-        cursor.execute(query)
+        cursor.execute('use ' + db)
+        cursor.execute(query, query_args)
         result = cursor.fetchall()
         if args.debug:
             print('\tDone at {}'.format(datetime.datetime.now()))
@@ -86,6 +92,7 @@ def edit_count_filter(actor_id_list, start=None, end=None, ns=None, excludens=No
 class UserData:
     users = {}
     actor_id_to_user_id = {}
+    user_name_to_user_id = {}
     ELIGIBLE_3000 = 3000
     ELIGIBLE_MAIN_1500 = 1500
     ELIGIBLE_120_500 = 500
@@ -103,6 +110,7 @@ class UserData:
         self.users[user_id]['actor_id'] = actor_id
         self.users[user_id]['user_name'] = user_name
         self.actor_id_to_user_id[actor_id] = user_id
+        self.user_name_to_user_id[user_name] = user_id
 
     def is_eligible(self, actor_id=None, user_id=None):
         if actor_id:
@@ -131,6 +139,12 @@ class UserData:
         elif el_type == self.ELIGIBLE_120_500:
             self.set_user('edit_count_120', edit_count, actor_id=actor_id)
 
+    def ban(self, user_id=None, user_name=None):
+        if user_name:
+            user_id = self.user_name_to_user_id[user_name]
+        if user_id in self.users:
+            self.set_user('banned', True, user_id)
+
     def user_id_list(self):
         return list(self.users.keys())
 
@@ -140,6 +154,13 @@ class UserData:
             if user['eligible'] and not user['banned']:
                 cnt += 1
         return cnt
+
+    def eligible_usernames(self):
+        result = []
+        for user in self.users.values():
+            if user['eligible'] and not user['banned']:
+                result.append(user['user_name'])
+        return result
 
 
 user_data = UserData()
@@ -271,7 +292,7 @@ if args.debug:
     print('Found {} blocked users'.format(len(result)))
 for row in result:
     user_id = row[0]
-    user_data.set_user('banned', True, user_id=user_id)
+    user_data.ban(user_id=user_id)
 
 
 # bots
@@ -284,11 +305,31 @@ if args.debug:
     print('Found {} bots'.format(len(result)))
 for row in result:
     user_id = row[0]
-    if user_id in user_data.users:
-        user_data.set_user('banned', True, user_id=user_id)
+    user_data.ban(user_id=user_id)
 
 
-text = '''以下根據[[Wikipedia:人事任免投票資格]]列出投票權人名單，目前被全站封鎖的使用者及機器人已被排除，共有{}名。計算基準日為{{{{subst:#time:Y年n月j日 (D) H:i (T)|{}}}}}。
+# locked users
+eligible_usernames = user_data.eligible_usernames()
+result = run_query('''
+SELECT gu_name
+FROM globaluser
+WHERE gu_locked = 1
+    AND gu_name IN ({})
+'''.format(
+    ','.join(['%s'] * len(eligible_usernames))
+), eligible_usernames, db='centralauth_p', cluster=authconn)
+if args.debug:
+    print('Found {} locked users'.format(len(result)))
+for row in result:
+    user_name = row[0].decode()
+    print(user_name)
+    user_data.ban(user_name=user_name)
+
+
+text = '''* 以下根據[[Wikipedia:人事任免投票資格]]列出投票權人名單，共有{}名。
+* 目前被全站封鎖、全域鎖定的使用者及機器人已被排除。
+* 該名單可能也會列出您的合法多重帳號，但您僅可使用一個帳號投票，否則會觸犯[[Wikipedia:傀儡#被視為濫用多重帳號的行為|傀儡方針]]。
+* 計算基準日為{{{{subst:#time:Y年n月j日 (D) H:i (T)|{}}}}}。
 {{{{HideH|投票權人名單}}}}'''.format(
     user_data.count_eligible(),
     BASETIME.totimestampformat()
