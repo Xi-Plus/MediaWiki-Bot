@@ -111,6 +111,8 @@ class UserData:
             }
             if re.search(r'bot\d*(~zhwiki)?$', user_name, flags=re.I):
                 self.users[user_id]['banned'] = True
+            if re.search(r'^(Former|Renamed|Vanished) (user|account) ', user_name, flags=re.I):
+                self.users[user_id]['banned'] = True
         self.users[user_id]['user_id'] = user_id
         self.users[user_id]['actor_id'] = actor_id
         self.users[user_id]['user_name'] = user_name
@@ -342,8 +344,8 @@ result = run_query('''
 SELECT log_title, COUNT(*) AS log_count
 FROM logging
 WHERE log_type = 'block'
-	AND log_timestamp < {}
-	AND log_timestamp > {}
+    AND log_timestamp < {}
+    AND log_timestamp > {}
     AND log_title IN ({})
 GROUP BY log_title
 '''.format(
@@ -389,7 +391,10 @@ for row in result:
 
 
 text = '''* 以下根據[[Wikipedia:人事任免投票資格]]列出投票權人名單，共有{}名。
-* 目前被全站封鎖、全域鎖定的使用者及機器人已被排除。
+* 部分使用者已被排除：
+** 被全站無限期封鎖、全域鎖定；提名通過之時被封鎖、禁制維基百科命名空間。
+** 擁有機器人群組或使用者名稱以bot結尾。
+** 使用者名稱判斷為隱退使用者。
 * 該名單可能也會列出您的合法多重帳號，但您僅可使用一個帳號投票，否則會觸犯[[Wikipedia:傀儡#被視為濫用多重帳號的行為|傀儡方針]]。
 * 計算基準日為{{{{subst:#time:Y年n月j日 (D) H:i (T)|{}}}}}。
 {{{{HideH|投票權人名單}}}}'''.format(
