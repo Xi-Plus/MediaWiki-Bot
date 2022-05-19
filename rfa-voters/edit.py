@@ -147,7 +147,7 @@ class UserData:
             self.set_user('edit_count_120', edit_count, actor_id=actor_id)
 
     def ban(self, user_id=None, user_name=None):
-        if user_name:
+        if user_name and user_name in self.user_name_to_user_id:
             user_id = self.user_name_to_user_id[user_name]
         if user_id in self.users:
             self.set_user('banned', True, user_id)
@@ -303,17 +303,32 @@ for row in result:
     user_data.ban(user_id=user_id)
 
 
-# bots
+# in bot user group
 result = run_query('''
 SELECT ug_user
 FROM user_groups
 WHERE ug_group = 'bot'
 ''')
 if args.debug:
-    print('Found {} bots'.format(len(result)))
+    print('Found {} users in bot group'.format(len(result)))
 for row in result:
     user_id = row[0]
     user_data.ban(user_id=user_id)
+
+
+# in bot category
+result = run_query('''
+SELECT page_title
+FROM categorylinks
+LEFT JOIN page ON cl_from = page_id
+WHERE cl_to = '所有維基百科機器人'
+    AND page_title NOT LIKE '%%/%%'
+''')
+if args.debug:
+    print('Found {} users in bot category'.format(len(result)))
+for row in result:
+    user_name = row[0].decode().replace('_', ' ')
+    user_data.ban(user_name=user_name)
 
 
 # locked users
