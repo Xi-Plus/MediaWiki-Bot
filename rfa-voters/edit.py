@@ -12,10 +12,13 @@ os.environ['TZ'] = 'UTC'
 
 os.environ['PYWIKIBOT_DIR'] = os.path.dirname(os.path.realpath(__file__))
 import pywikibot
+from pywikibot.data.api import Request
 
 parser = argparse.ArgumentParser()
 parser.add_argument('outpage')
+parser.add_argument('outpageplain')
 parser.add_argument('basetime')
+parser.add_argument('basetimeblock')
 parser.add_argument('--debug', action='store_true')
 parser.set_defaults(debug=False)
 args = parser.parse_args()
@@ -24,8 +27,10 @@ site = pywikibot.Site()
 site.login()
 
 BASETIME = pywikibot.Timestamp.fromtimestampformat(args.basetime)
+BASETIMEBLOCK = pywikibot.Timestamp.fromtimestampformat(args.basetimeblock)
 if args.debug:
     print('base time', BASETIME)
+    print('base time block', BASETIMEBLOCK)
 
 conn = pymysql.connect(
     host=host,
@@ -285,6 +290,7 @@ SELECT ipb_user
 FROM ipblocks
 WHERE ipb_user IN ({})
     AND ipb_sitewide = 1
+    AND ipb_expiry = 'infinity'
 '''.format(
     ','.join(map(str, user_data.user_id_list()))
 ))
@@ -322,8 +328,64 @@ if args.debug:
     print('Found {} locked users'.format(len(result)))
 for row in result:
     user_name = row[0].decode()
-    print(user_name)
+    # print(user_name)
     user_data.ban(user_name=user_name)
+
+
+# users have block log
+DAYS_400_AGO = BASETIME - datetime.timedelta(days=400)
+DAYS_AFTER = BASETIME + datetime.timedelta(days=1)
+if args.debug:
+    print('400 days ago', DAYS_400_AGO)
+eligible_usernames = list(map(lambda v: v.replace(' ', '_'), user_data.eligible_usernames()))
+result = run_query('''
+SELECT log_title, COUNT(*) AS log_count
+FROM logging
+WHERE log_type = 'block'
+	AND log_timestamp < {}
+	AND log_timestamp > {}
+    AND log_title IN ({})
+GROUP BY log_title
+'''.format(
+    BASETIME.totimestampformat(),
+    DAYS_400_AGO.totimestampformat(),
+    ','.join(['%s'] * len(eligible_usernames))
+), eligible_usernames)
+if args.debug:
+    print('Found {} users with block log'.format(len(result)))
+for row in result:
+    user_name = row[0].decode().replace('_', ' ')
+    r = Request(site=site, parameters={
+        'action': 'query',
+        'format': 'json',
+        'list': 'logevents',
+        'letype': 'block',
+        'lestart': BASETIME.isoformat(),
+        'leend': DAYS_400_AGO.isoformat(),
+        'letitle': 'User:' + user_name,
+        'lelimit': 'max'
+    })
+    data = r.submit()
+    unblocktime = None
+    # print(user_name)
+    for logevent in data['query']['logevents']:
+        if logevent['action'] == 'unblock':
+            unblocktime = pywikibot.Timestamp.fromISOformat(logevent['timestamp'])
+        else:
+            if 'expiry' in logevent['params']:
+                expiry = pywikibot.Timestamp.fromISOformat(logevent['params']['expiry'])
+            else:
+                expiry = DAYS_AFTER
+            if unblocktime and unblocktime < expiry:
+                expiry = unblocktime
+            start = pywikibot.Timestamp.fromISOformat(logevent['timestamp'])
+            # print('\t', start, expiry, logevent['params'])
+            if start <= BASETIMEBLOCK <= expiry:
+                if ('sitewide' in logevent['params']
+                        or ('restrictions' in logevent['params'] and 'namespace' in logevent['params'] and 4 in logevent['params']['restrictions']['namespaces'])):
+                    user_data.ban(user_name=user_name)
+                    # print('\t*** BAN ***')
+            unblocktime = start
 
 
 text = '''* 以下根據[[Wikipedia:人事任免投票資格]]列出投票權人名單，共有{}名。
@@ -334,6 +396,7 @@ text = '''* 以下根據[[Wikipedia:人事任免投票資格]]列出投票權人
     user_data.count_eligible(),
     BASETIME.totimestampformat()
 )
+text_plain = '''<pre>'''
 for user in sorted(user_data.users.values(), key=lambda v: v['user_name']):
     if not user['eligible'] or user['banned']:
         continue
@@ -344,9 +407,12 @@ for user in sorted(user_data.users.values(), key=lambda v: v['user_name']):
         text += '{}條目編輯'.format(user['edit_count_main'])
     elif user['type'] == UserData.ELIGIBLE_120_500:
         text += '120天前{}編輯'.format(user['edit_count_120'])
+    text_plain += '\n{}@zhwiki'.format(user['user_name'])
 text += '''
 {{HideF}}
 產生時間：~~~~'''
+text_plain += '''
+</pre>'''
 
 if args.debug:
     with open('out.txt', 'w', encoding='utf8') as f:
@@ -370,3 +436,10 @@ if args.debug:
 if input('Save? ').lower() in ['yes', 'y']:
     page.text = new_text
     page.save(summary='產生投票權人名單', minor=False)
+
+page_plain = pywikibot.Page(site, args.outpageplain)
+if args.debug:
+    pywikibot.showDiff(page_plain.text, text_plain)
+if input('Save? ').lower() in ['yes', 'y']:
+    page_plain.text = text_plain
+    page_plain.save(summary='產生投票權人名單', minor=False)
