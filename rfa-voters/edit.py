@@ -109,7 +109,7 @@ class UserData:
                 'banned': False,
                 'type': 0,
             }
-            if re.search(r'^(Former|Renamed|Vanished) (user|account) ', user_name, flags=re.I):
+            if re.search(r'^(Former|Renamed|Vanished|Deleted) (user|account) ', user_name, flags=re.I):
                 self.users[user_id]['banned'] = True
         self.users[user_id]['user_id'] = user_id
         self.users[user_id]['actor_id'] = actor_id
