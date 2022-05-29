@@ -1,11 +1,20 @@
 #!/usr/bin/env python
 # coding: utf-8
 
+import argparse
+
+import pymysql
 import pywikibot
 from pywikibot.data.api import Request
-import pymysql
 
 from config import host, password, user  # pylint: disable=E0611,W0614
+
+parser = argparse.ArgumentParser()
+parser.add_argument('--confirm', action='store_true')
+parser.set_defaults(
+    confirm=False,
+)
+args = parser.parse_args()
 
 site = pywikibot.Site('zh', 'wikipedia')
 site.login()
@@ -62,7 +71,7 @@ for row in pages:
         'format': 'json',
         'list': 'logevents',
         'utf8': 1,
-        'leprop': 'details',
+        'leprop': 'ids|timestamp|details',
         'letype': 'renameuser',
         'letitle': 'User:' + olduser
     })
@@ -70,10 +79,17 @@ for row in pages:
     if len(data['query']['logevents']) != 1:
         print('Failed to get new username for {}: {}'.format(olduser, data['query']['logevents']))
         continue
-    newuser = data['query']['logevents'][0]['params']['newuser']
+    logevent = data['query']['logevents'][0]
+    newuser = logevent['params']['newuser']
+    print('{} {} renamed to {}'.format(logevent['timestamp'], logevent['params']['olduser'], newuser))
 
     newtitle = get_new_title(newuser, subpage)
-    save = input('Move {} to {} ? '.format(page.title(), newtitle))
+    reason = '[[Special:Redirect/logid/{}|使用者已更名]]'.format(logevent['logid'])
+
+    if args.confirm:
+        save = input('\tMove {} to {} ? '.format(page.title(), newtitle))
+    else:
+        print('\tMove {} to {}'.format(page.title(), newtitle))
+        save = 'yes'
     if save.lower() in ['yes', 'y', '']:
-        reason = '使用者已更名'
         page.move(newtitle, reason=reason, movetalk=False, noredirect=True, movesubpages=False)
