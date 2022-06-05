@@ -47,6 +47,7 @@ LEFT JOIN user ON REGEXP_REPLACE(REPLACE(page_title, '_', ' '), '/.*', '') = use
 WHERE page_namespace = 3
 AND page_content_model = 'flow-board'
 AND user_id IS NULL
+ORDER BY page_id ASC
 """
 cur.execute(query)
 pages = cur.fetchall()
