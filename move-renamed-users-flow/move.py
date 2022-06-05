@@ -2,15 +2,18 @@
 # coding: utf-8
 
 import argparse
+import json
 
 import pymysql
 import pywikibot
 from pywikibot.data.api import Request
 
-from config import host, password, user  # pylint: disable=E0611,W0614
+from config import (config_page_name, host,  # pylint: disable=E0611,W0614
+                    password, user)
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--confirm', action='store_true')
+parser.add_argument('--limit', type=int, default=0)
 parser.set_defaults(
     confirm=False,
 )
@@ -18,6 +21,13 @@ args = parser.parse_args()
 
 site = pywikibot.Site('zh', 'wikipedia')
 site.login()
+
+config_page = pywikibot.Page(site, config_page_name)
+cfg = config_page.text
+cfg = json.loads(cfg)
+
+if not cfg['enable']:
+    exit('disabled\n')
 
 conn = pymysql.connect(
     host=host,
@@ -59,6 +69,7 @@ def get_new_title(username, subpage):
         i += 1
 
 
+cnt = 0
 for row in pages:
     title = row[0].decode()
     titleparts = title.split('/')
@@ -84,12 +95,15 @@ for row in pages:
     print('{} {} renamed to {}'.format(logevent['timestamp'], logevent['params']['olduser'], newuser))
 
     newtitle = get_new_title(newuser, subpage)
-    reason = '[[Special:Redirect/logid/{}|使用者已更名]]'.format(logevent['logid'])
+    reason = cfg['summary'].format(logevent['logid'])
 
     if args.confirm:
-        save = input('\tMove {} to {} ? '.format(page.title(), newtitle))
+        save = input('\tMove {} to {} ({}) ? '.format(page.title(), newtitle, reason))
     else:
-        print('\tMove {} to {}'.format(page.title(), newtitle))
+        print('\tMove {} to {} ({})'.format(page.title(), newtitle, reason))
         save = 'yes'
     if save.lower() in ['yes', 'y', '']:
         page.move(newtitle, reason=reason, movetalk=False, noredirect=True, movesubpages=False)
+        cnt += 1
+    if args.limit > 0 and cnt >= args.limit:
+        break
