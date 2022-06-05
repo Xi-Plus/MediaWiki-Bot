@@ -13,9 +13,11 @@ from config import (config_page_name, host,  # pylint: disable=E0611,W0614
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--confirm', action='store_true')
+parser.add_argument('--manual', action='store_true')
 parser.add_argument('--limit', type=int, default=0)
 parser.set_defaults(
     confirm=False,
+    manual=False,
 )
 args = parser.parse_args()
 
@@ -88,9 +90,21 @@ for row in pages:
     })
     data = r.submit()
     if len(data['query']['logevents']) != 1:
-        print('Failed to get new username for {}: {}'.format(olduser, data['query']['logevents']))
-        continue
-    logevent = data['query']['logevents'][0]
+        if args.manual:
+            for i in range(len(data['query']['logevents'])):
+                print('{}. {}'.format(i, data['query']['logevents'][i]))
+            while True:
+                try:
+                    idx = int(input('Pick a log: '))
+                    logevent = data['query']['logevents'][idx]
+                    break
+                except Exception as e:
+                    print(e)
+        else:
+            print('Failed to get new username for {}: {}'.format(olduser, data['query']['logevents']))
+            continue
+    else:
+        logevent = data['query']['logevents'][0]
     newuser = logevent['params']['newuser']
     print('{} {} renamed to {}'.format(logevent['timestamp'], logevent['params']['olduser'], newuser))
 
