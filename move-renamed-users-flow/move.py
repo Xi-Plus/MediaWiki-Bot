@@ -102,6 +102,7 @@ for row in pages:
                 except Exception as e:
                     print(e)
         else:
+            print(page.title())
             print('Failed to get new username for {}: {}'.format(olduser, data['query']['logevents']))
             continue
     else:
