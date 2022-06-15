@@ -35,8 +35,9 @@ print(title)
 page = pywikibot.Page(site, title)
 if not page.exists():
     print('page is not exists')
-    exit()
-
+    page.text = '{{subst:Wikipedia:維基百科政策簡報/存檔/模板}}'
+    page.save(summary='[[User:A2093064-bot/task/36|機器人36]]：建立空白模板', minor=False)
+    page.clear_cache()
 
 text = page.text
 
