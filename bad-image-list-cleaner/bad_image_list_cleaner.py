@@ -57,7 +57,7 @@ class BadImageListCleaner:
 
     @functools.lru_cache(maxsize=None)
     def get_exists_file_title(self, title):
-        if title in self.cachedFiles:
+        if title in self.cachedFiles and self.cachedFiles[title]:
             return title
         filepage = self.get_exists_file(title)
         if filepage:
@@ -126,6 +126,9 @@ class BadImageListCleaner:
             if new_line is not None:  # accept empty line
                 new_lines.append(new_line)
         new_text = '\n'.join(new_lines)
+
+        if len(en_list) == 0:
+            return new_text
 
         logger.info('merge en list')
         try:
