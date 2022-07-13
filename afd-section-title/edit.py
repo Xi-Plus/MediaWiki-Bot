@@ -169,10 +169,10 @@ def fix(pagename):
 
             title = '[[' + start + title + ']]'
 
-            if str(section.get(0).title).strip() != title:
-                if str(section.get(0).title).strip().replace('_', ' ') != title:
-                    section.insert(
-                        1, '\n{{formerly|' + str(section.get(0).title) + '}}')
+            oldtitle = str(section.get(0).title).strip()
+            if oldtitle != title:
+                if oldtitle.replace('_', ' ') != title:
+                    section.insert(1, '\n{{formerly|' + oldtitle + '}}')
                 if args.debug:
                     print('  set new title = ' + title)
                 section.get(0).title = title
