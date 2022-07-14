@@ -14,6 +14,7 @@ source pyvenv/bin/activate
 pip install -U pip wheel
 
 # install some concrete packages
+pip install dateutil
 pip install mwparserfromhell
 pip install pymysql
 pip install pywikibot
