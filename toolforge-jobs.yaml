@@ -44,7 +44,7 @@
   image: tf-python39
   command: MediaWiki-Bot/pyvenv/bin/python3 MediaWiki-Bot/cv-report/edit.py
   schedule: "*/10 * * * *"
-  emails: all
+  emails: onfailure
 
 - name: drv-tag-talk
   image: tf-php74
@@ -68,7 +68,7 @@
   image: tf-python39
   command: MediaWiki-Bot/pyvenv/bin/python3 MediaWiki-Bot/expand-templates-in-title/edit.py
   schedule: "26 * * * *"
-  emails: all
+  emails: onfailure
 
 - name: fix-broken-double-redirect
   image: tf-python39
@@ -122,7 +122,7 @@
   image: tf-python39
   command: MediaWiki-Bot/pyvenv/bin/python3 MediaWiki-Bot/o1-deleter/main.py
   schedule: "*/10 * * * *"
-  emails: all
+  emails: onfailure
 
 - name: policy-newsletter-last-1
   image: tf-python39
@@ -164,7 +164,7 @@
   image: tf-python39
   command: MediaWiki-Bot/pyvenv/bin/python3 MediaWiki-Bot/protect-locked-userpage/protect.py
   schedule: "24 * * * *"
-  emails: all
+  emails: onfailure
 
 - name: protect-templates-in-mediawiki-ns
   image: tf-python39
@@ -236,7 +236,7 @@
   image: tf-php74
   command: php MediaWiki-Bot/UAA-archive/edit.php
   schedule: "*/10 * * * *"
-  emails: all
+  emails: onfailure
 
 - name: unconnected-pages-report-zhwikt
   image: tf-python39
