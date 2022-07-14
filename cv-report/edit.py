@@ -55,7 +55,8 @@ if appendtext:
     text += appendtext
 
 if cvpage.text == text:
-    exit('Nothing changed')
+    print('Nothing changed')
+    exit()
 
 pywikibot.showDiff(cvpage.text, text)
 cvpage.text = text

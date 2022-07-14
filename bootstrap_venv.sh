@@ -15,4 +15,5 @@ pip install -U pip wheel
 
 # install some concrete packages
 pip install mwparserfromhell
+pip install pymysql
 pip install pywikibot
