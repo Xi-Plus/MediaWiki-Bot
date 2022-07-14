@@ -10,7 +10,8 @@ import pywikibot
 
 
 if len(sys.argv) < 2:
-    exit("no pagename provided.\n")
+    print('no pagename provided.')
+    exit()
 
 site = pywikibot.Site()
 site.login()
@@ -21,7 +22,8 @@ cfg = json.loads(cfg)["R2"]
 print(json.dumps(cfg, indent=4, ensure_ascii=False))
 
 if not cfg["enable"]:
-    exit("disabled\n")
+    print('disabled')
+    exit()
 
 pagename = sys.argv[1]
 

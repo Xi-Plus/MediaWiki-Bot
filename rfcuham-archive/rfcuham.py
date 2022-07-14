@@ -21,7 +21,8 @@ cfg = json.loads(cfg)
 print(json.dumps(cfg, indent=4, ensure_ascii=False))
 
 if not cfg["enable"]:
-    exit("disabled\n")
+    print('disabled')
+    exit()
 
 # Load {{Status}} parameter data
 status_config_text = pywikibot.Page(site, 'Module:Status/data.json').text
@@ -69,7 +70,8 @@ for section in wikicode.get_sections()[2:]:
 
 text = str(wikicode)
 if cupage.text == text:
-    exit("nothing changed")
+    print('nothing changed')
+    exit()
 
 cupage.text = text
 cupage.save(summary=cfg["main_page_summary"].format(count), minor=True)

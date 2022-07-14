@@ -29,7 +29,8 @@ cfg = json.loads(cfg)
 print(json.dumps(cfg, indent=4, ensure_ascii=False))
 
 if not cfg['enable']:
-    exit('disabled\n')
+    print('disabled')
+    exit()
 
 database['host'] = '{}.analytics.db.svc.eqiad.wmflabs'.format(args.dbwiki)
 conn = pymysql.connect(

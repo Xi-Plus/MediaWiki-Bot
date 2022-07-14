@@ -26,7 +26,8 @@ cfg = json.loads(cfg)
 print(json.dumps(cfg, indent=4, ensure_ascii=False))
 
 if not cfg['enable']:
-    exit('disabled\n')
+    print('disabled')
+    exit()
 
 dykcpage = pywikibot.Page(site, cfg['dykc_page'])
 text = dykcpage.text
@@ -78,7 +79,8 @@ for article in matches:
             talkPage.save(summary=summary, minor=True)
             count += 1
             if args.limit and count >= args.limit:
-                exit('Reach the limit')
+                print('Reach the limit')
+                exit()
 
 print(DYKCPages)
 
@@ -109,4 +111,5 @@ for talkPage in templatePage.embeddedin(namespaces=1):
             talkPage.save(summary=summary, minor=True)
             count += 1
             if args.limit and count >= args.limit:
-                exit('Reach the limit')
+                print('Reach the limit')
+                exit()

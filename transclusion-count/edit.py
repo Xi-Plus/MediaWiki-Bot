@@ -39,7 +39,8 @@ cfg = config_page.text
 cfg = json.loads(cfg)
 
 if not cfg['enable']:
-    exit('disabled\n')
+    print('disabled')
+    exit()
 
 
 report_template = '''\

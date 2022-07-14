@@ -19,7 +19,8 @@ token = site.tokens['csrf']
 # print(json.dumps(cfg, indent=4, ensure_ascii=False))
 
 # if not cfg["enable"]:
-#     exit("disabled\n")
+#     print('disabled')
+#     exit()
 
 cat = pywikibot.Page(site, "Category:快速删除候选")
 

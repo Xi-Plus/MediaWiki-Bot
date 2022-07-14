@@ -38,7 +38,8 @@ cfg = json.loads(cfg)
 print(json.dumps(cfg, indent=4, ensure_ascii=False))
 
 if not cfg['enable']:
-    exit('disabled\n')
+    print('disabled')
+    exit()
 
 USERNAME = pywikibot.User(site, USERNAME).username
 USERREGEX = r'^User( talk)?:{}(\/|$)'.format(re.escape(USERNAME))

@@ -30,7 +30,8 @@ if args.debug:
     print(json.dumps(cfg, indent=4, ensure_ascii=False))
 
 if not cfg['enable']:
-    exit('disabled\n')
+    print('disabled')
+    exit()
 
 
 def converttitle(title):

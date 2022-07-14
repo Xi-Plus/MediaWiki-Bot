@@ -27,7 +27,8 @@ cfg = json.loads(cfg)
 print(json.dumps(cfg, indent=4, ensure_ascii=False))
 
 if not cfg["enable"]:
-    exit("disabled\n")
+    print('disabled')
+    exit()
 
 cvpage = pywikibot.Page(site, cfg["page_name"])
 text = cvpage.text
@@ -112,7 +113,8 @@ for secid, section in enumerate(sections[1:], 1):
 text = ''.join(sections)
 
 if cvpage.text == text:
-    exit("nothing changed")
+    print('nothing changed')
+    exit()
 
 pywikibot.showDiff(cvpage.text, text)
 cvpage.text = text

@@ -35,7 +35,8 @@ site.login()
 listpage = pywikibot.Page(site, args.page)
 
 if not listpage.exists():
-    exit('not exists')
+    print('not exists')
+    exit()
 
 listtext = listpage.text
 

@@ -45,7 +45,8 @@ cfg = json.loads(cfg)
 logger.debug(cfg)
 
 if not cfg['enable']:
-    exit('disabled\n')
+    print('disabled')
+    exit()
 
 bilc = BadImageListCleaner(site, cfg)
 bilc.CONFIRM = args.confirm

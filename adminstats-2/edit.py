@@ -20,7 +20,8 @@ config_page = pywikibot.Page(site, config_page_name)
 cfg = json.loads(config_page.text)
 
 if not cfg['enable']:
-    exit('disabled\n')
+    print('disabled')
+    exit()
 
 
 CACHEDIR = os.path.join(BASEDIR, 'cache')

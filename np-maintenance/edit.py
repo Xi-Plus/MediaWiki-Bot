@@ -26,7 +26,8 @@ cfg = json.loads(cfg)
 print(json.dumps(cfg, indent=4, ensure_ascii=False))
 
 if not cfg['enable']:
-    exit('disabled\n')
+    print('disabled')
+    exit()
 
 url = 'https://zh.wikipedia.org/wiki/{}?action=render'.format(cfg['np_page'])
 try:
@@ -69,7 +70,8 @@ for ul in root.find_all('ul', recursive=False):
             cnt += 1
 
 if cnt == 0:
-    exit('Nothing to do\n')
+    print('Nothing to do')
+    exit()
 
 pywikibot.showDiff(npPage.text, text)
 summary = cfg['summary'].format(cnt)

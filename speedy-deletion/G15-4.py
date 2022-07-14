@@ -10,7 +10,8 @@ import pywikibot
 
 
 if len(sys.argv) < 2:
-    exit("no pagename provided.\n")
+    print('no pagename provided.')
+    exit()
 
 site = pywikibot.Site()
 site.login()
@@ -21,7 +22,8 @@ cfg = json.loads(cfg)["G15_4"]
 print(json.dumps(cfg, indent=4, ensure_ascii=False))
 
 if not cfg["enable"]:
-    exit("disabled\n")
+    print('disabled')
+    exit()
 
 pagename = sys.argv[1]
 
@@ -34,30 +36,37 @@ else:
     talkpage = mainpage.toggleTalkPage()
 
 if mainpage.exists():
-    exit("mainpage exist.\n")
+    print('mainpage exist.')
+    exit()
 
 if mainpage.namespace().id == 6:
     image = pywikibot.FilePage(site, mainpage.title())
     try:
         if image.file_is_shared():
-            exit("mainpage exist (shared file).\n")
+            print('mainpage exist (shared file).')
+            exit()
     except Exception as e:
         pass
 
 if not talkpage.exists():
-    exit("talkpage not exist.\n")
+    print('talkpage not exist.')
+    exit()
 
 if talkpage.namespace().id in [3, 9]:
-    exit("ignore namespace.\n")
+    print('ignore namespace.')
+    exit()
 
 if talkpage.depth > 0:
-    exit("ignore subpage.\n")
+    print('ignore subpage.')
+    exit()
 
 for template in talkpage.templates():
     if template.title() in ["Template:Talk archive"]:
-        exit("ignore talk archive.\n")
+        print('ignore talk archive.')
+        exit()
     if template.title() in ["Template:Delete"]:
-        exit("marked deletion.\n")
+        print('marked deletion.')
+        exit()
 
 if len(list(talkpage.embeddedin(total=1))) > 0:
     text = cfg["prepend_text_with_noinclude"] + talkpage.text

@@ -27,14 +27,16 @@ cfg = config_page.text
 cfg = json.loads(cfg)
 
 if not cfg['enable']:
-    exit('disabled\n')
+    print('disabled')
+    exit()
 
 outputPage = pywikibot.Page(site, cfg['output_page_name'])
 lastEditTime = list(outputPage.revisions(total=1))[0]['timestamp']
 lastEditTimestamp = datetime(lastEditTime.year, lastEditTime.month, lastEditTime.day,
                              lastEditTime.hour, lastEditTime.minute, tzinfo=timezone.utc).timestamp()
 if time.time() - lastEditTimestamp < cfg['interval'] and not args.force:
-    exit('Last edit on {0}\n'.format(lastEditTime))
+    print('Last edit on {0}'.format(lastEditTime))
+    exit()
 
 cat = pywikibot.Page(site, cfg['category'])
 

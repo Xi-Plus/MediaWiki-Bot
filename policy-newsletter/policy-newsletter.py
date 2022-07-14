@@ -57,7 +57,8 @@ if m:
     time2 = '{:04d}{:02d}{:02d}235959'.format(int(m.group(4)), int(m.group(5)), int(m.group(6)))
     print(time1, time2)
 else:
-    exit('Failed to get date range')
+    print('Failed to get date range')
+    exit()
 
 
 if not page.botMayEdit():

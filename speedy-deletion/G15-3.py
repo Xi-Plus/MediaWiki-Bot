@@ -10,7 +10,8 @@ import pywikibot
 
 
 if len(sys.argv) < 2:
-    exit("no pagename provided.\n")
+    print('no pagename provided.')
+    exit()
 
 site = pywikibot.Site()
 site.login()
@@ -21,17 +22,20 @@ cfg = json.loads(cfg)["G15_3"]
 print(json.dumps(cfg, indent=4, ensure_ascii=False))
 
 if not cfg["enable"]:
-    exit("disabled\n")
+    print('disabled')
+    exit()
 
 pagename = sys.argv[1]
 
 mainpage = pywikibot.Page(site, pagename)
 
 if mainpage.exists():
-    exit("mainpage exist.\n")
+    print('mainpage exist.')
+    exit()
 
 if mainpage.namespace().id in [2, 3]:
-    exit("ignore namespace.\n")
+    print('ignore namespace.')
+    exit()
 
 for backlink in mainpage.backlinks(filter_redirects=True):
     print(backlink.title())

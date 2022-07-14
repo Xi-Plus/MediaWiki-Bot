@@ -21,7 +21,8 @@ cfg = json.loads(cfg)
 print(json.dumps(cfg, indent=4, ensure_ascii=False))
 
 if not cfg["enable"]:
-    exit("disabled\n")
+    print('disabled')
+    exit()
 
 signpage = pywikibot.Page(site, cfg["main_page_name"])
 text = signpage.text
@@ -57,7 +58,8 @@ for section in wikicode.get_sections()[1:]:
 
 text = str(wikicode)
 if signpage.text == text:
-    exit("nothing changed")
+    print('nothing changed')
+    exit()
 
 pywikibot.showDiff(signpage.text, text)
 signpage.text = text

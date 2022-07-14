@@ -40,7 +40,8 @@ cfg = config_page.text
 cfg = json.loads(cfg)
 
 if not cfg['enable']:
-    exit('disabled\n')
+    print('disabled')
+    exit()
 
 # %%
 BASE_DIR = os.path.dirname(os.path.realpath(__file__))
