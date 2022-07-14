@@ -37,7 +37,8 @@ for page in cvtem.members():
         notreportedpage.append(pagetitle)
 
 if len(notreportedpage) == 0:
-    exit('Nothing to report')
+    print('Nothing to report')
+    exit()
 
 text = cvpage.text
 
