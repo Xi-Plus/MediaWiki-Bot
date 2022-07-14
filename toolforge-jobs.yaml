@@ -1,0 +1,263 @@
+- name: admin-activity-report
+  image: tf-python39
+  command: MediaWiki-Bot/pyvenv/bin/python3 MediaWiki-Bot/admin-activity-report/edit.py
+  schedule: "34 19 * * 0"
+  emails: all
+
+- name: adminstats
+  image: tf-python39
+  command: MediaWiki-Bot/pyvenv/bin/python3 MediaWiki-Bot/adminstats-2/edit.py
+  schedule: "0 0 1 * *"
+  emails: all
+
+- name: afd-section-title
+  image: tf-python39
+  command: MediaWiki-Bot/pyvenv/bin/python3 MediaWiki-Bot/afd-section-title/edit.py
+  schedule: "6 */3 * * *"
+  emails: all
+
+- name: bad-image-list-cleaner
+  image: tf-python39
+  command: MediaWiki-Bot/pyvenv/bin/python3 MediaWiki-Bot/bad-image-list-cleaner/main.py
+  schedule: "32 20 * * *"
+  emails: all
+
+- name: bot-list
+  image: tf-python39
+  command: MediaWiki-Bot/pyvenv/bin/python3 MediaWiki-Bot/bot-list/edit.py
+  schedule: "30 20 * * *"
+  emails: all
+
+- name: check-sign
+  image: tf-python39
+  command: MediaWiki-Bot/pyvenv/bin/python3 MediaWiki-Bot/check-sign/edit.py
+  schedule: "23 20 * * *"
+  emails: all
+
+- name: cv-remove-deleted
+  image: tf-python39
+  command: MediaWiki-Bot/pyvenv/bin/python3 MediaWiki-Bot/cv-remove-deleted/edit.py
+  schedule: "9 */3 * * *"
+  emails: all
+
+- name: cv-report
+  image: tf-python39
+  command: MediaWiki-Bot/pyvenv/bin/python3 MediaWiki-Bot/cv-report/edit.py
+  schedule: "*/10 * * * *"
+  emails: all
+
+- name: drv-tag-talk
+  image: tf-php74
+  command: php MediaWiki-Bot/DRV-tag-talk/edit.php
+  schedule: "5 20 * * *"
+  emails: all
+
+- name: ep-status
+  image: tf-python39
+  command: MediaWiki-Bot/pyvenv/bin/python3 MediaWiki-Bot/ep-status/edit.py
+  schedule: "12 * * * *"
+  emails: all
+
+- name: ewip-archive
+  image: tf-python39
+  command: MediaWiki-Bot/pyvenv/bin/python3 MediaWiki-Bot/ewip-archive/edit.py
+  schedule: "8 20 * * *"
+  emails: all
+
+- name: expand-templates-in-title
+  image: tf-python39
+  command: MediaWiki-Bot/pyvenv/bin/python3 MediaWiki-Bot/expand-templates-in-title/edit.py
+  schedule: "26 * * * *"
+  emails: all
+
+- name: fix-broken-double-redirect
+  image: tf-python39
+  command: MediaWiki-Bot/pyvenv/bin/python3 MediaWiki-Bot/fix-broken-double-redirect/edit.py
+  schedule: "46 * * * *"
+  emails: all
+
+- name: fix-non-free-files-backlink
+  image: tf-php74
+  command: php MediaWiki-Bot/fix-non-free-files-backlink/edit.php
+  schedule: "4 20 * * *"
+  emails: all
+
+- name: mark-dykc
+  image: tf-python39
+  command: MediaWiki-Bot/pyvenv/bin/python3 MediaWiki-Bot/mark-DYKC/edit.py
+  schedule: "13 20 * * *"
+  emails: all
+
+- name: mark-rrd
+  image: tf-python39
+  command: MediaWiki-Bot/pyvenv/bin/python3 MediaWiki-Bot/mark-RRD/edit.py
+  schedule: "*/30 * * * *"
+  emails: all
+
+- name: move-renamed-users-flow
+  image: tf-python39
+  command: MediaWiki-Bot/pyvenv/bin/python3 MediaWiki-Bot/move-renamed-users-flow/move.py
+  schedule: "35 20 * * *"
+  emails: all
+
+- name: newusermessage-signatures-archive
+  image: tf-python39
+  command: MediaWiki-Bot/pyvenv/bin/python3 MediaWiki-Bot/newusermessage-signatures-archive/edit.py
+  schedule: "10 20 * * *"
+  emails: all
+
+- name: not-report-afd-pages
+  image: tf-python39
+  command: MediaWiki-Bot/pyvenv/bin/python3 MediaWiki-Bot/not-report-afd-pages/edit.py
+  schedule: "17 20 * * 0"
+  emails: all
+
+- name: np-maintenance
+  image: tf-python39
+  command: MediaWiki-Bot/pyvenv/bin/python3 MediaWiki-Bot/np-maintenance/edit.py
+  schedule: "14 */6 * * *"
+  emails: all
+
+- name: o1-deleter
+  image: tf-python39
+  command: MediaWiki-Bot/pyvenv/bin/python3 MediaWiki-Bot/o1-deleter/main.py
+  schedule: "*/10 * * * *"
+  emails: all
+
+- name: policy-newsletter-last-1
+  image: tf-python39
+  command: MediaWiki-Bot/pyvenv/bin/python3 MediaWiki-Bot/policy-newsletter/policy-newsletter.py --months -1
+  schedule: "0 * 1-7 * *"
+  emails: all
+
+- name: policy-newsletter-last-2
+  image: tf-python39
+  command: MediaWiki-Bot/pyvenv/bin/python3 MediaWiki-Bot/policy-newsletter/policy-newsletter.py --months -1
+  schedule: "0 */6 8-31 * *"
+  emails: all
+
+- name: policy-newsletter-this
+  image: tf-python39
+  command: MediaWiki-Bot/pyvenv/bin/python3 MediaWiki-Bot/policy-newsletter/policy-newsletter.py --months 0
+  schedule: "0 0 */5 * *"
+  emails: all
+
+- name: pps-indef
+  image: tf-python39
+  command: MediaWiki-Bot/pyvenv/bin/python3 MediaWiki-Bot/protected-pages-status/indef.py
+  schedule: "16 20 * * 0"
+  emails: all
+
+- name: pps-longtime
+  image: tf-python39
+  command: MediaWiki-Bot/pyvenv/bin/python3 MediaWiki-Bot/protected-pages-status/longtime.py
+  schedule: "15 20 * * 0"
+  emails: all
+
+- name: proposed-mergers-archive
+  image: tf-php74
+  command: php MediaWiki-Bot/proposed-mergers-archive/edit.php
+  schedule: "20 20 * * *"
+  emails: all
+
+- name: protect-locked-userpage
+  image: tf-python39
+  command: MediaWiki-Bot/pyvenv/bin/python3 MediaWiki-Bot/protect-locked-userpage/protect.py
+  schedule: "24 * * * *"
+  emails: all
+
+- name: protect-templates-in-mediawiki-ns
+  image: tf-python39
+  command: MediaWiki-Bot/pyvenv/bin/python3 MediaWiki-Bot/protect-templates-in-mediawiki-ns/protect.py
+  schedule: "25 20 * * *"
+  emails: all
+
+- name: purge-at
+  image: tf-python39
+  command: MediaWiki-Bot/pyvenv/bin/python3 MediaWiki-Bot/purge-at/purge.py
+  schedule: "19 * * * *"
+  emails: all
+
+- name: remove-broken-file-edit
+  image: tf-python39
+  command: MediaWiki-Bot/pyvenv/bin/python3 MediaWiki-Bot/remove-broken-file/edit.py --limit 12
+  schedule: "*/30 * * * *"
+  emails: all
+
+- name: remove-broken-file-output
+  image: tf-python39
+  command: MediaWiki-Bot/pyvenv/bin/python3 MediaWiki-Bot/remove-broken-file/output_files.py
+  schedule: "18 20 * * 0"
+  emails: all
+
+- name: remove-broken-file-template
+  image: tf-python39
+  command: MediaWiki-Bot/pyvenv/bin/python3 MediaWiki-Bot/remove-broken-file/remove-template.py
+  schedule: "1 * * * *"
+  emails: all
+
+- name: remove-draft-copyvio
+  image: tf-php74
+  command: php MediaWiki-Bot/remove-draft-copyvio/edit.php
+  schedule: "2 20 * * *"
+  emails: all
+
+- name: remove-inuse
+  image: tf-php74
+  command: php MediaWiki-Bot/remove-inuse/edit.php
+  schedule: "3 * * * *"
+  emails: all
+
+- name: revoke-archive
+  image: tf-php74
+  command: php MediaWiki-Bot/revoke-archive/edit.php
+  schedule: "31 20 * * *"
+  emails: all
+
+- name: spam-blacklist-archive
+  image: tf-php74
+  command: php MediaWiki-Bot/spam-blacklist-archive/edit.php
+  schedule: "21 20 * * *"
+  emails: all
+
+- name: spam-whitelist-archive
+  image: tf-python39
+  command: MediaWiki-Bot/pyvenv/bin/python3 MediaWiki-Bot/spam-whitelist-archive/edit.py
+  schedule: "21 20 * * *"
+  emails: all
+
+- name: transclusion-count
+  image: tf-python39
+  command: MediaWiki-Bot/pyvenv/bin/python3 MediaWiki-Bot/transclusion-count/edit.py
+  schedule: "44 19 * * 0"
+  emails: all
+
+- name: uaa-archive
+  image: tf-php74
+  command: php MediaWiki-Bot/UAA-archive/edit.php
+  schedule: "*/10 * * * *"
+  emails: all
+
+- name: unconnected-pages-report-zhwikt
+  image: tf-python39
+  command: MediaWiki-Bot/pyvenv/bin/python3 MediaWiki-Bot/unconnected-pages-report/edit.py zh wiktionary
+  schedule: "22 20 * * 0"
+  emails: all
+
+- name: unconnected-pages-report-zhwp
+  image: tf-python39
+  command: MediaWiki-Bot/pyvenv/bin/python3 MediaWiki-Bot/unconnected-pages-report/edit.py zh wikipedia
+  schedule: "22 20 * * 0"
+  emails: all
+
+- name: user-right-process
+  image: tf-python39
+  command: MediaWiki-Bot/pyvenv/bin/python3 MediaWiki-Bot/user-right-process/edit.py
+  schedule: "33 20 * * *"
+  emails: all
+
+- name: usertalk-archive
+  image: tf-php74
+  command: php MediaWiki-Bot/usertalk-archive/edit.php
+  schedule: "21 20 * * *"
+  emails: all
