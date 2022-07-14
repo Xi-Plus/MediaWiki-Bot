@@ -26,6 +26,7 @@ DRV-tag-talk/revcache/
 MostTranscludedPages/config.*.php
 move-faga/page.txt
 move-g15-file/skipedpage.txt
+pyvenv/
 remove-broken-file/skipedpage.txt
 rfa-stats/data/
 rfa-stats-php/list/
