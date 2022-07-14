@@ -14,7 +14,7 @@
   image: tf-python39
   command: MediaWiki-Bot/pyvenv/bin/python3 MediaWiki-Bot/afd-section-title/edit.py
   schedule: "6 */3 * * *"
-  emails: all
+  emails: onfailure
 
 - name: bad-image-list-cleaner
   image: tf-python39
@@ -74,7 +74,7 @@
   image: tf-python39
   command: MediaWiki-Bot/pyvenv/bin/python3 MediaWiki-Bot/fix-broken-double-redirect/edit.py
   schedule: "46 * * * *"
-  emails: all
+  emails: onfailure
 
 - name: fix-non-free-files-backlink
   image: tf-php74
@@ -92,7 +92,7 @@
   image: tf-python39
   command: MediaWiki-Bot/pyvenv/bin/python3 MediaWiki-Bot/mark-RRD/edit.py
   schedule: "*/30 * * * *"
-  emails: all
+  emails: onfailure
 
 - name: move-renamed-users-flow
   image: tf-python39
@@ -182,7 +182,7 @@
   image: tf-python39
   command: MediaWiki-Bot/pyvenv/bin/python3 MediaWiki-Bot/remove-broken-file/edit.py --limit 12
   schedule: "*/30 * * * *"
-  emails: all
+  emails: onfailure
 
 - name: remove-broken-file-output
   image: tf-python39
@@ -194,7 +194,7 @@
   image: tf-python39
   command: MediaWiki-Bot/pyvenv/bin/python3 MediaWiki-Bot/remove-broken-file/remove-template.py
   schedule: "1 * * * *"
-  emails: all
+  emails: onfailure
 
 - name: remove-draft-copyvio
   image: tf-php74
@@ -206,7 +206,7 @@
   image: tf-php74
   command: php MediaWiki-Bot/remove-inuse/edit.php
   schedule: "3 * * * *"
-  emails: all
+  emails: onfailure
 
 - name: revoke-archive
   image: tf-php74
