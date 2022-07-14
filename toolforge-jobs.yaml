@@ -56,7 +56,7 @@
   image: tf-python39
   command: MediaWiki-Bot/pyvenv/bin/python3 MediaWiki-Bot/ep-status/edit.py
   schedule: "12 * * * *"
-  emails: all
+  emails: onfailure
 
 - name: ewip-archive
   image: tf-python39
@@ -93,6 +93,12 @@
   command: MediaWiki-Bot/pyvenv/bin/python3 MediaWiki-Bot/mark-RRD/edit.py
   schedule: "*/30 * * * *"
   emails: onfailure
+
+- name: most-transcluded-pages
+  image: tf-python39
+  command: MediaWiki-Bot/pyvenv/bin/python3 MediaWiki-Bot/MostTranscludedPages/protect.py
+  schedule: "49 20 * * *"
+  emails: all
 
 - name: move-renamed-users-flow
   image: tf-python39
@@ -176,7 +182,7 @@
   image: tf-python39
   command: MediaWiki-Bot/pyvenv/bin/python3 MediaWiki-Bot/purge-at/purge.py
   schedule: "19 * * * *"
-  emails: all
+  emails: onfailure
 
 - name: remove-broken-file-edit
   image: tf-python39

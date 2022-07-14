@@ -31,22 +31,20 @@ print(json.dumps(cfg, indent=4, ensure_ascii=False))
 if not cfg['enable']:
     exit('disabled\n')
 
-db = pymysql.connect(host=database['host'],
-                     user=database['user'],
-                     passwd=database['passwd'],
-                     db=database['db'],
-                     charset=database['charset'])
-cur = db.cursor()
-
-cur.execute("""SELECT `title`, `count`, `protectedit`, `protectmove`, `redirect` FROM `MostTranscludedPages_page` WHERE `wiki` = %s AND `redirect` != 2 ORDER BY `title` ASC""", (args.dbwiki))
-rows = cur.fetchall()
+database['host'] = '{}.analytics.db.svc.eqiad.wmflabs'.format(args.dbwiki)
+conn = pymysql.connect(
+    host=database['host'],
+    user=database['user'],
+    passwd=database['passwd'],
+    charset=database['charset']
+)
 
 
-def check_required_protection(title, count):
-    if title.startswith('MediaWiki:'):
+def check_required_protection(page, count):
+    if page.namespace().id == 8:
         return 0
-    if title.startswith('User:'):
-        if title.endswith('.js') or title.endswith('.css') or title.endswith('.json'):
+    if page.namespace().id == 2:
+        if page.title().endswith('.js') or page.title().endswith('.css') or page.title().endswith('.json'):
             return 0
     if count >= cfg['template_full'] and cfg['template_full'] > 0:
         return 4
@@ -72,25 +70,51 @@ number2protection = {
     0: '',
 }
 
-for row in rows:
-    title = row[0]
-    count = row[1]
-    protectedit = row[2]
-    protectmove = row[3]
-    redirect = row[4]
+with conn.cursor() as cursor:
+    cursor.execute('use zhwiki_p')
+    cursor.execute('''
+    SELECT
+        tl_namespace,
+        tl_title,
+        links,
+        pr_level,
+        pr_expiry
+    FROm (
+        SELECT
+        tl_namespace,
+        tl_title,
+        COUNT(*) AS links
+        FROM templatelinks
+        GROUP BY tl_namespace, tl_title
+        HAVING links >= 500
+    ) templatelinks
+    LEFT JOIN page ON tl_namespace = page_namespace AND tl_title = page_title
+    LEFT JOIN page_restrictions ON page_id = pr_page AND pr_type = 'edit'
+    ''')
+    rows = cursor.fetchall()
 
-    required_protection = check_required_protection(title, count)
-    current_protection = protection2number[protectedit]
+for row in rows:
+    page_namespace = row[0]
+    page_title = row[1].decode()
+    count = row[2]
+    if row[3] is None:
+        pr_level = ''
+        pr_expiry = ''
+    else:
+        pr_level = row[3].decode()
+        pr_expiry = row[4].decode()
+
+    page = pywikibot.Page(site, page_title, page_namespace)
+    required_protection = check_required_protection(page, count)
+    current_protection = protection2number[pr_level]
 
     if required_protection > current_protection:
-        page = pywikibot.Page(site, title)
-
         if not page.exists():
-            print('{} is not exist'.format(title))
+            print('{} is not exist'.format(page.title()))
             continue
 
-        if 'exclude_regex' in cfg and cfg['exclude_regex'] != '' and re.search(cfg['exclude_regex'], title):
-            print('Ignore {}'.format(title))
+        if 'exclude_regex' in cfg and cfg['exclude_regex'] != '' and re.search(cfg['exclude_regex'], page.title()):
+            print('Ignore {}'.format(page.title()))
             continue
 
         args = {
@@ -101,5 +125,5 @@ for row in rows:
                 'move': number2protection[required_protection],
             },
         }
-        print(title, args)
+        print(page.title(), args)
         page.protect(**args)
