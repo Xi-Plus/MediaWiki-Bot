@@ -63,7 +63,7 @@ for article in matches:
         continue
 
     talkText = talkPage.text
-    sections = pywikibot.textlib.extract_sections(talkText)
+    sections = pywikibot.textlib.extract_sections(talkText, site)
     if not re.search(r'{{\s*(DYK[ _]Invite|DYKInvite|DYKC|DYKN)\s*(?:\||}})', sections[0], flags=re.I):
         talkText = '{{DYK Invite}}\n' + talkText
         pywikibot.showDiff(talkPage.text, talkText)
