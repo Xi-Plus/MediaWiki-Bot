@@ -122,7 +122,7 @@
   image: tf-python39
   command: MediaWiki-Bot/pyvenv/bin/python3 MediaWiki-Bot/np-maintenance/edit.py
   schedule: "14 */6 * * *"
-  emails: all
+  emails: onfailure
 
 - name: o1-deleter
   image: tf-python39
