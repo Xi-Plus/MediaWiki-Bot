@@ -20,25 +20,25 @@
   image: tf-python39
   command: MediaWiki-Bot/pyvenv/bin/python3 MediaWiki-Bot/bad-image-list-cleaner/main.py
   schedule: "32 20 * * *"
-  emails: all
+  emails: onfailure
 
 - name: bot-list
   image: tf-python39
   command: MediaWiki-Bot/pyvenv/bin/python3 MediaWiki-Bot/bot-list/edit.py
   schedule: "30 20 * * *"
-  emails: all
+  emails: onfailure
 
 - name: check-sign
   image: tf-python39
   command: MediaWiki-Bot/pyvenv/bin/python3 MediaWiki-Bot/check-sign/edit.py
   schedule: "23 20 * * *"
-  emails: all
+  emails: onfailure
 
 - name: cv-remove-deleted
   image: tf-python39
   command: MediaWiki-Bot/pyvenv/bin/python3 MediaWiki-Bot/cv-remove-deleted/edit.py
   schedule: "9 */3 * * *"
-  emails: all
+  emails: onfailure
 
 - name: cv-report
   image: tf-python39
@@ -50,7 +50,7 @@
   image: tf-php74
   command: php MediaWiki-Bot/DRV-tag-talk/edit.php
   schedule: "5 20 * * *"
-  emails: all
+  emails: onfailure
 
 - name: ep-status
   image: tf-python39
@@ -62,7 +62,7 @@
   image: tf-python39
   command: MediaWiki-Bot/pyvenv/bin/python3 MediaWiki-Bot/ewip-archive/edit.py
   schedule: "8 20 * * *"
-  emails: all
+  emails: onfailure
 
 - name: expand-templates-in-title
   image: tf-python39
@@ -80,7 +80,7 @@
   image: tf-php74
   command: php MediaWiki-Bot/fix-non-free-files-backlink/edit.php
   schedule: "4 20 * * *"
-  emails: all
+  emails: onfailure
 
 - name: mark-dykc
   image: tf-python39
@@ -98,19 +98,19 @@
   image: tf-python39
   command: MediaWiki-Bot/pyvenv/bin/python3 MediaWiki-Bot/MostTranscludedPages/protect.py
   schedule: "49 20 * * *"
-  emails: all
+  emails: onfailure
 
 - name: move-renamed-users-flow
   image: tf-python39
   command: MediaWiki-Bot/pyvenv/bin/python3 MediaWiki-Bot/move-renamed-users-flow/move.py
   schedule: "35 20 * * *"
-  emails: all
+  emails: onfailure
 
 - name: newusermessage-signatures-archive
   image: tf-python39
   command: MediaWiki-Bot/pyvenv/bin/python3 MediaWiki-Bot/newusermessage-signatures-archive/edit.py
   schedule: "10 20 * * *"
-  emails: all
+  emails: onfailure
 
 - name: not-report-afd-pages
   image: tf-python39
@@ -140,7 +140,7 @@
   image: tf-python39
   command: MediaWiki-Bot/pyvenv/bin/python3 MediaWiki-Bot/policy-newsletter/policy-newsletter.py --months -1
   schedule: "0 */6 8-31 * *"
-  emails: all
+  emails: onfailure
 
 - name: policy-newsletter-this
   image: tf-python39
@@ -164,7 +164,7 @@
   image: tf-php74
   command: php MediaWiki-Bot/proposed-mergers-archive/edit.php
   schedule: "20 20 * * *"
-  emails: all
+  emails: onfailure
 
 - name: protect-locked-userpage
   image: tf-python39
@@ -176,7 +176,7 @@
   image: tf-python39
   command: MediaWiki-Bot/pyvenv/bin/python3 MediaWiki-Bot/protect-templates-in-mediawiki-ns/protect.py
   schedule: "25 20 * * *"
-  emails: all
+  emails: onfailure
 
 - name: purge-at
   image: tf-python39
@@ -206,7 +206,7 @@
   image: tf-php74
   command: php MediaWiki-Bot/remove-draft-copyvio/edit.php
   schedule: "2 20 * * *"
-  emails: all
+  emails: onfailure
 
 - name: remove-inuse
   image: tf-php74
@@ -218,19 +218,19 @@
   image: tf-php74
   command: php MediaWiki-Bot/revoke-archive/edit.php
   schedule: "31 20 * * *"
-  emails: all
+  emails: onfailure
 
 - name: spam-blacklist-archive
   image: tf-php74
   command: php MediaWiki-Bot/spam-blacklist-archive/edit.php
   schedule: "21 20 * * *"
-  emails: all
+  emails: onfailure
 
 - name: spam-whitelist-archive
   image: tf-python39
   command: MediaWiki-Bot/pyvenv/bin/python3 MediaWiki-Bot/spam-whitelist-archive/edit.py
   schedule: "21 20 * * *"
-  emails: all
+  emails: onfailure
 
 - name: transclusion-count
   image: tf-python39
@@ -260,10 +260,10 @@
   image: tf-python39
   command: MediaWiki-Bot/pyvenv/bin/python3 MediaWiki-Bot/user-right-process/edit.py
   schedule: "33 20 * * *"
-  emails: all
+  emails: onfailure
 
 - name: usertalk-archive
   image: tf-php74
   command: php MediaWiki-Bot/usertalk-archive/edit.php
   schedule: "21 20 * * *"
-  emails: all
+  emails: onfailure
