@@ -19,3 +19,4 @@ pip install mwparserfromhell
 pip install pymysql
 pip install python-dateutil
 pip install pywikibot
+pip install requests
