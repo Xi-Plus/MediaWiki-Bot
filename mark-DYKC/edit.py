@@ -89,7 +89,7 @@ templatePage = pywikibot.Page(site, 'Template:DYK Invite')
 for talkPage in templatePage.embeddedin(namespaces=1):
     if talkPage.title() not in DYKCPages:
         print(talkPage.title())
-        sections = pywikibot.textlib.extract_sections(talkPage.text)
+        sections = pywikibot.textlib.extract_sections(talkPage.text, site)
         header = sections[0]
         header = re.sub(r'{{\s*(DYK[ _]Invite|DYKInvite|DYKC|DYKN)\s*(\|.*)*}} *\n?', '', header, flags=re.I)
 
