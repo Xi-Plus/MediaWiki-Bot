@@ -34,4 +34,6 @@ user-config/
 user-right-process/user_data.json
 *.csv
 *.pyc
+bootstrap-venv.err
+bootstrap-venv.out
 replica.my.cnf
