@@ -5,6 +5,7 @@
 set -euo pipefail
 
 # create the venv
+rm -rf pyvenv
 python3 -m venv pyvenv
 
 # activate it

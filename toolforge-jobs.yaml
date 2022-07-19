@@ -2,7 +2,7 @@
   image: tf-python39
   command: MediaWiki-Bot/pyvenv/bin/python3 MediaWiki-Bot/admin-activity-report/edit.py
   schedule: "34 19 * * 0"
-  emails: all
+  emails: onfailure
 
 - name: adminstats
   image: tf-python39
@@ -86,7 +86,7 @@
   image: tf-python39
   command: MediaWiki-Bot/pyvenv/bin/python3 MediaWiki-Bot/mark-DYKC/edit.py
   schedule: "13 20 * * *"
-  emails: all
+  emails: onfailure
 
 - name: mark-rrd
   image: tf-python39
@@ -116,7 +116,7 @@
   image: tf-python39
   command: MediaWiki-Bot/pyvenv/bin/python3 MediaWiki-Bot/not-report-afd-pages/edit.py
   schedule: "17 20 * * 0"
-  emails: all
+  emails: onfailure
 
 - name: np-maintenance
   image: tf-python39
@@ -152,13 +152,13 @@
   image: tf-python39
   command: MediaWiki-Bot/pyvenv/bin/python3 MediaWiki-Bot/protected-pages-status/indef.py
   schedule: "16 20 * * 0"
-  emails: all
+  emails: onfailure
 
 - name: pps-longtime
   image: tf-python39
   command: MediaWiki-Bot/pyvenv/bin/python3 MediaWiki-Bot/protected-pages-status/longtime.py
   schedule: "15 20 * * 0"
-  emails: all
+  emails: onfailure
 
 - name: proposed-mergers-archive
   image: tf-php74
@@ -194,7 +194,7 @@
   image: tf-python39
   command: MediaWiki-Bot/pyvenv/bin/python3 MediaWiki-Bot/remove-broken-file/output_files.py
   schedule: "18 20 * * 0"
-  emails: all
+  emails: onfailure
 
 - name: remove-broken-file-template
   image: tf-python39
@@ -236,7 +236,7 @@
   image: tf-python39
   command: MediaWiki-Bot/pyvenv/bin/python3 MediaWiki-Bot/transclusion-count/edit.py
   schedule: "44 19 * * 0"
-  emails: all
+  emails: onfailure
 
 - name: uaa-archive
   image: tf-php74
@@ -248,13 +248,13 @@
   image: tf-python39
   command: MediaWiki-Bot/pyvenv/bin/python3 MediaWiki-Bot/unconnected-pages-report/edit.py zh wiktionary
   schedule: "22 20 * * 0"
-  emails: all
+  emails: onfailure
 
 - name: unconnected-pages-report-zhwp
   image: tf-python39
   command: MediaWiki-Bot/pyvenv/bin/python3 MediaWiki-Bot/unconnected-pages-report/edit.py zh wikipedia
   schedule: "22 20 * * 0"
-  emails: all
+  emails: onfailure
 
 - name: user-right-process
   image: tf-python39
