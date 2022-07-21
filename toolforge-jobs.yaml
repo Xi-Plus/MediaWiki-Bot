@@ -146,7 +146,7 @@
   image: tf-python39
   command: MediaWiki-Bot/pyvenv/bin/python3 MediaWiki-Bot/policy-newsletter/policy-newsletter.py --months 0
   schedule: "0 0 */5 * *"
-  emails: all
+  emails: onfailure
 
 - name: pps-indef
   image: tf-python39
