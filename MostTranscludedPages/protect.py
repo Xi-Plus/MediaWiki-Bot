@@ -4,13 +4,12 @@ import json
 import os
 import re
 
-os.environ['PYWIKIBOT_DIR'] = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'protect-config')
 import pymysql
+
+os.environ['PYWIKIBOT_DIR'] = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'protect-config')
 import pywikibot
 
-from config import (database,  # pylint: disable=E0611,W0614
-                    protect_config_page_name)
-
+from config import database, protect_config_page_name  # pylint: disable=E0611,W0614
 
 parser = argparse.ArgumentParser()
 parser.add_argument('lang', nargs='?', default='zh')
@@ -72,7 +71,7 @@ number2protection = {
 }
 
 with conn.cursor() as cursor:
-    cursor.execute('use zhwiki_p')
+    cursor.execute('use {}_p'.format(args.dbwiki))
     cursor.execute('''
     SELECT
         tl_namespace,
