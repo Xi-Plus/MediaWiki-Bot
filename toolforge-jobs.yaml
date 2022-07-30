@@ -94,16 +94,16 @@
   schedule: "*/30 * * * *"
   emails: onfailure
 
-- name: most-transcluded-pages-zhwp
-  image: tf-python39
-  command: MediaWiki-Bot/pyvenv/bin/python3 MediaWiki-Bot/MostTranscludedPages/protect.py zh wikipedia zhwiki
-  schedule: "49 20 * * *"
-  emails: onfailure
-
 - name: most-transcluded-pages-zhwikt
   image: tf-python39
   command: MediaWiki-Bot/pyvenv/bin/python3 MediaWiki-Bot/MostTranscludedPages/protect.py zh wiktionary zhwiktionary
   schedule: "11 20 * * *"
+  emails: onfailure
+
+- name: most-transcluded-pages-zhwp
+  image: tf-python39
+  command: MediaWiki-Bot/pyvenv/bin/python3 MediaWiki-Bot/MostTranscludedPages/protect.py zh wikipedia zhwiki
+  schedule: "49 20 * * *"
   emails: onfailure
 
 - name: move-renamed-users-flow
