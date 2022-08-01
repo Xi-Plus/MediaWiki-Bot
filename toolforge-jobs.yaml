@@ -8,7 +8,7 @@
   image: tf-python39
   command: MediaWiki-Bot/pyvenv/bin/python3 MediaWiki-Bot/adminstats-2/edit.py
   schedule: "0 0 1 * *"
-  emails: all
+  emails: onfailure
 
 - name: afd-section-title
   image: tf-python39
@@ -140,7 +140,7 @@
   image: tf-python39
   command: MediaWiki-Bot/pyvenv/bin/python3 MediaWiki-Bot/policy-newsletter/policy-newsletter.py --months -1
   schedule: "0 * 1-7 * *"
-  emails: all
+  emails: onfailure
 
 - name: policy-newsletter-last-2
   image: tf-python39
