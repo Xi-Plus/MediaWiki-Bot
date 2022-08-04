@@ -15,6 +15,8 @@ parser = argparse.ArgumentParser()
 parser.add_argument('lang', nargs='?', default='zh')
 parser.add_argument('wiki', nargs='?', default='wikipedia')
 parser.add_argument('dbwiki', nargs='?', default='zhwiki')
+parser.add_argument('--dry-run', action='store_true', dest='dry_run')
+parser.set_defaults(dry_run=False)
 args = parser.parse_args()
 
 os.environ['TZ'] = 'UTC'
@@ -117,7 +119,7 @@ for row in rows:
             print('Ignore {}'.format(page.title()))
             continue
 
-        args = {
+        params = {
             'reason': cfg['summary'].format(count),
             'prompt': False,
             'protections': {
@@ -125,5 +127,6 @@ for row in rows:
                 'move': number2protection[required_protection],
             },
         }
-        print(page.title(), args)
-        page.protect(**args)
+        print(page.title(), params)
+        if not args.dry_run:
+            page.protect(**params)
