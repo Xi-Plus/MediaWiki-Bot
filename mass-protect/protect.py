@@ -10,6 +10,8 @@ parser = argparse.ArgumentParser()
 parser.add_argument('lang', nargs='?', default='zh')
 parser.add_argument('wiki', nargs='?', default='wikipedia')
 parser.add_argument('dbwiki', nargs='?', default='zhwiki')
+parser.add_argument('--dry-run', action='store_true', dest='dry_run')
+parser.set_defaults(dry_run=False)
 args = parser.parse_args()
 
 os.environ['TZ'] = 'UTC'
@@ -27,7 +29,7 @@ with open('list.csv', 'r', encoding='utf8') as f:
         reason = row[4]
 
         page = pywikibot.Page(site, title)
-        args = {
+        params = {
             'reason': reason,
             'prompt': False,
         }
@@ -37,8 +39,9 @@ with open('list.csv', 'r', encoding='utf8') as f:
             protections['move'] = move
         else:
             protections['create'] = create
-        args['protections'] = protections
+        params['protections'] = protections
 
-        print(title, args)
+        print(title, params)
 
-        page.protect(**args)
+        if not args.dry_run:
+            page.protect(**params)
