@@ -79,9 +79,14 @@ with conn.cursor() as cursor:
         tl_namespace,
         tl_title,
         links,
-        pr_level,
-        pr_expiry
-    FROm (
+        page_id,
+        pr1.pr_level AS edit_level,
+        pr1.pr_expiry AS edit_expiry,
+        pr2.pr_level AS move_level,
+        pr2.pr_expiry AS move_expiry,
+        pt_create_perm,
+        pt_expiry
+    FROM (
         SELECT
         tl_namespace,
         tl_title,
@@ -91,42 +96,58 @@ with conn.cursor() as cursor:
         HAVING links >= 500
     ) templatelinks
     LEFT JOIN page ON tl_namespace = page_namespace AND tl_title = page_title
-    LEFT JOIN page_restrictions ON page_id = pr_page AND pr_type = 'edit'
+    LEFT JOIN page_restrictions AS pr1 ON page_id = pr1.pr_page AND pr1.pr_type = 'edit'
+    LEFT JOIN page_restrictions AS pr2 ON page_id = pr2.pr_page AND pr2.pr_type = 'move'
+    LEFT JOIN protected_titles ON page_id IS NULL AND tl_namespace = pt_namespace AND tl_title = pt_title
     ''')
     rows = cursor.fetchall()
+
+
+def get_protection(cur_level, cur_expiry, req_level):
+    if req_level > cur_level:
+        return number2protection[req_level], 'infinity', True
+    if req_level == cur_level:
+        return number2protection[req_level], 'infinity', req_level > 0 and cur_expiry != 'infinity'
+    return number2protection[cur_level], cur_expiry, False
+
 
 for row in rows:
     page_namespace = row[0]
     page_title = row[1].decode()
     count = row[2]
-    if row[3] is None:
-        pr_level = ''
-        pr_expiry = ''
-    else:
-        pr_level = row[3].decode()
-        pr_expiry = row[4].decode()
+    page_id = row[3]
+    edit_level = protection2number[row[4].decode()] if row[4] else 0
+    edit_expiry = row[5].decode() if row[5] else ''
+    move_level = protection2number[row[6].decode()] if row[6] else 0
+    move_expiry = row[7].decode() if row[7] else ''
+    create_level = protection2number[row[8].decode()] if row[8] else 0
+    create_expiry = row[9].decode() if row[9] else ''
 
     page = pywikibot.Page(site, page_title, page_namespace)
     required_protection = check_required_protection(page, count)
-    current_protection = protection2number[pr_level]
 
-    if required_protection > current_protection:
-        if not page.exists():
-            print('{} is not exist'.format(page.title()))
-            continue
+    needs_protect = False
 
+    params = {
+        'reason': cfg['summary'].format(count),
+        'prompt': False,
+        'protections': {},
+    }
+    if page_id:
+        params['protections']['edit'], new_exp_edit, changed = get_protection(edit_level, edit_expiry, required_protection)
+        needs_protect |= changed
+        params['protections']['move'], new_exp_move, changed = get_protection(move_level, move_expiry, required_protection)
+        if required_protection >= 2:
+            needs_protect |= changed
+        params['expiry'] = new_exp_edit + '|' + new_exp_move
+    else:
+        params['protections']['create'], params['expiry'], needs_protect = get_protection(edit_level, edit_expiry, required_protection)
+
+    if needs_protect:
         if 'exclude_regex' in cfg and cfg['exclude_regex'] != '' and re.search(cfg['exclude_regex'], page.title()):
             print('Ignore {}'.format(page.title()))
             continue
 
-        params = {
-            'reason': cfg['summary'].format(count),
-            'prompt': False,
-            'protections': {
-                'edit': number2protection[required_protection],
-                'move': number2protection[required_protection],
-            },
-        }
         print(page.title(), params)
         if not args.dry_run:
             page.protect(**params)
