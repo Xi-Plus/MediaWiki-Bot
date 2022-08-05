@@ -12,9 +12,9 @@ import pywikibot
 from config import database, protect_config_page_name  # pylint: disable=E0611,W0614
 
 parser = argparse.ArgumentParser()
-parser.add_argument('lang', nargs='?', default='zh')
-parser.add_argument('wiki', nargs='?', default='wikipedia')
-parser.add_argument('dbwiki', nargs='?', default='zhwiki')
+parser.add_argument('lang')
+parser.add_argument('wiki')
+parser.add_argument('dbwiki')
 parser.add_argument('--dry-run', action='store_true', dest='dry_run')
 parser.set_defaults(dry_run=False)
 args = parser.parse_args()
