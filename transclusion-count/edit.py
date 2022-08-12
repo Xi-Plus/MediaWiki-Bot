@@ -52,24 +52,28 @@ return {{
 query1 = '''
 /* transclusioncount.py SLOW_OK */
 SELECT
-  tl_title,
+  lt_title,
   COUNT(*)
 FROM templatelinks
-WHERE tl_namespace = 10
-GROUP BY tl_title
+LEFT JOIN linktarget ON tl_target_id = lt_id
+WHERE lt_namespace = 10
+GROUP BY tl_target_id
 HAVING COUNT(*) > 2000
+ORDER BY lt_title ASC
 LIMIT 10000;
 '''
 
 query2 = '''
 /* transclusioncount.py SLOW_OK */
 SELECT
-  tl_title,
+  lt_title,
   COUNT(*)
 FROM templatelinks
-WHERE tl_namespace = 828
-GROUP BY tl_title
+LEFT JOIN linktarget ON tl_target_id = lt_id
+WHERE lt_namespace = 828
+GROUP BY tl_target_id
 HAVING COUNT(*) > 2000
+ORDER BY lt_title ASC
 LIMIT 10000;
 '''
 

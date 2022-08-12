@@ -76,8 +76,8 @@ with conn.cursor() as cursor:
     cursor.execute('use {}_p'.format(args.dbwiki))
     cursor.execute('''
     SELECT
-        tl_namespace,
-        tl_title,
+        lt_namespace,
+        lt_title,
         links,
         page_id,
         pr1.pr_level AS edit_level,
@@ -88,17 +88,17 @@ with conn.cursor() as cursor:
         pt_expiry
     FROM (
         SELECT
-        tl_namespace,
-        tl_title,
+        tl_target_id,
         COUNT(*) AS links
         FROM templatelinks
-        GROUP BY tl_namespace, tl_title
+        GROUP BY tl_target_id
         HAVING links >= 500
     ) templatelinks
-    LEFT JOIN page ON tl_namespace = page_namespace AND tl_title = page_title
+    LEFT JOIN linktarget ON tl_target_id = lt_id
+    LEFT JOIN page ON lt_namespace = page_namespace AND lt_title = page_title
     LEFT JOIN page_restrictions AS pr1 ON page_id = pr1.pr_page AND pr1.pr_type = 'edit'
     LEFT JOIN page_restrictions AS pr2 ON page_id = pr2.pr_page AND pr2.pr_type = 'move'
-    LEFT JOIN protected_titles ON page_id IS NULL AND tl_namespace = pt_namespace AND tl_title = pt_title
+    LEFT JOIN protected_titles ON page_id IS NULL AND lt_namespace = pt_namespace AND lt_title = pt_title
     ''')
     rows = cursor.fetchall()
 

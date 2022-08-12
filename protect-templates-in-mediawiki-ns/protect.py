@@ -41,9 +41,10 @@ mediawiki_whitelist = ', '.join(mediawiki_whitelist)
 with conn.cursor() as cur:
     cur.execute('use zhwiki_p')
     cur.execute("""
-        SELECT tl_namespace, tl_title, tl_from
+        SELECT lt_namespace, lt_title, tl_from
         FROM templatelinks
-        WHERE tl_from_namespace = 8 AND tl_namespace != 8
+        LEFT JOIN linktarget ON tl_target_id = lt_id
+        WHERE tl_from_namespace = 8 AND lt_namespace != 8
         AND tl_from NOT IN ({})
     """.format(mediawiki_whitelist))
     res = cur.fetchall()
