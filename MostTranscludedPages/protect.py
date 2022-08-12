@@ -123,6 +123,10 @@ for row in rows:
     create_level = protection2number[row[8].decode()] if row[8] else 0
     create_expiry = row[9].decode() if row[9] else ''
 
+    # https://phabricator.wikimedia.org/T315055
+    if page_namespace == 0 and page_title == '':
+        continue
+
     page = pywikibot.Page(site, page_title, page_namespace)
     required_protection = check_required_protection(page, count)
 
@@ -141,7 +145,7 @@ for row in rows:
             needs_protect |= changed
         params['expiry'] = new_exp_edit + '|' + new_exp_move
     else:
-        params['protections']['create'], params['expiry'], needs_protect = get_protection(edit_level, edit_expiry, required_protection)
+        params['protections']['create'], params['expiry'], needs_protect = get_protection(create_level, create_expiry, required_protection)
 
     if needs_protect:
         if 'exclude_regex' in cfg and cfg['exclude_regex'] != '' and re.search(cfg['exclude_regex'], page.title()):
