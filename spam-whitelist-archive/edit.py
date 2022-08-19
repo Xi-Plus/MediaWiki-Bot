@@ -32,11 +32,12 @@ wikicode = mwparserfromhell.parse(text)
 
 archivelist = []
 count = 0
+MIN_TIME = datetime(1970, 1, 1)
 for section in wikicode.get_sections()[1:]:
     title = str(section.get(0).title)
     print(title, end='\t')
 
-    lasttime = datetime(1, 1, 1)
+    lasttime = MIN_TIME
     for m in re.findall(r'(\d{4})年(\d{1,2})月(\d{1,2})日 \(.\) (\d{2}):(\d{2}) \(UTC\)', str(section)):
         d = datetime(int(m[0]), int(m[1]), int(m[2]), int(m[3]), int(m[4]))
         lasttime = max(lasttime, d)
@@ -47,7 +48,7 @@ for section in wikicode.get_sections()[1:]:
         continue
 
     if (time.time() - lasttime.timestamp() > cfg['time_to_live']
-            and lasttime != datetime(1, 1, 1)):
+            and lasttime != MIN_TIME):
         archivestr = str(section).strip()
         archivestr = re.sub(
             r'{{bot-directive-archiver\|no-archive-begin}}[\s\S]+?{{bot-directive-archiver\|no-archive-end}}\n?', '', archivestr)
