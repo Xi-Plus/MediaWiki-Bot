@@ -1,3 +1,9 @@
+- name: abusefilter-list
+  image: tf-php74
+  command: php MediaWiki-Bot/Abusefilter-list/edit.php
+  schedule: "51 23 * * 0"
+  emails: onfailure
+
 - name: admin-activity-report
   image: tf-python39
   command: MediaWiki-Bot/pyvenv/bin/python3 MediaWiki-Bot/admin-activity-report/edit.py
@@ -118,6 +124,12 @@
   schedule: "35 20 * * *"
   emails: onfailure
 
+- name: newusermessage-signatures
+  image: tf-python39
+  command: MediaWiki-Bot/pyvenv/bin/python3 MediaWiki-Bot/Newusermessage-signatures/edit.py
+  schedule: "14 20 * * 0"
+  emails: onfailure
+
 - name: newusermessage-signatures-archive
   image: tf-python39
   command: MediaWiki-Bot/pyvenv/bin/python3 MediaWiki-Bot/newusermessage-signatures-archive/edit.py
@@ -128,6 +140,12 @@
   image: tf-python39
   command: MediaWiki-Bot/pyvenv/bin/python3 MediaWiki-Bot/not-report-afd-pages/edit.py
   schedule: "17 20 * * 0"
+  emails: onfailure
+
+- name: not-report-np-pages
+  image: tf-python39
+  command: MediaWiki-Bot/pyvenv/bin/python3 MediaWiki-Bot/not-report-np-pages/edit.py
+  schedule: "6 20 * * 0"
   emails: onfailure
 
 - name: np-maintenance
@@ -256,6 +274,12 @@
   schedule: "*/10 * * * *"
   emails: onfailure
 
+- name: unconnected-pages-report-szywp
+  image: tf-python39
+  command: MediaWiki-Bot/pyvenv/bin/python3 MediaWiki-Bot/unconnected-pages-report/edit.py szy wikipedia
+  schedule: "32 20 * * 0"
+  emails: onfailure
+
 - name: unconnected-pages-report-zhwikt
   image: tf-python39
   command: MediaWiki-Bot/pyvenv/bin/python3 MediaWiki-Bot/unconnected-pages-report/edit.py zh wiktionary
@@ -278,4 +302,10 @@
   image: tf-php74
   command: php MediaWiki-Bot/usertalk-archive/edit.php
   schedule: "21 20 * * *"
+  emails: onfailure
+
+- name: zhwikt-afd-archive
+  image: tf-python39
+  command: MediaWiki-Bot/pyvenv/bin/python3 MediaWiki-Bot/zhwikt-afd-archive/edit.py
+  schedule: "48 20 * * *"
   emails: onfailure
