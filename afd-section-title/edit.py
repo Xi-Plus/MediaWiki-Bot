@@ -172,7 +172,7 @@ def fix(pagename):
 
             oldtitle = str(section.get(0).title).strip()
             if oldtitle != title:
-                if oldtitle.replace('_', ' ') != title:
+                if oldtitle.replace('_', ' ').replace('&#39;', "'") != title:
                     section.insert(1, '\n{{formerly|' + oldtitle + '}}')
                 if args.debug:
                     print('  set new title = ' + title)
