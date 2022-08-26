@@ -3,6 +3,7 @@
 apicache-py3/
 log/
 tmp/
+*.my.cnf
 config.php
 config.py
 input.txt
@@ -36,4 +37,3 @@ user-right-process/user_data.json
 *.pyc
 bootstrap-venv.err
 bootstrap-venv.out
-replica.my.cnf

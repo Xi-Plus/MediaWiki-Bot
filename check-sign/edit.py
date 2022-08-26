@@ -8,17 +8,18 @@ import re
 from datetime import datetime, timedelta
 
 import pymysql
+
 os.environ['PYWIKIBOT_DIR'] = os.path.dirname(os.path.realpath(__file__))
 import pywikibot
 import requests
 
-from config import config_page_name, host, password, user  # pylint: disable=E0611,W0614
-
+from config import (CONFIG_PAGE_NAME,  # pylint: disable=E0611,W0614
+                    REPLICA_CONFIG_PATH)
 
 site = pywikibot.Site('zh', 'wikipedia')
 site.login()
 
-config_page = pywikibot.Page(site, config_page_name)
+config_page = pywikibot.Page(site, CONFIG_PAGE_NAME)
 cfg = config_page.text
 cfg = json.loads(cfg)
 print(json.dumps(cfg, indent=4, ensure_ascii=False))
@@ -27,42 +28,28 @@ if not cfg['enable']:
     print('disabled')
     exit()
 
-conn = pymysql.connect(
-    host=host,
-    user=user,
-    password=password,
-    charset="utf8"
-)
+conn = pymysql.connect(read_default_file=REPLICA_CONFIG_PATH)
+
+QUERY_USER_WITH_SIGN = '''
+SELECT rc_actor, actor_name, actor_user, up2.up_value AS `nickname`
+FROM recentchanges
+LEFT JOIN actor ON rc_actor = actor_id
+LEFT JOIN user_properties AS up1 ON actor_user = up1.up_user AND up1.up_property = 'fancysig'
+LEFT JOIN user_properties AS up2 ON actor_user = up2.up_user AND up2.up_property = 'nickname'
+WHERE (rc_namespace = 4 OR rc_namespace % 2 = 1)
+    AND rc_timestamp > DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 7 DAY), '%Y%m%d%H%i%s')
+    AND actor_user IS NOT NULL
+    AND up1.up_value IS NOT NULL
+    AND up2.up_value IS NOT NULL
+GROUP BY actor_user
+ORDER BY rc_timestamp DESC
+'''
 
 with conn.cursor() as cur:
     datelimit = datetime.now() - timedelta(days=7)
     timestamp = datelimit.strftime('%Y%m%d%H%M%S')
 
-    cur.execute('use zhwiki_p')
-    cur.execute("""
-        SELECT rc_actor, actor_name, actor_user,
-            up_value AS `nickname`
-        FROM (
-            SELECT rc_actor, actor_name, actor_user,
-                up_value AS `fancysig`
-            FROM (
-                SELECT rc_actor, actor_name, actor_user
-                FROM (
-                    SELECT DISTINCT rc_actor
-                    FROM recentchanges
-                    WHERE (rc_namespace = 4 OR rc_namespace % 2 = 1)
-                        AND rc_timestamp > {}
-                    ORDER BY rc_timestamp DESC
-                ) temp1
-                LEFT JOIN actor ON rc_actor = actor_id
-                WHERE actor_user IS NOT NULL
-            ) temp2
-            LEFT JOIN user_properties  ON actor_user = up_user AND up_property = 'fancysig'
-            WHERE up_value IS NOT NULL
-        ) temp3
-        LEFT JOIN user_properties ON actor_user = up_user AND up_property = 'nickname'
-        WHERE up_value IS NOT NULL AND up_value != ''
-    """.format(timestamp))
+    cur.execute(QUERY_USER_WITH_SIGN)
     res = cur.fetchall()
 
 usernames = []
@@ -79,12 +66,11 @@ print('Process {} users'.format(len(usernames)))
 
 API = 'https://zh.wikipedia.org/w/api.php'
 data = requests.post(API, data={
-    "action": "parse",
-    "format": "json",
-    "text": text,
-    "onlypst": 1,
-    "contentmodel": "wikitext",
-    "utf8": 1
+    'action': 'parse',
+    'format': 'json',
+    'text': text,
+    'onlypst': 1,
+    'contentmodel': 'wikitext',
 }).json()
 
 parsed_text = data['parse']['text']['*']
@@ -126,10 +112,10 @@ for username in usernames:
         sign_errors[username].add('簽名過長-{}'.format(signlen))
 
 data = requests.post('https://zh.wikipedia.org/api/rest_v1/transform/wikitext/to/lint', data=json.dumps({
-    "wikitext": text2,
+    'wikitext': text2,
 }).encode(), headers={
     'Content-Type': 'application/json',
-    'Accept': "application/json",
+    'Accept': 'application/json',
 }).json()
 
 for row in data:
