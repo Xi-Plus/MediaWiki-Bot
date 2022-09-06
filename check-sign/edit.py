@@ -14,6 +14,7 @@ import pymysql
 BASEDIR = os.path.dirname(os.path.realpath(__file__))
 os.environ['PYWIKIBOT_DIR'] = BASEDIR
 import pywikibot
+import pywikibot.flow
 import requests
 from sqlalchemy import create_engine, select
 from sqlalchemy.orm import Session
@@ -244,7 +245,9 @@ def warn_user(site, username, sign, warns, cfg):
             content = ''
             for template in warns:
                 content += '{{subst:' + template + '}}\n'
-            # board.new_topic(title, content)
+            print(content)
+            input('Save?')
+            board.new_topic(title, content)
         else:
             new_text = talk_page.text
             if new_text != '':
@@ -253,7 +256,9 @@ def warn_user(site, username, sign, warns, cfg):
             for template in warns:
                 new_text += '{{subst:' + template + '}}--~~~~\n'
             pywikibot.showDiff(talk_page.text, new_text)
-            # talk_page.save(summary=cfg['notice_summary'], minor=False)
+            input('Save?')
+            talk_page.text = new_text
+            talk_page.save(summary='提醒簽名問題', minor=False)
 
         user.warn_count += 1
         user.last_warn = datetime.now()
@@ -305,6 +310,7 @@ def main():
         sign_errors[username].update(errors)
 
     report_text = REPORT_HEADER
+    warned_users = set()
     for username in sorted(usernames):
         error = sign_errors[username]
         if len(error) > 0:
@@ -317,6 +323,7 @@ def main():
 
             warn_templates = get_warn_templates(error)
             if len(warn_templates) > 0:
+                warned_users.add(username)
                 warn_user(
                     site=site,
                     username=username,
@@ -335,6 +342,13 @@ def main():
 
     page.text = report_text
     # page.save(summary=cfg['report_summary'], minor=False)
+
+    session = Session(engine)
+    for user in session.query(User).all():
+        if user.name not in warned_users:
+            print('Remove {} from table'.format(user.name))
+            session.delete(user)
+    session.commit()
 
 
 if __name__ == '__main__':
