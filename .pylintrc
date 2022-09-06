@@ -95,6 +95,7 @@ disable=too-many-locals,
         consider-using-f-string,
         no-name-in-module,
         cache-max-size-none,
+        missing-timeout,
 
 # Enable the message, report, category or checker with the given id(s). You can
 # either give multiple identifier separated by comma (,) or put this option
