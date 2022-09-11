@@ -252,8 +252,8 @@
 
 - name: spam-blacklist-archive
   image: tf-php74
-  command: php MediaWiki-Bot/spam-blacklist-archive/edit.php
-  schedule: "21 20 * * *"
+  command: MediaWiki-Bot/pyvenv/bin/python3 MediaWiki-Bot/spam-blacklist-archive/edit.py
+  schedule: "18 20 * * *"
   emails: onfailure
 
 - name: spam-whitelist-archive
