@@ -237,7 +237,10 @@ def warn_user(site, username, sign, warns, cfg):
     if user.warn_count >= 3:
         pass
     else:
+        user.warn_count += 1
         title = '簽名問題'
+        if user.warn_count > 1:
+            title += '（第{}次）'.format(user.warn_count)
 
         talk_page = pywikibot.Page(site, 'User talk:' + username)
         if talk_page.is_flow_page():
@@ -245,7 +248,7 @@ def warn_user(site, username, sign, warns, cfg):
             content = ''
             for template in warns:
                 content += '{{subst:' + template + '}}\n'
-            print(content)
+            print('flow {}: {}'.format(title, content))
             input('Save?')
             board.new_topic(title, content)
         else:
@@ -260,7 +263,6 @@ def warn_user(site, username, sign, warns, cfg):
             talk_page.text = new_text
             talk_page.save(summary='提醒簽名問題', minor=False)
 
-        user.warn_count += 1
         user.last_warn = datetime.now()
         session.commit()
 
