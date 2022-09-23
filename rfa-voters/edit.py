@@ -3,6 +3,7 @@ import argparse
 import datetime
 import os
 import re
+import sys
 
 import pymysql
 
@@ -16,11 +17,14 @@ from pywikibot.data.api import Request
 
 parser = argparse.ArgumentParser()
 parser.add_argument('outpage')
-parser.add_argument('outpageplain')
 parser.add_argument('basetime')
 parser.add_argument('basetimeblock')
+parser.add_argument('--exclude', action='append')
 parser.add_argument('--debug', action='store_true')
-parser.set_defaults(debug=False)
+parser.set_defaults(
+    exclude=[],
+    debug=False,
+)
 args = parser.parse_args()
 
 site = pywikibot.Site()
@@ -28,9 +32,11 @@ site.login()
 
 BASETIME = pywikibot.Timestamp.fromtimestampformat(args.basetime)
 BASETIMEBLOCK = pywikibot.Timestamp.fromtimestampformat(args.basetimeblock)
+EXCLUDED_USERS = {user.capitalize() for user in args.exclude}
 if args.debug:
     print('base time', BASETIME)
     print('base time block', BASETIMEBLOCK)
+    print('excluded users', EXCLUDED_USERS)
 
 conn = pymysql.connect(
     host=host,
@@ -110,6 +116,8 @@ class UserData:
                 'type': 0,
             }
             if re.search(r'^(Former|Renamed|Vanished|Deleted) (user|account) ', user_name, flags=re.I):
+                self.users[user_id]['banned'] = True
+            if user_name in EXCLUDED_USERS:
                 self.users[user_id]['banned'] = True
         self.users[user_id]['user_id'] = user_id
         self.users[user_id]['actor_id'] = actor_id
@@ -403,38 +411,55 @@ for row in result:
             unblocktime = start
 
 
-text = '''* 以下根據[[Wikipedia:人事任免投票資格]]列出投票權人名單，共有{count}名。
-* 計算基準時間為{{{{subst:#time:Y年n月j日 (D) H:i (T)|{basetime}}}}}。
-* 下列使用者已被排除：
-** 被全站無限期封鎖、全域鎖定；[[Wikipedia:申请成为管理人员#安全投票暫行規定|提名通過之時]]（基準時間：{{{{subst:#time:Y年n月j日 (D) H:i (T)|{basetimeblock}}}}}）被封鎖、禁制維基百科命名空間。
-** 擁有機器人群組、使用者頁面標記為機器人。
-** 使用者名稱判斷為隱退使用者。
-* 下列使用者不具有投票權，但未被排除：
-** 合法多重帳號；您僅可使用一個帳號投票，否則會觸犯[[Wikipedia:傀儡#被視為濫用多重帳號的行為|傀儡方針]]。
-** 候選人。
-* 該名單基於固定規則產生，不保證最後會認定為有效票，具體執行仍以人事任免投票資格、申請成為管理人員等方針指引為準。如有疑義請在下方留言，對名單的直接修改將在下次更新被撤銷。
-{{{{HideH|投票權人名單}}}}'''.format(
-    count=user_data.count_eligible(),
-    basetime=BASETIME.totimestampformat(),
-    basetimeblock=BASETIMEBLOCK.totimestampformat(),
-)
-text_plain = '''<pre>'''
+voter_note = ''
+voter_plain = ''
 for user in sorted(user_data.users.values(), key=lambda v: v['user_name']):
     if not user['eligible'] or user['banned']:
         continue
-    text += '\n# [[User:{0}|{0}]] - '.format(user['user_name'])
+    voter_note += '\n# {0},'.format(user['user_name'])
     if user['type'] == UserData.ELIGIBLE_3000:
-        text += '{}編輯'.format(user['edit_count'])
+        voter_note += 'b,{}'.format(user['edit_count'])
     elif user['type'] == UserData.ELIGIBLE_MAIN_1500:
-        text += '{}條目編輯'.format(user['edit_count_main'])
+        voter_note += 'c,{}'.format(user['edit_count_main'])
     elif user['type'] == UserData.ELIGIBLE_120_500:
-        text += '120天前{}編輯'.format(user['edit_count_120'])
-    text_plain += '\n{}@zhwiki'.format(user['user_name'])
-text += '''
-{{HideF}}
-產生時間：~~~~'''
-text_plain += '''
-</pre>'''
+        voter_note += 'a,{}'.format(user['edit_count_120'])
+    voter_plain += '\n{}@zhwiki'.format(user['user_name'])
+
+
+text = '''
+<!-- command: python3 {command} -->
+* 以下根據[[Wikipedia:人事任免投票資格|人事任免投票資格]]列出投票權人名單，共有{count}名。
+* 計算基準時間為{{{{subst:#time:Y年n月j日 (D) H:i (T)|{basetime}}}}}。
+* 下列使用者已被排除：
+** 被全站無限期封鎖、全域鎖定；[[Special:PermaLink/73532512#安全投票暫行規定|提名通過之時]]（基準時間：{{{{subst:#time:Y年n月j日 (D) H:i (T)|{basetimeblock}}}}}）被封鎖、禁制維基百科命名空間。
+** 擁有機器人群組、使用者頁面標記為機器人。
+** 使用者名稱判斷為隱退使用者。
+** 候選人。
+* 該名單可能包含您的合法多重帳號；您僅可使用一個帳號投票，否則會觸犯[[Wikipedia:傀儡#被視為濫用多重帳號的行為|傀儡方針]]。
+* 該名單基於固定規則產生，不保證最後會認定為有效票，具體執行仍以人事任免投票資格、申請成為管理人員等方針指引為準。如有疑義請在下方留言，對名單的直接修改將在下次更新被撤銷。
+
+{{{{HideH|投票權人名單}}}}
+代號範例：
+* a,X - 120天前X編輯（人事任免投票資格第一項）
+* b,X - X編輯（人事任免投票資格第二項第一款）
+* c,X - X條目編輯（人事任免投票資格第二項第二款）
+列表：
+{votersnote}
+{{{{HideF}}}}
+{{{{HideH|Voter list (plain text for SecurePoll)}}}}
+<pre>
+{votersplain}
+</pre>
+{{{{HideF}}}}
+產生時間：~~~~
+'''.format(
+    count=user_data.count_eligible(),
+    basetime=BASETIME.totimestampformat(),
+    basetimeblock=BASETIMEBLOCK.totimestampformat(),
+    votersnote=voter_note.strip(),
+    votersplain=voter_plain.strip(),
+    command=' '.join(sys.argv),
+)
 
 if args.debug:
     with open('out.txt', 'w', encoding='utf8') as f:
@@ -443,6 +468,8 @@ if args.debug:
 
 page = pywikibot.Page(site, args.outpage)
 new_text = page.text.rstrip()
+if not new_text:
+    new_text += '\n\n'
 
 FLAG_START = '<!-- voter-start -->'
 FLAG_END = '<!-- voter-end -->'
@@ -451,17 +478,9 @@ try:
     INDEX_END = new_text.index(FLAG_END)
     new_text = new_text[:INDEX_START] + FLAG_START + text + new_text[INDEX_END:]
 except ValueError:
-    new_text += '\n\n== 投票權人名單 ==\n' + FLAG_START + text + FLAG_END
+    new_text += '== 投票權人名單 ==\n' + FLAG_START + text + FLAG_END
 
-if args.debug:
-    pywikibot.showDiff(page.text, new_text)
+pywikibot.showDiff(page.text, new_text)
 if input('Save? ').lower() in ['yes', 'y']:
     page.text = new_text
     page.save(summary='產生投票權人名單', minor=False)
-
-page_plain = pywikibot.Page(site, args.outpageplain)
-if args.debug:
-    pywikibot.showDiff(page_plain.text, text_plain)
-if input('Save? ').lower() in ['yes', 'y']:
-    page_plain.text = text_plain
-    page_plain.save(summary='產生投票權人名單', minor=False)
