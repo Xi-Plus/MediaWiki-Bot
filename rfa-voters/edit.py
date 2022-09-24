@@ -19,6 +19,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument('outpage')
 parser.add_argument('basetime')
 parser.add_argument('basetimeblock')
+parser.add_argument('--candidate')
 parser.add_argument('--exclude', action='append')
 parser.add_argument('--debug', action='store_true')
 parser.set_defaults(
@@ -32,7 +33,10 @@ site.login()
 
 BASETIME = pywikibot.Timestamp.fromtimestampformat(args.basetime)
 BASETIMEBLOCK = pywikibot.Timestamp.fromtimestampformat(args.basetimeblock)
+CANDIDATE = args.candidate.capitalize() if args.candidate else None
 EXCLUDED_USERS = {user.capitalize() for user in args.exclude}
+if CANDIDATE:
+    EXCLUDED_USERS.add(CANDIDATE)
 if args.debug:
     print('base time', BASETIME)
     print('base time block', BASETIMEBLOCK)
@@ -416,14 +420,15 @@ voter_plain = ''
 for user in sorted(user_data.users.values(), key=lambda v: v['user_name']):
     if not user['eligible'] or user['banned']:
         continue
-    voter_note += '\n# {0},'.format(user['user_name'])
+    voter_note += '# {0},'.format(user['user_name'])
     if user['type'] == UserData.ELIGIBLE_3000:
         voter_note += 'b,{}'.format(user['edit_count'])
     elif user['type'] == UserData.ELIGIBLE_MAIN_1500:
         voter_note += 'c,{}'.format(user['edit_count_main'])
     elif user['type'] == UserData.ELIGIBLE_120_500:
         voter_note += 'a,{}'.format(user['edit_count_120'])
-    voter_plain += '\n{}@zhwiki'.format(user['user_name'])
+    voter_note += '\n'
+    voter_plain += '{}@zhwiki\n'.format(user['user_name'])
 
 
 text = '''
@@ -434,8 +439,15 @@ text = '''
 ** 被全站無限期封鎖、全域鎖定；[[Special:PermaLink/73532512#安全投票暫行規定|提名通過之時]]（基準時間：{{{{subst:#time:Y年n月j日 (D) H:i (T)|{basetimeblock}}}}}）被封鎖、禁制維基百科命名空間。
 ** 擁有機器人群組、使用者頁面標記為機器人。
 ** 使用者名稱判斷為隱退使用者。
-** 候選人。
-* 該名單可能包含您的合法多重帳號；您僅可使用一個帳號投票，否則會觸犯[[Wikipedia:傀儡#被視為濫用多重帳號的行為|傀儡方針]]。
+'''.format(
+    command=' '.join(sys.argv),
+    count=user_data.count_eligible(),
+    basetime=BASETIME.totimestampformat(),
+    basetimeblock=BASETIMEBLOCK.totimestampformat(),
+)
+if args.candidate:
+    text += '** 候選人（{}）。\n'.format(CANDIDATE)
+text += '''* 該名單可能包含您的合法多重帳號，您僅可使用一個帳號投票，否則會觸犯[[Wikipedia:傀儡#被視為濫用多重帳號的行為|傀儡方針]]。
 * 該名單基於固定規則產生，不保證最後會認定為有效票，具體執行仍以人事任免投票資格、申請成為管理人員等方針指引為準。如有疑義請在下方留言，對名單的直接修改將在下次更新被撤銷。
 
 {{{{HideH|投票權人名單}}}}
@@ -453,12 +465,8 @@ text = '''
 {{{{HideF}}}}
 產生時間：~~~~
 '''.format(
-    count=user_data.count_eligible(),
-    basetime=BASETIME.totimestampformat(),
-    basetimeblock=BASETIMEBLOCK.totimestampformat(),
     votersnote=voter_note.strip(),
     votersplain=voter_plain.strip(),
-    command=' '.join(sys.argv),
 )
 
 if args.debug:
