@@ -190,7 +190,6 @@ USERDB_PORT = reader.get('client', 'port')
 engine = create_engine(
     f'mysql+pymysql://{USERDB_HOST}:{USERDB_PORT}',
     connect_args={'read_default_file': USERDB_CONFIG_PATH},
-    future=True,
 )
 
 
@@ -200,7 +199,7 @@ def warn_user(site, username, sign, warns, cfg):
     TIMELIMIT = datetime.now() - timedelta(days=7)
 
     session = Session(engine)
-    user = session.scalars(select(User).where(User.name == username)).first()
+    user = session.query(User).filter(User.name == username).first()
     if user is None:
         user = User(
             name=username,

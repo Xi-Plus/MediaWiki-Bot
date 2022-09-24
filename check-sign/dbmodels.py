@@ -1,5 +1,6 @@
 from sqlalchemy import Column, DateTime, Integer, String, create_engine
-from sqlalchemy.orm import Session, declarative_base
+from sqlalchemy.orm import Session
+from sqlalchemy.ext.declarative import declarative_base
 
 Base = declarative_base()
 
@@ -28,7 +29,6 @@ if __name__ == '__main__':
     engine = create_engine(
         f'mysql+pymysql://{USERDB_HOST}:{USERDB_PORT}',
         connect_args={'read_default_file': USERDB_CONFIG_PATH},
-        future=True,
     )
 
     Base.metadata.create_all(engine)
