@@ -31,10 +31,15 @@ args = parser.parse_args()
 site = pywikibot.Site()
 site.login()
 
+
+def normalize_username(username):
+    return username.replace('_', ' ').capitalize()
+
+
 BASETIME = pywikibot.Timestamp.fromtimestampformat(args.basetime)
 BASETIMEBLOCK = pywikibot.Timestamp.fromtimestampformat(args.basetimeblock)
-CANDIDATE = args.candidate.capitalize() if args.candidate else None
-EXCLUDED_USERS = {user.capitalize() for user in args.exclude}
+CANDIDATE = normalize_username(args.candidate) if args.candidate else None
+EXCLUDED_USERS = {normalize_username(user) for user in args.exclude}
 if CANDIDATE:
     EXCLUDED_USERS.add(CANDIDATE)
 if args.debug:
@@ -489,6 +494,6 @@ except ValueError:
     new_text += '== 投票權人名單 ==\n' + FLAG_START + text + FLAG_END
 
 pywikibot.showDiff(page.text, new_text)
-if input('Save? ').lower() in ['yes', 'y']:
+if input('Save? ').lower() in ['yes', 'y', '']:
     page.text = new_text
     page.save(summary='產生投票權人名單', minor=False)
