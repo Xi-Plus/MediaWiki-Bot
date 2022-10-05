@@ -111,6 +111,9 @@ def edit_count_filter(actor_id_list, start=None, end=None, ns=None, excludens=No
     return edit_counts
 
 
+banned_users = set()
+
+
 class UserData:
     users = {}
     actor_id_to_user_id = {}
@@ -130,6 +133,7 @@ class UserData:
                 self.users[user_id]['banned'] = True
             if user_name in EXCLUDED_USERS:
                 self.users[user_id]['banned'] = True
+                banned_users.add(user_name)
         self.users[user_id]['user_id'] = user_id
         self.users[user_id]['actor_id'] = actor_id
         self.users[user_id]['user_name'] = user_name
@@ -424,6 +428,7 @@ for row in result:
 
 voter_note = ''
 voter_plain = ''
+voters = set()
 for user in sorted(user_data.users.values(), key=lambda v: v['user_name']):
     if not user['eligible'] or user['banned']:
         continue
@@ -436,6 +441,7 @@ for user in sorted(user_data.users.values(), key=lambda v: v['user_name']):
         voter_note += 'a,{}'.format(user['edit_count_120'])
     voter_note += '\n'
     voter_plain += '{}@zhwiki\n'.format(user['user_name'])
+    voters.add(user['user_name'])
 
 
 text = '''
@@ -496,6 +502,10 @@ except ValueError:
     new_text += '== 投票權人名單 ==\n' + FLAG_START + text + FLAG_END
 
 pywikibot.showDiff(page.text, new_text)
+
+if len(EXCLUDED_USERS - banned_users):
+    print('WARNING: These excluded users is not used:', EXCLUDED_USERS - banned_users)
+
 if input('Save? ').lower() in ['yes', 'y', '']:
     page.text = new_text
     page.save(summary='產生投票權人名單', minor=False)
