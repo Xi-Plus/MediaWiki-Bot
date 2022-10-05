@@ -33,7 +33,9 @@ site.login()
 
 
 def normalize_username(username):
-    return username.replace('_', ' ').capitalize()
+    username = username.replace('_', ' ')
+    username = username[0].upper() + username[1:]
+    return username
 
 
 BASETIME = pywikibot.Timestamp.fromtimestampformat(args.basetime)
