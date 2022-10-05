@@ -476,7 +476,7 @@ if args.debug:
 
 page = pywikibot.Page(site, args.outpage)
 new_text = page.text.rstrip()
-if not new_text:
+if len(new_text) > 0:
     new_text += '\n\n'
 
 FLAG_START = '<!-- voter-start -->'
