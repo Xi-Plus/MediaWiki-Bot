@@ -124,6 +124,15 @@ for username in usernames:
         sign_errors[username].add('簽名過長-{{{{orange|{}}}}}'.format(signlen))
     elif signlen > 255:
         sign_errors[username].add('簽名過長-{}'.format(signlen))
+    names_in_sign = set()
+    for name in re.findall(r'\[\[:?(?:(?:User(?:[ _]talk)?|U|UT|用户|用戶|使用者|用戶對話|用戶討論|用户对话|用户讨论|使用者討論):|(?:Special|特殊):(?:(?:Contributions|Contribs)|(?:用户|用戶|使用者)?(?:贡献|貢獻))/)([^/|#]+)[/|#]', sign, re.I):
+        name = name.replace('_', ' ').strip()
+        name = name[0].upper() + name[1:]
+        names_in_sign.add(name)
+    if len(names_in_sign) > 1:
+        sign_errors[username].add('ambiguous-<nowiki>' + ','.join(sorted(names_in_sign)) + '</nowiki>')
+    elif len(names_in_sign) == 0:
+        sign_errors[username].add('nolink')
 
 data = requests.post('https://zh.wikipedia.org/api/rest_v1/transform/wikitext/to/lint', data=json.dumps({
     "wikitext": text2,
