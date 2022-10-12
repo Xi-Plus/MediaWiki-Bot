@@ -4,12 +4,9 @@ apicache-py3/
 log/
 tmp/
 *.csv
-*.csv
 *.my.cnf
 *.pyc
 *.txt
-bootstrap-venv.err
-bootstrap-venv.out
 config.php
 config.py
 pywikibot.lwp
@@ -33,3 +30,5 @@ rfa-stats/data/
 rfa-stats-php/list/
 user-config/
 user-right-process/user_data.json
+bootstrap-venv.err
+bootstrap-venv.out
