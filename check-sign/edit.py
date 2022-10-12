@@ -36,14 +36,14 @@ GROUP BY actor_user
 ORDER BY rc_timestamp DESC
 '''
 
-REPORT_HEADER = '''{| class="wikitable sortable"
+OUTPUT_HEADER = '''{| class="wikitable sortable"
 !使用者
 !檢查
 !簽名
 !問題
 '''
 
-REPORT_ROW = '''|-
+OUTPUT_ROW = '''|-
 | [[Special:Contributions/{0}|{0}]]
 | {1}
 | {2}
@@ -70,10 +70,20 @@ def check_sign_problems(sign):
     if sign_len > 255:
         sign_errors.add((1, 'sign-too-long', sign_len))
 
+    names_in_sign = set()
+    for name in re.findall(r'\[\[:?(?:(?:User(?:[ _]talk)?|U|UT|用户|用戶|使用者|用戶對話|用戶討論|用户对话|用户讨论|使用者討論):|(?:Special|特殊):(?:(?:Contributions|Contribs)|(?:用户|用戶|使用者)?(?:贡献|貢獻))/)([^/|#]+)[/|#]', sign, re.I):
+        name = name.replace('_', ' ').strip()
+        name = name[0].upper() + name[1:]
+        names_in_sign.add(name)
+    if len(names_in_sign) > 1:
+        sign_errors.add((3, 'ambiguous', ','.join(sorted(names_in_sign))))
+    elif len(names_in_sign) == 0:
+        sign_errors.add((3, 'nolink', None))
+
     return sign_errors, hide_sign
 
 
-def format_sign_errors(sign_errors):
+def format_sign_errors_output(sign_errors):
     result = []
     sign_errors = sorted(list(sign_errors))
 
@@ -96,6 +106,10 @@ def format_sign_errors(sign_errors):
                 result.append('簽名過長-{{{{orange|{}}}}}'.format(error_param))
             else:
                 result.append('簽名過長-{}'.format(error_param))
+        elif error_type == 'ambiguous':
+            result.append('混淆-<nowiki>{}</nowiki>'.format(error_param))
+        elif error_type == 'nolink':
+            result.append('無連結')
         elif error_type == 'obsolete-tag':
             result.append('過時的標籤-{}'.format(error_param))
         else:
@@ -118,6 +132,28 @@ def get_warn_templates(sign_errors):
         elif error_type == 'sign-too-long':
             templates.add('Uw-sign-toolong')
     return templates
+
+
+def format_sign_errors_report(sign_errors):
+    result = []
+    sign_errors = sorted(list(sign_errors))
+
+    for row in sign_errors:
+        error_type = row[1]
+        error_param = row[2]
+
+        if error_type == 'file':
+            result.append('[[Wikipedia:签名#外观|包含檔案]]')
+        elif error_type == 'template':
+            result.append('[[Wikipedia:签名#外部链接与模板|包含模板]]')
+        elif error_type == 'templatestyles':
+            result.append('[[Wikipedia:签名#外部链接与模板|包含模板樣式]]')
+        elif error_type == 'link':
+            result.append('[[Wikipedia:签名#外部链接与模板|包含外部連結]]')
+        elif error_type == 'sign-too-long':
+            result.append('[[Wikipedia:签名#长度|簽名過長（{}位元組）]]'.format(error_param))
+
+    return '、'.join(result)
 
 
 def parse_signs(signs):
@@ -192,8 +228,12 @@ engine = create_engine(
 )
 
 
-def warn_user(site, username, sign, warns, cfg):
-    print('warn', username, warns)
+def get_sign_url(username):
+    return 'https://signatures.toolforge.org/check/zh.wikipedia.org/{}'.format(username.replace(' ', '%20'))
+
+
+def warn_user(site, username, sign, sign_error, warn_templates, cfg):
+    print('warn', username, warn_templates)
     TALK_NAMESPACES = list(filter(lambda v: v >= 0 and v % 2 == 1 or v == 4, site.namespaces))
     TIMELIMIT = datetime.now() - timedelta(days=7)
 
@@ -207,7 +247,7 @@ def warn_user(site, username, sign, warns, cfg):
         session.commit()
 
     if user.last_warn > TIMELIMIT:
-        print('recent warned')
+        print('\trecent warned')
         return
 
     contributions = site.usercontribs(
@@ -218,22 +258,44 @@ def warn_user(site, username, sign, warns, cfg):
     )
     has_recent_edit = False
     for contris in contributions:
-        print(contris)
+        print('\t', contris)
         page = pywikibot.Page(site, contris['title'])
         old_text = page.getOldVersion(contris['parentid']) if contris['parentid'] > 0 else ''
         new_text = page.getOldVersion(contris['revid'])
         old_cnt = old_text.count(sign)
         new_cnt = new_text.count(sign)
         if new_cnt > old_cnt:
-            print('recent edit', contris['revid'], old_cnt, new_cnt)
+            print('\trecent edit', contris['revid'], old_cnt, new_cnt)
             has_recent_edit = True
             break
     if not has_recent_edit:
-        print('no recent edit')
+        print('\tno recent edit')
         return
 
     if user.warn_count >= 3:
-        pass
+        report_page = pywikibot.Page(site, cfg['report_page'])
+        new_text = report_page.text
+
+        report_flag = '<!-- sign report: {} -->'.format(username)
+
+        if report_flag in new_text:
+            print('\treported')
+            return
+
+        report_text = '=== {{{{vandal|{}}}}} ===\n'.format(('1=' if '=' in username else '') + username)
+        report_text += '* 其[{} 簽名]違反簽名指引：{}，已警告3次仍未改善。{}\n'.format(
+            get_sign_url(username),
+            format_sign_errors_report(sign_error),
+            report_flag
+        )
+        report_text += '* 提報人：~~~~\n'
+        report_text += '* 处理：\n'
+
+        new_text = re.sub('(\n===)', report_text + r'\1', new_text, 1)
+        pywikibot.showDiff(report_page.text, new_text)
+        input('Save?')
+        report_page.text = new_text
+        report_page.save(summary=cfg['report_summary'], minor=False)
     else:
         user.warn_count += 1
         title = '簽名問題'
@@ -244,9 +306,9 @@ def warn_user(site, username, sign, warns, cfg):
         if talk_page.is_flow_page():
             board = pywikibot.flow.Board(talk_page)
             content = ''
-            for template in warns:
+            for template in warn_templates:
                 content += '{{subst:' + template + '}}\n'
-            print('flow {}: {}'.format(title, content))
+            print('\tflow {}: {}'.format(title, content))
             input('Save?')
             board.new_topic(title, content)
         else:
@@ -254,15 +316,15 @@ def warn_user(site, username, sign, warns, cfg):
             if new_text != '':
                 new_text += '\n\n'
             new_text += '== {} ==\n'.format(title)
-            for template in warns:
+            for template in warn_templates:
                 new_text += '{{subst:' + template + '}}--~~~~\n'
             pywikibot.showDiff(talk_page.text, new_text)
             input('Save?')
             talk_page.text = new_text
-            talk_page.save(summary='提醒簽名問題', minor=False)
+            talk_page.save(summary=cfg['notice_summary'], minor=False)
 
-        user.last_warn = datetime.now()
-        session.commit()
+    user.last_warn = datetime.now()
+    session.commit()
 
 
 def main():
@@ -309,17 +371,17 @@ def main():
     for username, errors in lint_sign_errors.items():
         sign_errors[username].update(errors)
 
-    report_text = REPORT_HEADER
+    output_text = OUTPUT_HEADER
     warned_users = set()
     for username in sorted(usernames):
         error = sign_errors[username]
         if len(error) > 0:
-            check_link = '[https://signatures.toolforge.org/check/zh.wikipedia.org/{} check]'.format(username.replace(' ', '%20'))
+            check_link = '[{} check]'.format(get_sign_url(username))
             sign = ''
             if not hide_sign[username]:
                 sign = parsed_signs[username]
-            error_text = format_sign_errors(error)
-            report_text += REPORT_ROW.format(username, check_link, sign, error_text)
+            error_text = format_sign_errors_output(error)
+            output_text += OUTPUT_ROW.format(username, check_link, sign, error_text)
 
             warn_templates = get_warn_templates(error)
             if len(warn_templates) > 0:
@@ -328,20 +390,24 @@ def main():
                     site=site,
                     username=username,
                     sign=parsed_signs[username],
-                    warns=warn_templates,
+                    sign_error=error,
+                    warn_templates=warn_templates,
                     cfg=cfg,
                 )
 
-    report_text += '|}'
+    output_text += '|}'
 
     page = pywikibot.Page(site, cfg['output_page'])
 
-    print('Diff:')
-    pywikibot.showDiff(page.text, report_text)
-    print('-' * 50)
+    if page.text != output_text:
+        print('Diff:')
+        pywikibot.showDiff(page.text, output_text)
+        print('-' * 50)
 
-    page.text = report_text
-    # page.save(summary=cfg['report_summary'], minor=False)
+        page.text = output_text
+        page.save(summary=cfg['output_summary'], minor=False)
+    else:
+        print('No diff')
 
     session = Session(engine)
     for user in session.query(User).all():
