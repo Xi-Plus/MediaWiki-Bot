@@ -405,9 +405,10 @@ def main(args):
     page = pywikibot.Page(site, cfg['output_page'])
 
     if page.text != output_text:
-        print('Diff:')
-        pywikibot.showDiff(page.text, output_text)
-        print('-' * 50)
+        if args.confirm:
+            print('Diff:')
+            pywikibot.showDiff(page.text, output_text)
+            print('-' * 50)
 
         page.text = output_text
         page.save(summary=cfg['output_summary'], minor=False)
