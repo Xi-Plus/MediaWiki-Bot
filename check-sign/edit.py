@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
+import argparse
 import bisect
 import configparser
 import json
@@ -232,7 +233,7 @@ def get_sign_url(username):
     return 'https://signatures.toolforge.org/check/zh.wikipedia.org/{}'.format(username.replace(' ', '%20'))
 
 
-def warn_user(site, username, sign, sign_error, warn_templates, cfg):
+def warn_user(site, username, sign, sign_error, warn_templates, cfg, args):
     print('warn', username, warn_templates)
     TALK_NAMESPACES = list(filter(lambda v: v >= 0 and v % 2 == 1 or v == 4, site.namespaces))
     TIMELIMIT = datetime.now() - timedelta(days=7)
@@ -282,7 +283,7 @@ def warn_user(site, username, sign, sign_error, warn_templates, cfg):
             print('\treported')
             return
 
-        report_text = '=== {{{{vandal|{}}}}} ===\n'.format(('1=' if '=' in username else '') + username)
+        report_text = '\n=== {{{{vandal|{}}}}} ===\n'.format(('1=' if '=' in username else '') + username)
         report_text += '* 其[{} 簽名]違反簽名指引：{}，已警告3次仍未改善。{}\n'.format(
             get_sign_url(username),
             format_sign_errors_report(sign_error),
@@ -292,8 +293,9 @@ def warn_user(site, username, sign, sign_error, warn_templates, cfg):
         report_text += '* 处理：\n'
 
         new_text = re.sub('(\n===)', report_text + r'\1', new_text, 1)
-        pywikibot.showDiff(report_page.text, new_text)
-        input('Save?')
+        if args.confirm:
+            pywikibot.showDiff(report_page.text, new_text)
+            input('Save?')
         report_page.text = new_text
         report_page.save(summary=cfg['report_summary'], minor=False)
     else:
@@ -308,8 +310,9 @@ def warn_user(site, username, sign, sign_error, warn_templates, cfg):
             content = ''
             for template in warn_templates:
                 content += '{{subst:' + template + '}}\n'
-            print('\tflow {}: {}'.format(title, content))
-            input('Save?')
+            if args.confirm:
+                print('\tflow {}: {}'.format(title, content))
+                input('Save?')
             board.new_topic(title, content)
         else:
             new_text = talk_page.text
@@ -318,8 +321,9 @@ def warn_user(site, username, sign, sign_error, warn_templates, cfg):
             new_text += '== {} ==\n'.format(title)
             for template in warn_templates:
                 new_text += '{{subst:' + template + '}}--~~~~\n'
-            pywikibot.showDiff(talk_page.text, new_text)
-            input('Save?')
+            if args.confirm:
+                pywikibot.showDiff(talk_page.text, new_text)
+                input('Save?')
             talk_page.text = new_text
             talk_page.save(summary=cfg['notice_summary'], minor=False)
 
@@ -327,7 +331,7 @@ def warn_user(site, username, sign, sign_error, warn_templates, cfg):
     session.commit()
 
 
-def main():
+def main(args):
     site = pywikibot.Site('zh', 'wikipedia')
     site.login()
 
@@ -393,6 +397,7 @@ def main():
                     sign_error=error,
                     warn_templates=warn_templates,
                     cfg=cfg,
+                    args=args,
                 )
 
     output_text += '|}'
@@ -418,4 +423,9 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--confirm', action='store_true')
+    parser.set_defaults(confirm=False)
+    args = parser.parse_args()
+
+    main(args)
