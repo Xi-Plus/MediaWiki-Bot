@@ -6,6 +6,7 @@ set -euo pipefail
 
 # create the venv
 rm -rf pyvenv
+rm -rf $HOME/pywikibot
 python3 -m venv pyvenv
 
 # activate it
