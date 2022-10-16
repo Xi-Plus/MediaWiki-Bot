@@ -21,6 +21,7 @@ pip install mwparserfromhell
 pip install pymysql
 pip install python-dateutil
 pip install requests
+pip install SQLAlchemy
 
 git clone --recursive --branch stable "https://gerrit.wikimedia.org/r/pywikibot/core" $HOME/pywikibot
 pip install --upgrade "setuptools>=49.4.0, !=50.0.0, <50.2.0"
