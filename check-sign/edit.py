@@ -311,7 +311,7 @@ def warn_user(site, username, sign, sign_error, warn_templates, cfg, args):
             board = pywikibot.flow.Board(talk_page)
             content = ''
             for template in warn_templates:
-                content += '{{subst:' + template + '}}\n'
+                content += '{{subst:' + template + '}}\n\n'
             if args.confirm:
                 print('\tflow {}: {}'.format(title, content))
                 input('Save?')
@@ -322,7 +322,8 @@ def warn_user(site, username, sign, sign_error, warn_templates, cfg, args):
                 new_text += '\n\n'
             new_text += '== {} ==\n'.format(title)
             for template in warn_templates:
-                new_text += '{{subst:' + template + '}}--~~~~\n'
+                new_text += '{{subst:' + template + '}}\n\n'
+            new_text += cfg['notice_suffix'] + '--~~~~'
             if args.confirm:
                 pywikibot.showDiff(talk_page.text, new_text)
                 input('Save?')
