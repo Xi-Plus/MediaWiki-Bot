@@ -132,6 +132,8 @@ def get_warn_templates(sign_errors):
             templates.add('Uw-sign-external-link')
         elif error_type == 'sign-too-long':
             templates.add('Uw-sign-toolong')
+        elif error_type == 'nolink':
+            templates.add('Uw-signlink')
     return templates
 
 
