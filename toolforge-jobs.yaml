@@ -125,8 +125,8 @@
   emails: onfailure
 
 - name: newusermessage-signatures
-  image: tf-python39
-  command: MediaWiki-Bot/pyvenv/bin/python3 MediaWiki-Bot/Newusermessage-signatures/edit.py
+  image: tf-php74
+  command: php MediaWiki-Bot/Newusermessage-signatures/edit.php
   schedule: "14 20 * * 0"
   emails: onfailure
 
