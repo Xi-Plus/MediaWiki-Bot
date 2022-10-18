@@ -251,7 +251,7 @@
   emails: onfailure
 
 - name: spam-blacklist-archive
-  image: tf-php74
+  image: tf-python39
   command: MediaWiki-Bot/pyvenv/bin/python3 MediaWiki-Bot/spam-blacklist-archive/edit.py
   schedule: "18 20 * * *"
   emails: onfailure
