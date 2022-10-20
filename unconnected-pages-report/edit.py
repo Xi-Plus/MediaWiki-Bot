@@ -31,10 +31,14 @@ if not cfg['enable']:
 
 
 skip_pages = set()
+
 for title in cfg['skip_templates']:
     for page in pywikibot.Page(site, title).getReferences(only_template_inclusion=True):
         skip_pages.add(page.title())
 
+for title in cfg['skip_categories']:
+    for page in pywikibot.Category(site, title).members():
+        skip_pages.add(page.title())
 
 parameters = {
     "action": "query",
