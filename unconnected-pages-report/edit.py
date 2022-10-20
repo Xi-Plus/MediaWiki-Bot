@@ -13,8 +13,12 @@ from config import config_page_name  # pylint: disable=E0611,W0614
 parser = argparse.ArgumentParser()
 parser.add_argument('lang', nargs='?', default='zh')
 parser.add_argument('wiki', nargs='?', default='wikipedia')
+parser.add_argument('--debug', action='store_true')
 parser.add_argument('--dry-run', action='store_true')
-parser.set_defaults(dry_run=False)
+parser.set_defaults(
+    debug=False,
+    dry_run=False,
+)
 args = parser.parse_args()
 
 site = pywikibot.Site(args.lang, args.wiki)
@@ -23,7 +27,8 @@ site.login()
 config_page = pywikibot.Page(site, config_page_name[args.lang][args.wiki])
 cfg = config_page.text
 cfg = json.loads(cfg)
-print(json.dumps(cfg, indent=4, ensure_ascii=False))
+if args.debug:
+    print(json.dumps(cfg, indent=4, ensure_ascii=False))
 
 if not cfg['enable']:
     print('disabled')
@@ -49,7 +54,6 @@ parameters = {
 }
 allpages = []
 while True:
-    print(parameters)
     r = Request(site=site, parameters=parameters)
     data = r.submit()
     for row in data['query']['querypage']['results']:
