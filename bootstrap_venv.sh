@@ -1,12 +1,12 @@
 #!/bin/bash
 # ref: https://wikitech.wikimedia.org/wiki/Help:Toolforge/Python#Kubernetes_python_jobs
+# run: toolforge-jobs run bootstrap-venv --command "cd $PWD && ./bootstrap_venv.sh" --image tf-python39 --wait
 
 # use bash strict mode
 set -euo pipefail
 
 # create the venv
 rm -rf pyvenv
-rm -rf $HOME/pywikibot
 python3 -m venv pyvenv
 
 # activate it
@@ -23,7 +23,6 @@ pip install python-dateutil
 pip install requests
 pip install SQLAlchemy
 
-git clone --recursive --branch stable "https://gerrit.wikimedia.org/r/pywikibot/core" $HOME/pywikibot
 pip install --upgrade "setuptools>=49.4.0, !=50.0.0, <50.2.0"
 cd $HOME/pywikibot
 pip install -e .
