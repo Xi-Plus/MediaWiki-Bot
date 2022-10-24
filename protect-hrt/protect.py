@@ -6,10 +6,10 @@ import re
 
 import pymysql
 
-os.environ['PYWIKIBOT_DIR'] = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'protect-config')
+os.environ['PYWIKIBOT_DIR'] = os.path.dirname(os.path.realpath(__file__))
 import pywikibot
 
-from config import database, protect_config_page_name  # pylint: disable=E0611,W0614
+from config import database, config_page_name  # pylint: disable=E0611,W0614
 
 parser = argparse.ArgumentParser()
 parser.add_argument('lang')
@@ -24,7 +24,7 @@ os.environ['TZ'] = 'UTC'
 site = pywikibot.Site(args.lang, args.wiki)
 site.login()
 
-config_page = pywikibot.Page(site, protect_config_page_name[args.lang][args.wiki])
+config_page = pywikibot.Page(site, config_page_name[args.lang][args.wiki])
 cfg = config_page.text
 cfg = json.loads(cfg)
 print(json.dumps(cfg, indent=4, ensure_ascii=False))
@@ -38,7 +38,8 @@ conn = pymysql.connect(
     host=database['host'],
     user=database['user'],
     passwd=database['passwd'],
-    charset=database['charset']
+    charset=database['charset'],
+    database='{}_p'.format(args.dbwiki),
 )
 
 
@@ -73,7 +74,6 @@ number2protection = {
 }
 
 with conn.cursor() as cursor:
-    cursor.execute('use {}_p'.format(args.dbwiki))
     cursor.execute('''
     SELECT
         lt_namespace,
@@ -127,7 +127,7 @@ for row in rows:
     if page_namespace == 0 and page_title == '':
         continue
 
-    page = pywikibot.Page(site, page_title, page_namespace)
+    page = pywikibot.Page(site, '{}:{}'.format(site.namespace(page_namespace), page_title))
     required_protection = check_required_protection(page, count)
 
     needs_protect = False

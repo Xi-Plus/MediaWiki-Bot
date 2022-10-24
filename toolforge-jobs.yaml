@@ -100,24 +100,6 @@
   schedule: "*/30 * * * *"
   emails: onfailure
 
-- name: most-transcluded-pages-zhwikt
-  image: tf-python39
-  command: MediaWiki-Bot/pyvenv/bin/python3 MediaWiki-Bot/MostTranscludedPages/protect.py zh wiktionary zhwiktionary
-  schedule: "11 20 * * *"
-  emails: onfailure
-
-- name: most-transcluded-pages-zhvoy
-  image: tf-python39
-  command: MediaWiki-Bot/pyvenv/bin/python3 MediaWiki-Bot/MostTranscludedPages/protect.py zh wikivoyage zhwikivoyage
-  schedule: "25 20 * * *"
-  emails: onfailure
-
-- name: most-transcluded-pages-zhwp
-  image: tf-python39
-  command: MediaWiki-Bot/pyvenv/bin/python3 MediaWiki-Bot/MostTranscludedPages/protect.py zh wikipedia zhwiki
-  schedule: "49 20 * * *"
-  emails: onfailure
-
 - name: move-renamed-users-flow
   image: tf-python39
   command: MediaWiki-Bot/pyvenv/bin/python3 MediaWiki-Bot/move-renamed-users-flow/move.py
@@ -194,6 +176,24 @@
   image: tf-php74
   command: php MediaWiki-Bot/proposed-mergers-archive/edit.php
   schedule: "20 20 * * *"
+  emails: onfailure
+
+- name: protect-hrt-zhwikt
+  image: tf-python39
+  command: MediaWiki-Bot/pyvenv/bin/python3 MediaWiki-Bot/protect-hrt/protect.py zh wiktionary zhwiktionary
+  schedule: "11 20 * * *"
+  emails: onfailure
+
+- name: protect-hrt-zhvoy
+  image: tf-python39
+  command: MediaWiki-Bot/pyvenv/bin/python3 MediaWiki-Bot/protect-hrt/protect.py zh wikivoyage zhwikivoyage
+  schedule: "25 20 * * *"
+  emails: onfailure
+
+- name: protect-hrt-zhwp
+  image: tf-python39
+  command: MediaWiki-Bot/pyvenv/bin/python3 MediaWiki-Bot/protect-hrt/protect.py zh wikipedia zhwiki
+  schedule: "49 20 * * *"
   emails: onfailure
 
 - name: protect-locked-userpage
