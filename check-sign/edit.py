@@ -312,6 +312,7 @@ def warn_user(site, username, sign, sign_error, warn_templates, cfg, args):
             content = ''
             for template in warn_templates:
                 content += '{{subst:' + template + '}}\n\n'
+            content += cfg['notice_suffix']
             if args.confirm:
                 print('\tflow {}: {}'.format(title, content))
                 input('Save?')
