@@ -159,10 +159,10 @@ for revids in ignoreRevids:
     page_id = revid2page_id[revids[1]]
     idx1 = 0
     if revids[0] != 0:
-        while record[page_id]['history'][idx1]['rev_parent_id'] != revids[0]:
+        while record[page_id]['history'][idx1]['revid'] <= revids[0]:
             idx1 += 1
     idx2 = 0
-    while record[page_id]['history'][idx2]['revid'] != revids[1]:
+    while record[page_id]['history'][idx2]['revid'] < revids[1]:
         idx2 += 1
 
     for i in range(idx1, idx2 + 1):
