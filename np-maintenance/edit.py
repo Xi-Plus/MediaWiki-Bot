@@ -50,7 +50,11 @@ for ul in root.find_all('ul', recursive=False):
             title = urllib.parse.unquote_plus(title)
             print(title)
 
-            log = list(site.logevents(page=pywikibot.Page(site, title), total=1))[0]
+            logs = list(site.logevents(page=pywikibot.Page(site, title), total=1))
+            if len(logs) == 0:
+                print('\tno log')
+                continue
+            log = logs[0]
             if log.type() != 'move':
                 print('\tnot move')
                 continue
