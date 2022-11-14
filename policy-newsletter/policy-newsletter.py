@@ -19,6 +19,10 @@ from config import host, password, user  # pylint: disable=E0611,W0614
 parser = argparse.ArgumentParser()
 parser.add_argument('--page')
 parser.add_argument('--months', type=int, default=0)
+parser.add_argument('--confirm', action='store_true')
+parser.set_defaults(
+    confirm=False,
+)
 args = parser.parse_args()
 
 title = args.page
@@ -291,13 +295,32 @@ chineseNumber = ['一', '二', '三', '四', '五']
 
 
 def formatTitle(title, isPolicy):
+    title = re.sub(r'_', ' ', title)
+
     if title == '可靠来源/布告板/评级指引':
         return '可靠来源布告板评级指引'
 
-    title = re.sub(r'/(条目指引)', r'\1', title)
+    m = re.search(r'^(命名常[規规]) \((.+?)\)$', title)
+    if m:
+        return '{}{}'.format(m.group(2), m.group(1))
+
+    m = re.search(r'^(可靠來源|[關关]注度) \((.+?)\)$', title)
+    if m:
+        return '{}{}指引'.format(m.group(2), m.group(1))
+
+    if title == '格式手冊/不要華而不實':
+        return '格式手冊（不要華而不實）'
+
+    if title == '格式手冊/文字格式':
+        return '文字格式手冊'
+
+    m = re.search(r'^(格式手[冊册])/((.+?))$', title)
+    if m:
+        return '{}{}'.format(m.group(2), m.group(1))
+
     title = re.sub(r'^(.+)/(.+)$', r'\g<1>（\g<2>）', title)
-    title = re.sub(r'^(.+)_\((.+)\)$', r'\g<1>（\g<2>）', title)
-    if not re.search(r'方[針针]|指引|格式手[冊册]|五大支柱|维基百科不是什么|命名常规|忽略所有规则|游戏维基规则|非自由内容使用准则|使用条款|通用行為準則', title):
+    title = re.sub(r'^(.+) \((.+)\)$', r'\g<1>（\g<2>）', title)
+    if not re.search(r'方[針针]|指引|格式手册|五大支柱|维基百科不是什么|命名常规|忽略所有规则|游戏维基规则|非自由内容使用准则|使用条款|通用行為準則', title):
         if isPolicy:
             title = re.sub(r'^(.+?)(（.+?）)?$', r'\g<1>方針\g<2>', title)
         else:
@@ -389,6 +412,9 @@ if page.text == text:
 print('Diff:')
 pywikibot.showDiff(page.text, text)
 print('-' * 50)
+
+if args.confirm:
+    input('Press any key to continue...')
 
 page.text = text
 page.save(summary='[[User:A2093064-bot/task/36|機器人36]]：自動更新雜項修訂', minor=False, apply_cosmetic_changes=True)
