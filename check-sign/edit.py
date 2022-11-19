@@ -7,6 +7,7 @@ import configparser
 import json
 import os
 import re
+import time
 from datetime import datetime, timedelta
 
 import pymysql
@@ -16,11 +17,11 @@ os.environ['PYWIKIBOT_DIR'] = BASEDIR
 import pywikibot
 import pywikibot.flow
 import requests
+from dbmodels import User
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
 
 from config import CONFIG_PAGE_NAME, REPLICA_CONFIG_PATH, USERDB_CONFIG_PATH
-from dbmodels import User
 
 QUERY_USER_WITH_SIGN = '''
 SELECT actor_user, actor_name, up2.up_value AS `nickname`
@@ -342,7 +343,8 @@ def main(args):
     config_page = pywikibot.Page(site, CONFIG_PAGE_NAME)
     cfg = config_page.text
     cfg = json.loads(cfg)
-    print(json.dumps(cfg, indent=4, ensure_ascii=False))
+    if args.confirm:
+        print(json.dumps(cfg, indent=4, ensure_ascii=False))
 
     if not cfg['enable']:
         print('disabled')
@@ -431,6 +433,7 @@ def main(args):
 
 
 if __name__ == '__main__':
+    print(time.ctime())
     parser = argparse.ArgumentParser()
     parser.add_argument('--confirm', action='store_true')
     parser.set_defaults(confirm=False)
