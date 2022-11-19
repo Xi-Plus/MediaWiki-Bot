@@ -381,6 +381,7 @@ def main(args):
 
     output_text = OUTPUT_HEADER
     warned_users = set()
+    legal_users = set()
     for username in sorted(usernames):
         error = sign_errors[username]
         if len(error) > 0:
@@ -403,6 +404,8 @@ def main(args):
                     cfg=cfg,
                     args=args,
                 )
+        else:
+            legal_users.add(username)
 
     output_text += '|}'
 
@@ -421,7 +424,7 @@ def main(args):
 
     session = Session(engine)
     for user in session.query(User).all():
-        if user.name not in warned_users:
+        if user.name in legal_users:
             print('Remove {} from table'.format(user.name))
             session.delete(user)
     session.commit()
