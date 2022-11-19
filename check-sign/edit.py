@@ -102,12 +102,7 @@ def format_sign_errors_output(sign_errors):
         elif error_type == 'link':
             result.append('外部連結')
         elif error_type == 'sign-too-long':
-            if error_param >= 280:
-                result.append('簽名過長-{{{{red|{}}}}}'.format(error_param))
-            elif error_param >= 270:
-                result.append('簽名過長-{{{{orange|{}}}}}'.format(error_param))
-            else:
-                result.append('簽名過長-{}'.format(error_param))
+            result.append('簽名過長-{}'.format(error_param))
         elif error_type == 'ambiguous':
             result.append('混淆-<nowiki>{}</nowiki>'.format(error_param))
         elif error_type == 'nolink':
