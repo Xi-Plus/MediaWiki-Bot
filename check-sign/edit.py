@@ -261,6 +261,12 @@ def warn_user(site, username, sign, sign_error, warn_templates, cfg, args):
         page = pywikibot.Page(site, contris['title'])
         old_text = page.getOldVersion(contris['parentid']) if contris['parentid'] > 0 else ''
         new_text = page.getOldVersion(contris['revid'])
+        if old_text is None:
+            print('\trev {} is deleted'.format(contris['parentid']))
+            continue
+        if new_text is None:
+            print('\trev {} is deleted'.format(contris['revid']))
+            continue
         old_cnt = old_text.count(sign)
         new_cnt = new_text.count(sign)
         if new_cnt > old_cnt:
