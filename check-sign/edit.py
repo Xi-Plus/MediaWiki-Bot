@@ -73,7 +73,7 @@ def check_sign_problems(sign):
         sign_errors.add((1, 'sign-too-long', sign_len))
 
     names_in_sign = set()
-    for name in re.findall(r'\[\[:?(?:(?:User(?:[ _]talk)?|U|UT|用户|用戶|使用者|用戶對話|用戶討論|用户对话|用户讨论|使用者討論):|(?:Special|特殊):(?:(?:Contributions|Contribs)|(?:用户|用戶|使用者)?(?:贡献|貢獻))/)([^/|#]+)[/|#]', sign, re.I):
+    for name in re.findall(r'\[\[:?(?:(?:User(?:[ _]talk)?|U|UT|用户|用戶|使用者|用戶對話|用戶討論|用户对话|用户讨论|使用者討論):|(?:Special|特殊):(?:(?:Contributions|Contribs)|(?:用户|用戶|使用者)?(?:贡献|貢獻))/)([^\]/|#]+)[\]/|#]', sign, re.I):
         name = name.replace('_', ' ').strip()
         name = name[0].upper() + name[1:]
         names_in_sign.add(name)
