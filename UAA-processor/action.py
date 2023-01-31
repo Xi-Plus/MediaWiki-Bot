@@ -97,3 +97,6 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     check_username(args.username, args.dry_run)
+
+    cur.close()
+    db.close()
