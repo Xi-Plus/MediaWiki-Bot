@@ -100,9 +100,9 @@ for ($i = $C["fail_retry"]; $i > 0; $i--) {
 		if (count($text[$i]) > 1) {
 			unset($text[$i][0]);
 			foreach ($text[$i] as $temp) {
-				preg_match("/{{User\|(.+)}}/", $temp, $m);
+				preg_match("/\s*{{\s*User\s*\|\s*(.+?)\s*}}/", $temp, $m);
 				echo $m[1] . "\t";
-				preg_match("/{{Status\|(.+?)(\||}})/", $temp, $m);
+				preg_match("/{{\s*Status\s*\|\s*(.+?)\s*(\||}})/", $temp, $m);
 				echo "status " . $m[1] . "\t";
 				if (in_array($m[1], $cfg["statusdone"])) {
 					preg_match_all("/\d{4}年\d{1,2}月\d{1,2}日 \(.{3}\) \d{2}\:\d{2} \(UTC\)/", $temp, $m);
