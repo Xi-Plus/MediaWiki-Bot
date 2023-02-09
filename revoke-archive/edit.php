@@ -93,14 +93,14 @@ for ($i = $C["fail_retry"]; $i > 0; $i--) {
 	$archive_count = array("all" => 0);
 
 	for ($i = 1; $i <= 4; $i++) {
-		$text[$i] = preg_replace("/^(\*{{User\|.+}} *)$/m", $hash . "$1", $text[$i]);
+		$text[$i] = preg_replace("/^(\*\s*{{\s*User\s*\|.+}})$/m", $hash . "$1", $text[$i]);
 		$text[$i] = explode($hash, $text[$i]);
 		echo "section {$i} find " . (count($text[$i]) - 1) . " revoke\n";
 		$oldpagetext .= $text[$i][0];
 		if (count($text[$i]) > 1) {
 			unset($text[$i][0]);
 			foreach ($text[$i] as $temp) {
-				preg_match("/\s*{{\s*User\s*\|\s*(.+?)\s*}}/", $temp, $m);
+				preg_match("/{{\s*User\s*\|\s*(.+?)\s*}}/", $temp, $m);
 				echo $m[1] . "\t";
 				preg_match("/{{\s*Status\s*\|\s*(.+?)\s*(\||}})/", $temp, $m);
 				echo "status " . $m[1] . "\t";
