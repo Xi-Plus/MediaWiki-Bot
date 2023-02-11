@@ -37,8 +37,13 @@ logger.debug('args: %s', args)
 
 
 def read_last_time():
-    with open(LAST_TIME_PATH, 'r') as f:
-        last_time = f.read().strip()
+    try:
+        with open(LAST_TIME_PATH, 'r') as f:
+            last_time = f.read().strip()
+    except FileNotFoundError:
+        logger.warning('last_time.txt not found, use now time instead')
+        last_time = pywikibot.Timestamp.now().isoformat()
+        write_last_time(last_time)
     return last_time
 
 
@@ -186,7 +191,10 @@ def main():
 
     while True:
         revisions = itnpage.revisions(reverse=True, content=True, starttime=last_time, total=50)
-        first_rev = next(revisions)
+        try:
+            first_rev = next(revisions)
+        except StopIteration:
+            break
         old_pages = parse_wikitext(first_rev.text)
 
         new_last_time = last_time
