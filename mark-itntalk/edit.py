@@ -79,15 +79,15 @@ def convert_title(title):
 PLACEHOLDER = str(uuid.uuid1())
 
 
-def mark_talkpage(title, timestamp: pywikibot.Timestamp, oldid):
-    title = convert_title(title)
-    article_page = pywikibot.Page(site, title)
+def mark_talkpage(article_title, timestamp: pywikibot.Timestamp, oldid):
+    article_title = convert_title(article_title)
+    article_page = pywikibot.Page(site, article_title)
     if not article_page.exists():
-        logger.warning('%s is not exists', title)
+        logger.warning('%s is not exists', article_title)
         return
 
     if article_page.isRedirectPage():
-        logger.warning('%s is redirect to %s', title, article_page.getRedirectTarget().title())
+        logger.warning('%s is redirect to %s', article_title, article_page.getRedirectTarget().title())
         article_page = article_page.getRedirectTarget()
 
     talk_page = article_page.toggleTalkPage()
