@@ -77,17 +77,17 @@ class MarkItntalk:
         article_title = self.convert_title(article_title)
         article_page = pywikibot.Page(self.site, article_title)
         if not article_page.exists():
-            logger.warning('%s is not exists', article_title)
+            self.logger.warning('%s is not exists', article_title)
             return
 
         if article_page.isRedirectPage():
-            logger.warning('%s is redirect to %s', article_title, article_page.getRedirectTarget().title())
+            self.logger.warning('%s is redirect to %s', article_title, article_page.getRedirectTarget().title())
             article_page = article_page.getRedirectTarget()
 
         talk_page = article_page.toggleTalkPage()
         new_param_year = timestamp.strftime('%Y年')
         new_param_date = timestamp.strftime('{}月{}日'.format(timestamp.month, timestamp.day))
-        logger.info('mark %s %s %s %s %s', talk_page.title(), new_param_year, new_param_date, timestamp.isoformat(), oldid)
+        self.logger.info('mark %s %s %s %s %s', talk_page.title(), new_param_year, new_param_date, timestamp.isoformat(), oldid)
 
         new_text = talk_page.text
 
@@ -113,11 +113,11 @@ class MarkItntalk:
                         try:
                             exist_date = pywikibot.Timestamp.strptime(params[key1] + params[key2], '%Y年%m月%d日')
                             if abs(exist_date.timestamp() - timestamp.timestamp()) < 86400 * 7:
-                                logger.info('already exists: %s %s', params[key1], params[key2])
+                                self.logger.info('already exists: %s %s', params[key1], params[key2])
                                 return
                             sort_key = exist_date.isoformat()
                         except Exception:
-                            logger.warning('invalid date: %s %s', params[key1], params[key2])
+                            self.logger.warning('invalid date: %s %s', params[key1], params[key2])
                             sort_key = 'bad_date'
                         if keyid in params:
                             all_dates.append((sort_key, params[key1], params[key2], params[keyid]))
@@ -134,8 +134,8 @@ class MarkItntalk:
         all_dates.append((timestamp.isoformat(), new_param_year, new_param_date, oldid))
         all_dates.sort()
 
-        logger.debug('all_dates: %s', all_dates)
-        logger.debug('other_params: %s', other_params)
+        self.logger.debug('all_dates: %s', all_dates)
+        self.logger.debug('other_params: %s', other_params)
 
         # replace first tempalte
         new_text, sub_cnt = re.subn(r'{{\s*(ITNtalk|ITN[ _]+talk|新聞|新闻)\s*\|[^}]+?}}', self.PLACEHOLDER, new_text, flags=re.I, count=1)
@@ -158,7 +158,7 @@ class MarkItntalk:
 
         new_text, sub_cnt = re.subn(self.PLACEHOLDER, new_template, new_text, count=1)
         if sub_cnt == 0:
-            logger.error('failed to replace template')
+            self.logger.error('failed to replace template')
             return
 
         if self.args.confirm or self.args.loglevel <= logging.DEBUG:
@@ -170,11 +170,11 @@ class MarkItntalk:
         if self.args.confirm:
             save = pywikibot.input_yn('Save changes with oldid {} ?'.format(oldid), 'Y')
         if save:
-            logger.debug('save changes')
+            self.logger.debug('save changes')
             talk_page.text = new_text
             talk_page.save(summary=summary, minor=False)
         else:
-            logger.debug('skip save')
+            self.logger.debug('skip save')
 
     def main(self):
         if not self.cfg['enable']:
@@ -183,7 +183,7 @@ class MarkItntalk:
 
         itnpage = pywikibot.Page(self.site, 'Template:Itn')
         last_time = self.read_last_time()
-        logger.info('read last time: %s', last_time)
+        self.logger.info('read last time: %s', last_time)
 
         while True:
             revisions = itnpage.revisions(reverse=True, content=True, starttime=last_time, total=50)
@@ -196,7 +196,7 @@ class MarkItntalk:
             new_last_time = last_time
             for rev in revisions:
                 if rev.text is None:
-                    logger.warning('rev %s is deleted', rev.revid)
+                    self.logger.warning('rev %s is deleted', rev.revid)
                     continue
                 new_pages = self.parse_wikitext(rev.text)
                 for page in new_pages:
@@ -204,8 +204,8 @@ class MarkItntalk:
                         try:
                             self.mark_talkpage(page, rev.timestamp, rev.revid)
                         except pywikibot.bot_choice.QuitKeyboardInterrupt:
-                            logger.warning('quitting')
-                            logger.info('write last time: %s', last_time)
+                            self.logger.warning('quitting')
+                            self.logger.info('write last time: %s', last_time)
                             self.write_last_time(last_time)
                             return
                         old_pages.add(page)
@@ -214,10 +214,10 @@ class MarkItntalk:
             if new_last_time == last_time:
                 break
             last_time = new_last_time
-            logger.info('write last time: %s', last_time)
+            self.logger.info('write last time: %s', last_time)
             self.write_last_time(last_time)
 
-        logger.info('done')
+        self.logger.info('done')
 
 
 if __name__ == '__main__':
@@ -230,7 +230,6 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     mark_itntalk = MarkItntalk(LAST_TIME_PATH, config_page_name, args)
-    logger = logging.getLogger('mark_itntalk')
-    logger.setLevel(args.loglevel)
-    logger.debug('args: %s', args)
+    mark_itntalk.logger.setLevel(args.loglevel)
+    mark_itntalk.logger.debug('args: %s', args)
     mark_itntalk.main()
