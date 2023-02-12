@@ -172,7 +172,7 @@ class MarkItntalk:
         if save:
             logger.debug('save changes')
             talk_page.text = new_text
-            talk_page.save(summary=summary, minor=False, asynchronous=True)
+            talk_page.save(summary=summary, minor=False)
         else:
             logger.debug('skip save')
 
