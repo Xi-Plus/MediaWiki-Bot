@@ -195,6 +195,9 @@ class MarkItntalk:
 
             new_last_time = last_time
             for rev in revisions:
+                if rev.text is None:
+                    logger.warning('rev %s is deleted', rev.revid)
+                    continue
                 new_pages = self.parse_wikitext(rev.text)
                 for page in new_pages:
                     if page not in old_pages:
