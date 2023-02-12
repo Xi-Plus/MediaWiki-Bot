@@ -94,6 +94,12 @@
   schedule: "13 20 * * *"
   emails: onfailure
 
+- name: mark-itntalk
+  image: tf-python39
+  command: MediaWiki-Bot/pyvenv/bin/python3 MediaWiki-Bot/mark-itntalk/edit.py
+  schedule: "22 */4 * * *"
+  emails: onfailure
+
 - name: mark-rrd
   image: tf-python39
   command: MediaWiki-Bot/pyvenv/bin/python3 MediaWiki-Bot/mark-RRD/edit.py
