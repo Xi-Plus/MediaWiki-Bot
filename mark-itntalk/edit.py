@@ -115,12 +115,14 @@ class MarkItntalk:
                             if abs(exist_date.timestamp() - timestamp.timestamp()) < 86400 * 7:
                                 logger.info('already exists: %s %s', params[key1], params[key2])
                                 return
+                            sort_key = exist_date.isoformat()
                         except Exception:
                             logger.warning('invalid date: %s %s', params[key1], params[key2])
+                            sort_key = 'bad_date'
                         if keyid in params:
-                            all_dates.append((params[key1], params[key2], params[keyid]))
+                            all_dates.append((sort_key, params[key1], params[key2], params[keyid]))
                         else:
-                            all_dates.append((params[key1], params[key2]))
+                            all_dates.append((sort_key, params[key1], params[key2]))
                     else:
                         break
                 # process other params
@@ -129,7 +131,8 @@ class MarkItntalk:
                         other_params[key] = params[key]
 
         # append new params
-        all_dates.append((new_param_year, new_param_date, oldid))
+        all_dates.append((timestamp.isoformat(), new_param_year, new_param_date, oldid))
+        all_dates.sort()
 
         logger.debug('all_dates: %s', all_dates)
         logger.debug('other_params: %s', other_params)
@@ -144,10 +147,10 @@ class MarkItntalk:
         new_template = '{{' + template_name
         # build dates
         for idx, date in enumerate(all_dates, 1):
-            if len(date) == 2:
-                new_template += '|{}|{}'.format(date[0], date[1])
-            elif len(date) == 3:
-                new_template += '|{}|{}|oldid{}={}'.format(date[0], date[1], idx, date[2])
+            if len(date) == 3:
+                new_template += '|{}|{}'.format(date[1], date[2])
+            elif len(date) == 4:
+                new_template += '|{}|{}|oldid{}={}'.format(date[1], date[2], idx, date[3])
         # build other params
         for key, value in other_params.items():
             new_template += '|{}={}'.format(key, value)
