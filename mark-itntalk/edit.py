@@ -87,7 +87,7 @@ class MarkItntalk:
         talk_page = article_page.toggleTalkPage()
         new_param_year = timestamp.strftime('%Y年')
         new_param_date = timestamp.strftime('{}月{}日'.format(timestamp.month, timestamp.day))
-        logger.info('mark %s %s %s %s', talk_page.title(), new_param_year, new_param_date, timestamp.isoformat())
+        logger.info('mark %s %s %s %s %s', talk_page.title(), new_param_year, new_param_date, timestamp.isoformat(), oldid)
 
         new_text = talk_page.text
 
@@ -104,14 +104,19 @@ class MarkItntalk:
                     key2 = str(key + 1)
                     keyid = 'oldid{}'.format(key // 2 + 1)
                     if key1 in params and key2 in params:
+                        params[key1] = params[key1].strip()
+                        params[key2] = params[key2].strip()
+                        # Handle wrong format
+                        if re.search(r'^\d+$', params[key1]):
+                            params[key1] = params[key1] + '年'
+
                         try:
-                            exist_date = pywikibot.Timestamp.strptime(params[key1].strip() + params[key2].strip(), '%Y年%m月%d日')
+                            exist_date = pywikibot.Timestamp.strptime(params[key1] + params[key2], '%Y年%m月%d日')
                             if abs(exist_date.timestamp() - timestamp.timestamp()) < 86400 * 7:
                                 logger.info('already exists: %s %s', params[key1], params[key2])
                                 return
-                        except Exception as e:
+                        except Exception:
                             logger.warning('invalid date: %s %s', params[key1], params[key2])
-                            logger.warning(e)
                         if keyid in params:
                             all_dates.append((params[key1], params[key2], params[keyid]))
                         else:
