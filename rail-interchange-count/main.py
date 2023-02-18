@@ -5,10 +5,14 @@ from config import host, password, user  # pylint: disable=E0611,W0614
 
 
 query = '''
-SELECT cl_sortkey_prefix, COUNT(*) AS cnt
-FROM categorylinks
-WHERE cl_to = '使用Rail-interchange的頁面'
-GROUP BY cl_sortkey_prefix
+SELECT pl_title, COUNT(*) AS cnt
+FROM (
+  SELECT LOWER(CONVERT(pl_title USING UTF8)) AS pl_title
+  FROM pagelinks
+  WHERE pl_namespace = 10 AND pl_title LIKE 'Rail-interchange/count/%'
+) t
+GROUP BY pl_title
+ORDER BY cnt DESC
 '''
 
 conn = pymysql.connect(
@@ -25,7 +29,7 @@ with conn.cursor() as cursor:
 maincnt = defaultdict(int)
 subcnt = defaultdict(lambda: defaultdict(int))
 for row in result:
-    params = row[0].decode().split('-')
+    params = row[0].replace('rail-interchange/count/', '').split('-')
     cnt = row[1]
     maincnt[params[0]] += cnt
     subcnt[params[0]]['-'.join(params[1:])] += cnt
