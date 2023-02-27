@@ -44,11 +44,14 @@ conn = pymysql.connect(
 
 
 def check_required_protection(page, count):
-    if page.namespace().id == 8:
+    if page.namespace().id == 8:  # MediaWiki
         return 0
-    if page.namespace().id == 2:
-        if page.title().endswith('.js') or page.title().endswith('.css') or page.title().endswith('.json'):
+    if page.namespace().id == 2:  # User
+        if re.search(r'\.(js|css|json)$', page.title()):
             return 0
+    if page.site.dbName() == 'zhwiki':
+        if re.search(r'^(Template|Module):CGroup/', page.title()) and not re.search(r'^Module:CGroup/core$', page.title()) and count >= cfg['template_temp']:
+            return 2
     if count >= cfg['template_full'] and cfg['template_full'] > 0:
         return 4
     if count >= cfg['template_temp'] and cfg['template_temp'] > 0:
