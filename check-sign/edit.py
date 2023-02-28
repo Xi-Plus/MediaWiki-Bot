@@ -287,7 +287,8 @@ def warn_user(site, username, sign, sign_error, warn_templates, cfg, args):
             print('\treported')
             return
 
-        report_text = '\n=== {{{{vandal|{}}}}} ===\n'.format(('1=' if '=' in username else '') + username)
+        report_text = '\n=== {} ===\n'.format(username)
+        report_text += "* '''{{{{vandal|{}}}}}'''\n".format(('1=' if '=' in username else '') + username)
         report_text += '* 其[{} 簽名]違反簽名指引：{}，已警告3次仍未改善。{}\n'.format(
             get_sign_url(username),
             format_sign_errors_report(sign_error),
