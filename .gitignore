@@ -9,7 +9,7 @@ tmp/
 *.txt
 config.php
 config.py
-pywikibot.lwp
+pywikibot*.lwp
 throttle.ctrl
 user-config.py
 user-password.py
