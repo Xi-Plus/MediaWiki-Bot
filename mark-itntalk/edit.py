@@ -7,6 +7,7 @@ import os
 import re
 import sys
 import uuid
+import dateutil.parser
 
 os.environ['PYWIKIBOT_DIR'] = os.path.dirname(os.path.realpath(__file__))
 import pywikibot
@@ -45,9 +46,11 @@ class MarkItntalk:
             self.logger.warning('last_time.txt not found, use now time instead')
             last_time = pywikibot.Timestamp.now().isoformat()
             self.write_last_time(last_time)
+        self.logger.info('read last time: %s', last_time)
         return last_time
 
     def write_last_time(self, last_time):
+        self.logger.info('write last time: %s', last_time)
         with open(self.last_time_path, 'w') as f:
             f.write(last_time)
 
@@ -78,7 +81,7 @@ class MarkItntalk:
         article_page = pywikibot.Page(self.site, article_title)
         if not article_page.exists():
             self.logger.warning('%s is not exists', article_title)
-            return
+            return False
 
         if article_page.isRedirectPage():
             self.logger.warning('%s is redirect to %s', article_title, article_page.getRedirectTarget().title())
@@ -114,7 +117,7 @@ class MarkItntalk:
                             exist_date = pywikibot.Timestamp.strptime(params[key1] + params[key2], '%Y年%m月%d日')
                             if abs(exist_date.timestamp() - timestamp.timestamp()) < 86400 * 7:
                                 self.logger.info('already exists: %s %s', params[key1], params[key2])
-                                return
+                                return False
                             sort_key = exist_date.isoformat()
                         except Exception:
                             self.logger.warning('invalid date: %s %s', params[key1], params[key2])
@@ -159,7 +162,7 @@ class MarkItntalk:
         new_text, sub_cnt = re.subn(self.PLACEHOLDER, new_template, new_text, count=1)
         if sub_cnt == 0:
             self.logger.error('failed to replace template')
-            return
+            return False
 
         if self.args.confirm or self.args.loglevel <= logging.DEBUG:
             pywikibot.showDiff(talk_page.text, new_text)
@@ -169,22 +172,23 @@ class MarkItntalk:
         save = True
         if self.args.confirm:
             save = pywikibot.input_yn('Save changes with oldid {} ?'.format(oldid), 'Y')
-        if save:
-            self.logger.debug('save changes')
-            talk_page.text = new_text
-            talk_page.save(summary=summary, minor=False)
-        else:
+        if not save:
             self.logger.debug('skip save')
+            return False
+        self.logger.debug('save changes')
+        talk_page.text = new_text
+        talk_page.save(summary=summary, minor=False)
+        return True
 
     def main(self):
         if not self.cfg['enable']:
             logging.warning('disabled')
-            exit()
+            return
 
         itnpage = pywikibot.Page(self.site, 'Template:Itn')
         last_time = self.read_last_time()
-        self.logger.info('read last time: %s', last_time)
 
+        cnt = 0
         while True:
             revisions = itnpage.revisions(reverse=True, content=True, starttime=last_time, total=50)
             try:
@@ -198,15 +202,26 @@ class MarkItntalk:
                 if rev.text is None:
                     self.logger.warning('rev %s is deleted', rev.revid)
                     continue
+                if args.end and rev.timestamp > args.end:
+                    self.logger.warning('reach end time (next rev %s)', rev.revid)
+                    self.write_last_time(new_last_time)
+                    self.logger.info('edited %s pages', cnt)
+                    return
                 new_pages = self.parse_wikitext(rev.text)
                 for page in new_pages:
                     if page not in old_pages:
                         try:
-                            self.mark_talkpage(page, rev.timestamp, rev.revid)
-                        except pywikibot.bot_choice.QuitKeyboardInterrupt:
-                            self.logger.warning('quitting')
-                            self.logger.info('write last time: %s', last_time)
+                            is_edited = self.mark_talkpage(page, rev.timestamp, rev.revid)
+                            cnt += is_edited
+                            if args.limit and cnt >= args.limit:
+                                raise StopIteration
+                        except (pywikibot.bot_choice.QuitKeyboardInterrupt, StopIteration) as e:
+                            if isinstance(e, pywikibot.bot_choice.QuitKeyboardInterrupt):
+                                self.logger.warning('quitting')
+                            if isinstance(e, StopIteration):
+                                self.logger.warning('reach limit')
                             self.write_last_time(last_time)
+                            self.logger.info('edited %s pages', cnt)
                             return
                         old_pages.add(page)
                 new_last_time = rev.timestamp.isoformat()
@@ -214,10 +229,9 @@ class MarkItntalk:
             if new_last_time == last_time:
                 break
             last_time = new_last_time
-            self.logger.info('write last time: %s', last_time)
             self.write_last_time(last_time)
 
-        self.logger.info('done')
+        self.logger.info('edited %s pages', cnt)
 
 
 if __name__ == '__main__':
@@ -227,6 +241,8 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('-c', '--confirm', action='store_true')
     parser.add_argument('-d', '--debug', action='store_const', dest='loglevel', const=logging.DEBUG, default=logging.INFO)
+    parser.add_argument('--end', type=dateutil.parser.parse)
+    parser.add_argument('--limit', type=int)
     args = parser.parse_args()
 
     mark_itntalk = MarkItntalk(LAST_TIME_PATH, config_page_name, args)
