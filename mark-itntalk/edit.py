@@ -79,8 +79,12 @@ class MarkItntalk:
     def mark_talkpage(self, article_title, timestamp: pywikibot.Timestamp, oldid):
         article_title = self.convert_title(article_title)
         article_page = pywikibot.Page(self.site, article_title)
-        if not article_page.exists():
-            self.logger.warning('%s is not exists', article_title)
+        try:
+            if not article_page.exists():
+                self.logger.warning('%s is not exists', article_title)
+                return False
+        except pywikibot.exceptions.InvalidTitleError as e:
+            self.logger.error('invalid title: %s', e)
             return False
 
         if article_page.isRedirectPage():
