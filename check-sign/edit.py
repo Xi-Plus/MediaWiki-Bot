@@ -53,7 +53,7 @@ OUTPUT_ROW = '''|-
 '''
 
 
-def check_sign_problems(sign):
+def check_sign_problems(sign, username):
     sign_errors = set()
     hide_sign = False
 
@@ -81,6 +81,8 @@ def check_sign_problems(sign):
         sign_errors.add((3, 'ambiguous', ','.join(sorted(names_in_sign))))
     elif len(names_in_sign) == 0:
         sign_errors.add((3, 'nolink', None))
+    elif username not in names_in_sign:
+        sign_errors.add((3, 'otherlink', ','.join(sorted(names_in_sign))))
 
     return sign_errors, hide_sign
 
@@ -107,6 +109,8 @@ def format_sign_errors_output(sign_errors):
             result.append('混淆-<nowiki>{}</nowiki>'.format(error_param))
         elif error_type == 'nolink':
             result.append('無連結')
+        elif error_type == 'otherlink':
+            result.append('偽造-<nowiki>{}</nowiki>'.format(error_param))
         elif error_type == 'obsolete-tag':
             result.append('過時的標籤-{}'.format(error_param))
         else:
@@ -130,6 +134,8 @@ def get_warn_templates(sign_errors):
             templates.add('Uw-sign-toolong')
         elif error_type == 'nolink':
             templates.add('Uw-signlink')
+        elif error_type == 'otherlink':
+            templates.add('Uw-sign-link-mismatch')
     return templates
 
 
@@ -151,6 +157,8 @@ def format_sign_errors_report(sign_errors):
             result.append('[[Wikipedia:签名#外部链接与模板|包含外部連結]]')
         elif error_type == 'sign-too-long':
             result.append('[[Wikipedia:签名#长度|簽名過長（{}位元組）]]'.format(error_param))
+        elif error_type == 'otherlink':
+            result.append('[[Wikipedia:签名#假冒签名|假冒簽名（簽名連結到其他人的用戶頁、討論頁或貢獻頁）]]')
 
     return '、'.join(result)
 
@@ -377,7 +385,7 @@ def main(args):
     sign_errors = {}
     hide_sign = {}
     for username, sign in parsed_signs.items():
-        sign_errors[username], hide_sign[username] = check_sign_problems(sign)
+        sign_errors[username], hide_sign[username] = check_sign_problems(sign, username)
 
     lint_sign_errors = lint_signs(parsed_signs)
     for username, errors in lint_sign_errors.items():
