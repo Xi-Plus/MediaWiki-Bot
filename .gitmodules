@@ -286,3 +286,6 @@
 [submodule "zhwikt-move-pages"]
 	path = zhwikt-move-pages
 	url = https://github.com/xiplus-mediawiki-programs/zhwikt-move-pages.git
+[submodule "toolforge-jobs"]
+	path = toolforge-jobs
+	url = https://github.com/xiplus-mediawiki-programs/toolforge-jobs.git
