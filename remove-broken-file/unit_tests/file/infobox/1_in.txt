@@ -1,5 +1,0 @@
-{{Infobox
-|name=xxx
-|image=example image.png
-|caption=xxx
-}}

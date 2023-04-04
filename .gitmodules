@@ -1,3 +1,288 @@
 [submodule "function/cURL-HTTP-function"]
 	path = function/cURL-HTTP-function
 	url = https://github.com/Xi-Plus/cURL-HTTP-function.git
+[submodule "Abusefilter-list"]
+	path = Abusefilter-list
+	url = https://github.com/xiplus-mediawiki-programs/abusefilter-list.git
+[submodule "admin-activity-report"]
+	path = admin-activity-report
+	url = https://github.com/xiplus-mediawiki-programs/admin-activity-report.git
+[submodule "adminstats"]
+	path = adminstats
+	url = https://github.com/xiplus-mediawiki-programs/adminstats.git
+[submodule "adminstats-2"]
+	path = adminstats-2
+	url = https://github.com/xiplus-mediawiki-programs/adminstats-2.git
+[submodule "afd-nac"]
+	path = afd-nac
+	url = https://github.com/xiplus-mediawiki-programs/afd-nac.git
+[submodule "afd-section-title"]
+	path = afd-section-title
+	url = https://github.com/xiplus-mediawiki-programs/afd-section-title.git
+[submodule "AFD-stats"]
+	path = AFD-stats
+	url = https://github.com/xiplus-mediawiki-programs/afd-stats.git
+[submodule "bad-image-list"]
+	path = bad-image-list
+	url = https://github.com/xiplus-mediawiki-programs/bad-image-list.git
+[submodule "bad-image-list-cleaner"]
+	path = bad-image-list-cleaner
+	url = https://github.com/xiplus-mediawiki-programs/bad-image-list-cleaner.git
+[submodule "blocked-ip"]
+	path = blocked-ip
+	url = https://github.com/xiplus-mediawiki-programs/blocked-ip.git
+[submodule "bot-list"]
+	path = bot-list
+	url = https://github.com/xiplus-mediawiki-programs/bot-list.git
+[submodule "check-sign"]
+	path = check-sign
+	url = https://github.com/xiplus-mediawiki-programs/check-sign.git
+[submodule "config"]
+	path = config
+	url = https://github.com/xiplus-mediawiki-programs/config.git
+[submodule "copy-interface"]
+	path = copy-interface
+	url = https://github.com/xiplus-mediawiki-programs/copy-interface.git
+[submodule "copy-paste"]
+	path = copy-paste
+	url = https://github.com/xiplus-mediawiki-programs/copy-paste.git
+[submodule "copyright-violation-add-section"]
+	path = copyright-violation-add-section
+	url = https://github.com/xiplus-mediawiki-programs/copyright-violation-add-section.git
+[submodule "create"]
+	path = create
+	url = https://github.com/xiplus-mediawiki-programs/create.git
+[submodule "create-redirect"]
+	path = create-redirect
+	url = https://github.com/xiplus-mediawiki-programs/create-redirect.git
+[submodule "cv-remove-deleted"]
+	path = cv-remove-deleted
+	url = https://github.com/xiplus-mediawiki-programs/cv-remove-deleted.git
+[submodule "cv-remove-deleted-php"]
+	path = cv-remove-deleted-php
+	url = https://github.com/xiplus-mediawiki-programs/cv-remove-deleted-php.git
+[submodule "cv-report"]
+	path = cv-report
+	url = https://github.com/xiplus-mediawiki-programs/cv-report.git
+[submodule "DRV-tag-talk"]
+	path = DRV-tag-talk
+	url = https://github.com/xiplus-mediawiki-programs/drv-tag-talk.git
+[submodule "ep-status"]
+	path = ep-status
+	url = https://github.com/xiplus-mediawiki-programs/ep-status.git
+[submodule "ewip-archive"]
+	path = ewip-archive
+	url = https://github.com/xiplus-mediawiki-programs/ewip-archive.git
+[submodule "expand-templates-in-title"]
+	path = expand-templates-in-title
+	url = https://github.com/xiplus-mediawiki-programs/expand-templates-in-title.git
+[submodule "fix-broken-double-redirect"]
+	path = fix-broken-double-redirect
+	url = https://github.com/xiplus-mediawiki-programs/fix-broken-double-redirect.git
+[submodule "fix-flow-content"]
+	path = fix-flow-content
+	url = https://github.com/xiplus-mediawiki-programs/fix-flow-content.git
+[submodule "fix-lbot-redirect"]
+	path = fix-lbot-redirect
+	url = https://github.com/xiplus-mediawiki-programs/fix-lbot-redirect.git
+[submodule "fix-non-free-files-backlink"]
+	path = fix-non-free-files-backlink
+	url = https://github.com/xiplus-mediawiki-programs/fix-non-free-files-backlink.git
+[submodule "get-redirects"]
+	path = get-redirects
+	url = https://github.com/xiplus-mediawiki-programs/get-redirects.git
+[submodule "import"]
+	path = import
+	url = https://github.com/xiplus-mediawiki-programs/import.git
+[submodule "import-UnwatchedPages"]
+	path = import-UnwatchedPages
+	url = https://github.com/xiplus-mediawiki-programs/import-unwatchedpages.git
+[submodule "lastedit"]
+	path = lastedit
+	url = https://github.com/xiplus-mediawiki-programs/lastedit.git
+[submodule "link-to-wikidata"]
+	path = link-to-wikidata
+	url = https://github.com/xiplus-mediawiki-programs/link-to-wikidata.git
+[submodule "list-hrt"]
+	path = list-hrt
+	url = https://github.com/xiplus-mediawiki-programs/list-hrt.git
+[submodule "log-rights-confirmed"]
+	path = log-rights-confirmed
+	url = https://github.com/xiplus-mediawiki-programs/log-rights-confirmed.git
+[submodule "mark-DYKC"]
+	path = mark-DYKC
+	url = https://github.com/xiplus-mediawiki-programs/mark-dykc.git
+[submodule "mark-itntalk"]
+	path = mark-itntalk
+	url = https://github.com/xiplus-mediawiki-programs/mark-itntalk.git
+[submodule "mark-RRD"]
+	path = mark-RRD
+	url = https://github.com/xiplus-mediawiki-programs/mark-rrd.git
+[submodule "mass-protect"]
+	path = mass-protect
+	url = https://github.com/xiplus-mediawiki-programs/mass-protect.git
+[submodule "move-faga"]
+	path = move-faga
+	url = https://github.com/xiplus-mediawiki-programs/move-faga.git
+[submodule "move-g15-file"]
+	path = move-g15-file
+	url = https://github.com/xiplus-mediawiki-programs/move-g15-file.git
+[submodule "move-pages"]
+	path = move-pages
+	url = https://github.com/xiplus-mediawiki-programs/move-pages.git
+[submodule "move-renamed-users-flow"]
+	path = move-renamed-users-flow
+	url = https://github.com/xiplus-mediawiki-programs/move-renamed-users-flow.git
+[submodule "Newusermessage-signatures"]
+	path = Newusermessage-signatures
+	url = https://github.com/xiplus-mediawiki-programs/newusermessage-signatures.git
+[submodule "newusermessage-signatures-archive"]
+	path = newusermessage-signatures-archive
+	url = https://github.com/xiplus-mediawiki-programs/newusermessage-signatures-archive.git
+[submodule "not-report-afd-pages"]
+	path = not-report-afd-pages
+	url = https://github.com/xiplus-mediawiki-programs/not-report-afd-pages.git
+[submodule "not-report-np-pages"]
+	path = not-report-np-pages
+	url = https://github.com/xiplus-mediawiki-programs/not-report-np-pages.git
+[submodule "np-maintenance"]
+	path = np-maintenance
+	url = https://github.com/xiplus-mediawiki-programs/np-maintenance.git
+[submodule "o1-deleter"]
+	path = o1-deleter
+	url = https://github.com/xiplus-mediawiki-programs/o1-deleter.git
+[submodule "policy-newsletter"]
+	path = policy-newsletter
+	url = https://github.com/xiplus-mediawiki-programs/policy-newsletter.git
+[submodule "proposed-mergers-archive"]
+	path = proposed-mergers-archive
+	url = https://github.com/xiplus-mediawiki-programs/proposed-mergers-archive.git
+[submodule "protect-hrt"]
+	path = protect-hrt
+	url = https://github.com/xiplus-mediawiki-programs/protect-hrt.git
+[submodule "protect-locked-userpage"]
+	path = protect-locked-userpage
+	url = https://github.com/xiplus-mediawiki-programs/protect-locked-userpage.git
+[submodule "protect-templates-in-mediawiki-ns"]
+	path = protect-templates-in-mediawiki-ns
+	url = https://github.com/xiplus-mediawiki-programs/protect-templates-in-mediawiki-ns.git
+[submodule "protected-pages-status"]
+	path = protected-pages-status
+	url = https://github.com/xiplus-mediawiki-programs/protected-pages-status.git
+[submodule "purge"]
+	path = purge
+	url = https://github.com/xiplus-mediawiki-programs/purge.git
+[submodule "purge-at"]
+	path = purge-at
+	url = https://github.com/xiplus-mediawiki-programs/purge-at.git
+[submodule "push"]
+	path = push
+	url = https://github.com/xiplus-mediawiki-programs/push.git
+[submodule "push-php"]
+	path = push-php
+	url = https://github.com/xiplus-mediawiki-programs/push-php.git
+[submodule "rail-interchange-count"]
+	path = rail-interchange-count
+	url = https://github.com/xiplus-mediawiki-programs/rail-interchange-count.git
+[submodule "reblock-ip-range"]
+	path = reblock-ip-range
+	url = https://github.com/xiplus-mediawiki-programs/reblock-ip-range.git
+[submodule "remove-broken-file"]
+	path = remove-broken-file
+	url = https://github.com/xiplus-mediawiki-programs/remove-broken-file.git
+[submodule "remove-draft-copyvio"]
+	path = remove-draft-copyvio
+	url = https://github.com/xiplus-mediawiki-programs/remove-draft-copyvio.git
+[submodule "remove-inuse"]
+	path = remove-inuse
+	url = https://github.com/xiplus-mediawiki-programs/remove-inuse.git
+[submodule "replace-sitename"]
+	path = replace-sitename
+	url = https://github.com/xiplus-mediawiki-programs/replace-sitename.git
+[submodule "revoke-archive"]
+	path = revoke-archive
+	url = https://github.com/xiplus-mediawiki-programs/revoke-archive.git
+[submodule "rfa-stats"]
+	path = rfa-stats
+	url = https://github.com/xiplus-mediawiki-programs/rfa-stats.git
+[submodule "rfa-stats-php"]
+	path = rfa-stats-php
+	url = https://github.com/xiplus-mediawiki-programs/rfa-stats-php.git
+[submodule "rfa-voters"]
+	path = rfa-voters
+	url = https://github.com/xiplus-mediawiki-programs/rfa-voters.git
+[submodule "rfcuham-archive"]
+	path = rfcuham-archive
+	url = https://github.com/xiplus-mediawiki-programs/rfcuham-archive.git
+[submodule "sign-check"]
+	path = sign-check
+	url = https://github.com/xiplus-mediawiki-programs/sign-check.git
+[submodule "spam-blacklist-archive"]
+	path = spam-blacklist-archive
+	url = https://github.com/xiplus-mediawiki-programs/spam-blacklist-archive.git
+[submodule "spam-whitelist-archive"]
+	path = spam-whitelist-archive
+	url = https://github.com/xiplus-mediawiki-programs/spam-whitelist-archive.git
+[submodule "speedy-deletion"]
+	path = speedy-deletion
+	url = https://github.com/xiplus-mediawiki-programs/speedy-deletion.git
+[submodule "subst"]
+	path = subst
+	url = https://github.com/xiplus-mediawiki-programs/subst.git
+[submodule "sync-black-white-list"]
+	path = sync-black-white-list
+	url = https://github.com/xiplus-mediawiki-programs/sync-black-white-list.git
+[submodule "template-use"]
+	path = template-use
+	url = https://github.com/xiplus-mediawiki-programs/template-use.git
+[submodule "transclusion-count"]
+	path = transclusion-count
+	url = https://github.com/xiplus-mediawiki-programs/transclusion-count.git
+[submodule "translatewiki-translate-variants"]
+	path = translatewiki-translate-variants
+	url = https://github.com/xiplus-mediawiki-programs/translatewiki-translate-variants.git
+[submodule "twinkle-status"]
+	path = twinkle-status
+	url = https://github.com/xiplus-mediawiki-programs/twinkle-status.git
+[submodule "UAA-archive"]
+	path = UAA-archive
+	url = https://github.com/xiplus-mediawiki-programs/uaa-archive.git
+[submodule "UAA-processor"]
+	path = UAA-processor
+	url = https://github.com/xiplus-mediawiki-programs/uaa-processor.git
+[submodule "unconnected-pages-report"]
+	path = unconnected-pages-report
+	url = https://github.com/xiplus-mediawiki-programs/unconnected-pages-report.git
+[submodule "UnusedTemplates"]
+	path = UnusedTemplates
+	url = https://github.com/xiplus-mediawiki-programs/unusedtemplates.git
+[submodule "update-high-use"]
+	path = update-high-use
+	url = https://github.com/xiplus-mediawiki-programs/update-high-use.git
+[submodule "user-name-check"]
+	path = user-name-check
+	url = https://github.com/xiplus-mediawiki-programs/user-name-check.git
+[submodule "user-right-check"]
+	path = user-right-check
+	url = https://github.com/xiplus-mediawiki-programs/user-right-check.git
+[submodule "user-right-process"]
+	path = user-right-process
+	url = https://github.com/xiplus-mediawiki-programs/user-right-process.git
+[submodule "usertalk-archive"]
+	path = usertalk-archive
+	url = https://github.com/xiplus-mediawiki-programs/usertalk-archive.git
+[submodule "zhwikt-afd-archive"]
+	path = zhwikt-afd-archive
+	url = https://github.com/xiplus-mediawiki-programs/zhwikt-afd-archive.git
+[submodule "zhwikt-afd-section-title"]
+	path = zhwikt-afd-section-title
+	url = https://github.com/xiplus-mediawiki-programs/zhwikt-afd-section-title.git
+[submodule "zhwikt-broken-file-links"]
+	path = zhwikt-broken-file-links
+	url = https://github.com/xiplus-mediawiki-programs/zhwikt-broken-file-links.git
+[submodule "zhwikt-merge-history"]
+	path = zhwikt-merge-history
+	url = https://github.com/xiplus-mediawiki-programs/zhwikt-merge-history.git
+[submodule "zhwikt-move-pages"]
+	path = zhwikt-move-pages
+	url = https://github.com/xiplus-mediawiki-programs/zhwikt-move-pages.git
